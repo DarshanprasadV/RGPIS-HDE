@@ -1,0 +1,13 @@
+{
+  "weights": "/Users/darshan/Documents/Codex/2026-11-17/referenced-chatgpt-conversation-this-is-an-3/outputs/RGPIS-HDE/outputs/yolo_training/deeppcb_yolo26n_seed2026_02/weights/best.pt",
+  "dataset_config": "/Users/darshan/Documents/Codex/2026-11-17/referenced-chatgpt-conversation-this-is-an-3/outputs/RGPIS-HDE/datasets/deeppcb_audit/yolo/data.yaml",
+  "split": "design-held-out test",
+  "device": "mps",
+  "metrics": {
+    "metrics/precision(B)": 0.949766804786235,
+    "metrics/recall(B)": 0.9522584248656486,
+    "metrics/mAP50(B)": 0.9754214408481058,
+    "metrics/mAP50-95(B)": 0.7364957597423613,
+    "fitness": 0.7364957597423613
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Train DeepPCB YOLO26n baseline",
+      "type": "process",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "args": ["tools/train_yolo.py"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": false
+      }
+    },
+    {
+      "label": "Train YOLO26n on 6,166 real PCB images",
+      "type": "process",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "args": [
+        "tools/train_yolo.py",
+        "--data", "datasets/mixed_real_6167/yolo/data.yaml",
+        "--name", "deeppcb_dspcbsd_real6166_seed2026",
+        "--epochs", "30",
+        "--batch", "16",
+        "--patience", "10"
+      ],
+      "options": {"cwd": "${workspaceFolder}"},
+      "problemMatcher": [],
+      "presentation": {"reveal": "always", "panel": "dedicated", "clear": false}
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "settings_version": "0.0.8",
+  "datasets_dir": "/Users/darshan/Documents/Codex/2026-11-17/referenced-chatgpt-conversation-this-is-an-3/outputs/RGPIS-HDE/datasets",
+  "weights_dir": "weights",
+  "runs_dir": "runs",
+  "uuid": "c5a6c422b095a8047ff14232c52403dc5452394595da597a2196960ae0f6b9b7",
+  "sync": true,
+  "api_key": "",
+  "openai_api_key": "",
+  "clearml": true,
+  "comet": true,
+  "dvc": true,
+  "mlflow": true,
+  "raytune": true,
+  "tensorboard": false,
+  "wandb": false,
+  "vscode_msg": true,
+  "openvino_msg": true
+}

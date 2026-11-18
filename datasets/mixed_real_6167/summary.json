@@ -1,0 +1,52 @@
+{
+  "dataset": "DeepPCB + DsPCBSD+ real-image six-class mix",
+  "training_images": 6166,
+  "validation_images": 227,
+  "test_images": 225,
+  "dspcbsd_images_added": 5118,
+  "dspcbsd_boxes_added": 9449,
+  "exclusions": {
+    "contains_unsupported_classes": 5140,
+    "invalid_bbox": 1
+  },
+  "class_names": [
+    "open",
+    "short",
+    "mousebite",
+    "spur",
+    "copper",
+    "pin-hole"
+  ],
+  "dspcbsd_to_yolo_class_mapping": {
+    "OP": 0,
+    "SH": 1,
+    "MB": 2,
+    "SP": 3,
+    "SC": 4
+  },
+  "per_source_class_counts": {
+    "DeepPCB": {
+      "mousebite": 1965,
+      "short": 1506,
+      "spur": 1625,
+      "copper": 1474,
+      "pin-hole": 1501,
+      "open": 1942
+    },
+    "DsPCBSD+": {
+      "open": 1451,
+      "mousebite": 1983,
+      "short": 762,
+      "spur": 3926,
+      "copper": 1327
+    }
+  },
+  "evaluation_note": "DeepPCB's existing design-held-out val/test splits are preserved. All compatible DsPCBSD+ images from its supplied train and val partitions are used for training; no DsPCBSD+ image is treated as an evaluation image.",
+  "license_note": "DsPCBSD+ is CC BY 4.0 and requires attribution. DeepPCB README restricts dataset use to research; the mixed dataset therefore remains research-only unless rights are separately granted.",
+  "excluded_classes": [
+    "HB (hole breakout)",
+    "CS (conductor scratch)",
+    "CFO (conductor foreign object)",
+    "BMFO (base material foreign object)"
+  ]
+}

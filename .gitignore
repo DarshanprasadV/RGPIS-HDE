@@ -1,0 +1,28 @@
+# Environments and Caches
+.venv/
+.uv-cache/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+*.swp
+
+# Inference runs
+runs/
+
+# Training debug batches & checkpoint duplicates (keeps best.pt, metrics, and plots)
+outputs/yolo_training/**/train_batch*.jpg
+outputs/yolo_training/**/val_batch*.jpg
+outputs/yolo_training/**/weights/last.pt
+
+# Base model weights
+yolo26n.pt
+
+# Generated dataset image symlinks and label files (recreated via tools/ scripts)
+datasets/**/yolo/images/
+datasets/**/yolo/labels/
+

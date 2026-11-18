@@ -1,0 +1,11 @@
+path: /Users/darshan/Documents/Codex/2026-11-17/referenced-chatgpt-conversation-this-is-an-3/outputs/RGPIS-HDE/datasets/mixed_real_6167/yolo
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: open
+  1: short
+  2: mousebite
+  3: spur
+  4: copper
+  5: pin-hole

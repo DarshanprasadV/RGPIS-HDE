@@ -1,0 +1,173 @@
+{
+  "source_root": "/Users/darshan/Downloads/DeepPCB-master/PCBData",
+  "seed": 2026,
+  "split_method": "whole board design directories; exhaustive 2-val/2-test design selection minimizing image-count deviation from 70/15/15; seed breaks ties",
+  "test_images": 1500,
+  "template_images": 1501,
+  "annotation_files": 1500,
+  "board_designs": 11,
+  "dimensions": {
+    "640x640": 1500
+  },
+  "issues": 1,
+  "defect_instances": 10013,
+  "class_map_yolo_zero_based": {
+    "0": "open",
+    "1": "short",
+    "2": "mousebite",
+    "3": "spur",
+    "4": "copper",
+    "5": "pin-hole"
+  },
+  "class_counts": {
+    "open": 1942,
+    "short": 1506,
+    "mousebite": 1965,
+    "spur": 1625,
+    "copper": 1474,
+    "pin-hole": 1501
+  },
+  "design_split": {
+    "group00041": "train",
+    "group12000": "train",
+    "group12100": "test",
+    "group12300": "train",
+    "group13000": "train",
+    "group20085": "train",
+    "group44000": "train",
+    "group50600": "test",
+    "group77000": "val",
+    "group90100": "train",
+    "group92000": "val"
+  },
+  "design_defect_counts": {
+    "group00041": {
+      "open": 304,
+      "short": 212,
+      "mousebite": 372,
+      "spur": 273,
+      "copper": 245,
+      "pin-hole": 236
+    },
+    "group12000": {
+      "open": 23,
+      "short": 19,
+      "mousebite": 11,
+      "spur": 15,
+      "copper": 14,
+      "pin-hole": 11
+    },
+    "group12100": {
+      "open": 178,
+      "short": 131,
+      "mousebite": 177,
+      "spur": 145,
+      "copper": 143,
+      "pin-hole": 145
+    },
+    "group12300": {
+      "open": 137,
+      "short": 80,
+      "mousebite": 112,
+      "spur": 86,
+      "copper": 89,
+      "pin-hole": 96
+    },
+    "group13000": {
+      "open": 211,
+      "short": 141,
+      "mousebite": 328,
+      "spur": 262,
+      "copper": 255,
+      "pin-hole": 254
+    },
+    "group20085": {
+      "open": 508,
+      "short": 474,
+      "mousebite": 460,
+      "spur": 394,
+      "copper": 317,
+      "pin-hole": 275
+    },
+    "group44000": {
+      "open": 160,
+      "short": 120,
+      "mousebite": 147,
+      "spur": 111,
+      "copper": 99,
+      "pin-hole": 110
+    },
+    "group50600": {
+      "open": 85,
+      "short": 70,
+      "mousebite": 72,
+      "spur": 72,
+      "copper": 57,
+      "pin-hole": 76
+    },
+    "group77000": {
+      "open": 89,
+      "short": 76,
+      "mousebite": 107,
+      "spur": 83,
+      "copper": 90,
+      "pin-hole": 113
+    },
+    "group90100": {
+      "open": 109,
+      "short": 88,
+      "mousebite": 76,
+      "spur": 67,
+      "copper": 70,
+      "pin-hole": 73
+    },
+    "group92000": {
+      "open": 138,
+      "short": 95,
+      "mousebite": 103,
+      "spur": 117,
+      "copper": 95,
+      "pin-hole": 112
+    }
+  },
+  "split_image_counts": {
+    "train": 1048,
+    "test": 225,
+    "val": 227
+  },
+  "split_defect_counts": {
+    "train": {
+      "open": 1452,
+      "short": 1134,
+      "mousebite": 1506,
+      "spur": 1208,
+      "copper": 1089,
+      "pin-hole": 1055
+    },
+    "val": {
+      "open": 227,
+      "short": 171,
+      "mousebite": 210,
+      "spur": 200,
+      "copper": 185,
+      "pin-hole": 225
+    },
+    "test": {
+      "open": 263,
+      "short": 201,
+      "mousebite": 249,
+      "spur": 217,
+      "copper": 200,
+      "pin-hole": 221
+    }
+  },
+  "notes": [
+    "Image paths in manifest.csv point to the source dataset; YOLO image entries are symlinks, so source images are not copied or modified.",
+    "YOLO label files are converted to zero-based class IDs and normalized xywh coordinates.",
+    "Design-wise split is deterministic for a fixed seed and balances image counts; class balance should be reviewed before training.",
+    "The supplied trainval/test lists are image-level, not design-isolated: seven board design directories occur in both lists.",
+    "The supplied trainval.txt/test.txt lists cover 1,500 pairs when their unsuffixed image names are resolved to the *_test.jpg files in this checkout.",
+    "One extra *_temp.jpg exists without a matching test image.",
+    "DeepPCB README says the dataset is for research use; verify rights before commercial use or redistribution."
+  ]
+}
