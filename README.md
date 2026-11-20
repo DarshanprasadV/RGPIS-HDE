@@ -1,10 +1,72 @@
 # RGPIS-HDE PCB Inspection
 
-This repository contains the OpenCV reference-guided inspection prototype and the next roadmap phase, a DeepPCB dataset audit with YOLO label preparation. The DeepPCB images remain in their original location; the generated YOLO image folders use symlinks to that source.
+This repository contains:
+1. **Trained YOLO PCB Defect Detection Model** (`best.pt`) with **92.8% Precision** and **95.1% Recall** on held-out test designs.
+2. **OpenCV reference-guided inspection prototype** (homography registration, difference mapping, cleanup, and validation).
+3. **Full dataset release** with 5,100+ real PCB defect images and YOLO annotations.
 
-## Current progress
+---
 
-### OpenCV foundation — implemented in the supplied project
+## 🚀 Quick Start: Run Inference
+
+Test defect detection on any sample image using Apple MPS or CPU:
+
+```bash
+# Predict on a sample image
+.venv/bin/yolo predict \
+  model=outputs/yolo_training/deeppcb_dspcbsd_real6166_seed2026_02/weights/best.pt \
+  source=test_images/deep_12100046.jpg \
+  conf=0.25 \
+  save=True \
+  device=mps
+
+# Or predict on all sample images
+.venv/bin/yolo predict \
+  model=outputs/yolo_training/deeppcb_dspcbsd_real6166_seed2026_02/weights/best.pt \
+  source=test_images/ \
+  conf=0.25 \
+  save=True \
+  device=mps
+```
+Results and annotated bounding box images are saved automatically to `runs/detect/predict/`.
+
+---
+
+## 📊 Model Performance (Held-out Test Set)
+
+* **Overall Precision:** **92.82%**
+* **Overall Recall:** **95.08%** (catches ~95 out of 100 defects)
+* **mAP@50:** **96.57%**
+* **mAP@50-95:** **77.75%**
+
+| Defect Class | Precision | Recall | mAP@50 |
+| :--- | :---: | :---: | :---: |
+| **spur** | 100.00% | 97.57% | 99.22% |
+| **pin-hole** | 100.00% | 99.27% | 99.50% |
+| **copper** | 99.50% | 99.17% | 99.38% |
+| **short** | 98.80% | 82.18% | 97.03% |
+| **mousebite** | 98.54% | 98.39% | 99.17% |
+| **open** | 60.09% | 93.92% | 85.15% |
+| **Overall** | **92.82%** | **95.08%** | **96.57%** |
+
+---
+
+## 📦 Full Training Dataset (5,100+ Images)
+
+The complete dataset (images + YOLO format annotations) is published as a release asset:
+* **Direct Download:** [pcb_dataset_6167.zip (v1.0.0)](https://github.com/DarshanprasadV/RGPIS-HDE/releases/download/v1.0.0/pcb_dataset_6167.zip)
+* **Releases Page:** [GitHub Releases v1.0.0](https://github.com/DarshanprasadV/RGPIS-HDE/releases/tag/v1.0.0)
+
+To unpack and setup:
+```bash
+curl -L -o dataset.zip https://github.com/DarshanprasadV/RGPIS-HDE/releases/download/v1.0.0/pcb_dataset_6167.zip
+unzip -q dataset.zip
+```
+
+---
+
+## OpenCV Foundation
+
 
 - Image loading, reference/test comparison, difference maps, and annotation visualization.
 - ORB feature matching and RANSAC homography registration, with saved alignment outputs.
