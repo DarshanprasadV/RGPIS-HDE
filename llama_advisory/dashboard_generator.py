@@ -10,6 +10,7 @@ Renders an enterprise-grade, standalone, interactive HTML dashboard visualizing:
 7. Interactive Engineer Q&A Simulator Console
 """
 
+import base64
 import json
 import os
 from pathlib import Path
@@ -17,6 +18,26 @@ from typing import Any, Dict, List, Optional
 
 PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 OUTPUT_DIR = PROJECT_ROOT / "outputs" / "intelligence"
+
+
+def _embed_image_b64(image_name: str) -> str:
+    """
+    Returns a data-URI string for the annotated YOLO image (falling back to the
+    original test image, then an empty string if neither is found).
+    The image is embedded inline so the HTML is fully self-contained / offline.
+    """
+    stems = [
+        PROJECT_ROOT / "outputs" / "predictions" / f"{Path(image_name).stem}_annotated.jpg",
+        PROJECT_ROOT / "test_images" / image_name,
+    ]
+    for path in stems:
+        if path.exists():
+            with open(path, "rb") as fh:
+                b64 = base64.b64encode(fh.read()).decode("ascii")
+            suffix = path.suffix.lstrip(".")
+            mime = "jpeg" if suffix in ("jpg", "jpeg") else suffix
+            return f"data:image/{mime};base64,{b64}"
+    return ""
 
 
 def generate_dashboard_html(
@@ -60,6 +81,17 @@ def generate_dashboard_html(
     # Serialized JSON data for interactive client-side Q&A
     client_report_json = json.dumps(report).replace("</script>", "<\\/script>")
     client_intel_json = json.dumps(intelligence).replace("</script>", "<\\/script>")
+
+    # Embed annotated PCB image as base64 (fully offline / self-contained HTML)
+    pcb_image_b64 = _embed_image_b64(image_name)
+    pcb_bg_style = (
+        f"background-image: url('{pcb_image_b64}'); "
+        "background-size: contain; "
+        "background-repeat: no-repeat; "
+        "background-position: center;"
+        if pcb_image_b64
+        else ""
+    )
 
     html_content = f"""<!DOCTYPE html>
 <html lang="en">
@@ -167,25 +199,35 @@ def generate_dashboard_html(
       justify-content: center;
     }}
     .pcb-canvas {{ width: 100%; height: 100%; position: relative; }}
+    .pcb-bg-image {{
+      position: absolute;
+      inset: 0;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 0.82;
+    }}
     .pcb-grid-lines {{
       position: absolute; width: 100%; height: 100%;
       background-size: 32px 32px;
-      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      pointer-events: none;
     }}
     .bbox-marker {{
       position: absolute;
       border: 2px solid;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.18);
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
       align-items: flex-start;
       padding: 2px;
+      z-index: 5;
     }}
     .bbox-marker:hover {{
-      background: rgba(255, 255, 255, 0.25);
-      box-shadow: 0 0 15px currentColor;
+      background: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 0 18px currentColor, inset 0 0 8px rgba(255,255,255,0.08);
       z-index: 10;
     }}
     .bbox-tag {{
@@ -406,6 +448,7 @@ def generate_dashboard_html(
         <span class="tag" style="margin-left:auto;">Interactive Coordinates</span>
       </div>
       <div class="pcb-canvas-wrap">
+        <div class="pcb-bg-image" style="{pcb_bg_style}"></div>
         <div class="pcb-grid-lines"></div>
         <div class="pcb-canvas" id="pcbCanvas">
           <!-- Bounding Boxes rendered here dynamically -->
@@ -418,7 +461,7 @@ def generate_dashboard_html(
         <span><span style="color:var(--p4); font-weight:800;">■</span> P4 Low</span>
       </div>
       <p style="font-size:11.5px; color:#64748b; margin-top:8px; text-align:center;">
-        Hover marker for telemetry; click to jump directly to detailed defect intelligence.
+        YOLO-annotated PCB image with priority-coded bounding boxes — hover to inspect, click to jump to defect card.
       </p>
     </div>
 
