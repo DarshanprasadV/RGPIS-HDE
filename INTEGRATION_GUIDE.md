@@ -1,8 +1,11 @@
-# PCB Defect Detection Integration Guide (CERI & CEIA)
+# RGPIS-HDE Integration Guide
 
-This guide documents the trained YOLO defect detection module for seamless integration into:
-1. **CERI** — Geometric Defect Severity and Risk (trace-width loss, clearance intrusion).
-2. **CEIA** — Counterfactual Electrical Impact Analysis (defect-affected copper regions, current-density simulation).
+This guide documents all integration layers of the RGPIS-HDE pipeline:
+1. **YOLO Defect Detection** — trained YOLO26n model, Python API, JSON/CSV output schema.
+2. **CERI** — Geometric Defect Severity and Risk (trace-width loss, clearance intrusion).
+3. **CEIA** — Counterfactual Electrical Impact Analysis (geometry-based proxies, current-density model).
+4. **Unified Scoring** — combined P1–P4 priority ranking and board ACCEPT/REJECT decision.
+5. **Engineering Intelligence Layer** — ExecuTorch Llama 3.2 1B producing structured reports, per-defect explanations, corrective actions, process hypotheses, and Q&A.
 
 ---
 
@@ -164,3 +167,144 @@ Outputs are written to:
 * `outputs/predictions/detections.json`
 * `outputs/predictions/detections.csv`
 * `outputs/predictions/*_annotated.jpg`
+
+---
+
+## 5. Engineering Intelligence Layer
+
+The Engineering Intelligence Layer consumes the **unified defect report** (`unified_report.json`) produced by CERI + CEIA + unified scoring and generates five structured intelligence outputs via **Llama 3.2 1B running 100% offline on ExecuTorch (XNNPACK CPU)**.
+
+### Architecture
+
+```
+outputs/predictions/detections.json
+        │
+        ▼
+llama_advisory/unified_pipeline_bridge.py   ← computes CERI, CEIA, Unified Scores
+        │
+        ▼
+llama_advisory/sample_unified_report.json   ← intermediate structured board report
+        │
+        ▼
+llama_advisory/engineering_intelligence.py  ← orchestrates all 5 Llama inference passes
+        │
+        ├── llama_advisory/prompt_templates.py    ← prompt builders + schema validators
+        ├── llama_advisory/executorch_engine.py   ← ExecuTorch XNNPACK inference wrapper
+        └── llama_advisory/engineer_qa.py         ← contextual Q&A (fast-path + Llama)
+        │
+        ▼
+llama_advisory/dashboard_generator.py      ← HTML dashboard + Markdown traveler + JSON
+        │
+        ▼
+outputs/intelligence/<board>_intelligence_dashboard.html
+outputs/intelligence/<board>_engineering_report.md
+outputs/intelligence/<board>_engineering_intelligence.json
+```
+
+### Output JSON Schema (`engineering_intelligence.json`)
+
+```json
+{
+  "board_id": "deep_12100046",
+  "analysis_timestamp": "2026-11-22T...",
+  "board_decision": "REJECT",
+  "board_condition_summary": "...",
+  "unified_score": 99.1,
+  "total_defects": 6,
+  "board_intelligence": {
+    "major_risks": ["Open circuit: complete trace discontinuity at defect #1", "..."],
+    "immediate_priorities": ["Defect #1 (OPEN): P1 Critical — rework or scrap", "..."],
+    "decision_rationale": "...",
+    "engine": "ExecuTorch-XNNPACK"
+  },
+  "defect_intelligence": [
+    {
+      "defect_id": 1,
+      "class_name": "open",
+      "priority": "P1",
+      "unified_score": 99.1,
+      "what_detected": "...",
+      "why_significant": "...",
+      "engineering_consequences": "...",
+      "region_inspection": "...",
+      "corrective_action": "...",
+      "verification": "...",
+      "ceri_risk_score": 0.95,
+      "ceia_risk_score": 0.98,
+      "engine": "ExecuTorch-XNNPACK"
+    }
+  ],
+  "corrective_actions": {
+    "summary": "...",
+    "prioritized_actions": ["1. ...", "2. ..."],
+    "ipc_references": ["IPC-A-600 Class 3", "..."]
+  },
+  "process_intelligence": {
+    "pattern_summary": "...",
+    "fab_stage_hypotheses": ["Etching process variation hypothesis: ...", "..."],
+    "investigation_areas": ["..."],
+    "confidence_note": "These are geometric-pattern hypotheses, not confirmed root causes."
+  },
+  "qa_session": null
+}
+```
+
+> **Important:** `ceia_risk_score` and all CEIA electrical values are **geometry-based proxies** computed from bounding-box dimensions using counterfactual resistance network formulas. They are **not** physical bench measurements. Always display the `confidence_note` from `process_intelligence` to downstream consumers.
+
+### Downstream Consumer Integration
+
+**AOI / MES Systems** can ingest the JSON directly:
+
+```python
+import json
+
+with open("outputs/intelligence/deep_12100046_engineering_intelligence.json") as f:
+    ei = json.load(f)
+
+decision   = ei["board_decision"]          # "ACCEPT" or "REJECT"
+score      = ei["unified_score"]           # 0–100
+priorities = ei["board_intelligence"]["immediate_priorities"]
+actions    = ei["corrective_actions"]["prioritized_actions"]
+
+for defect in ei["defect_intelligence"]:
+    if defect["priority"] == "P1":
+        print(f"[CRITICAL] {defect['class_name']} #{defect['defect_id']}: {defect['corrective_action']}")
+```
+
+**Q&A Interface** can be driven programmatically:
+
+```python
+from llama_advisory.engineer_qa import EngineerQA
+
+qa = EngineerQA(unified_report_path="llama_advisory/sample_unified_report.json")
+answer = qa.answer("Which defect is most critical?")
+print(answer["answer"])
+```
+
+### CLI Reference
+
+```bash
+# Engineering Intelligence runner
+llama_advisory/venv/bin/python -m llama_advisory.run_engineering_intelligence [OPTIONS]
+
+Options:
+  --image IMAGE     Source image name in test_images/ (default: deep_12100046.jpg)
+  --file FILE       Load unified report directly from JSON file
+  --fast            Deterministic mode — no model load, <0.1s
+  --all-llama       Run Llama inference for every defect (not just first)
+  --query QUERY     Answer a single question (Llama-powered)
+  --qa              Launch interactive Q&A session
+```
+
+### Python Module Map
+
+| Module | Role |
+| :--- | :--- |
+| `unified_pipeline_bridge.py` | Bridges YOLO detections → CERI/CEIA/Unified Score computation |
+| `engineering_intelligence.py` | Orchestrates all 5 Llama inference passes |
+| `engineer_qa.py` | Contextual Q&A (5 fast-path deterministic + open-ended Llama) |
+| `dashboard_generator.py` | Generates HTML dashboard, Markdown traveler, JSON export |
+| `run_engineering_intelligence.py` | Unified CLI entry point |
+| `prompt_templates.py` | Prompt builders and schema validators for all 5 intelligence layers |
+| `executorch_engine.py` | ExecuTorch XNNPACK inference wrapper (model load, generate, timing) |
+| `demo.py` | Interactive demo menu — options [6] Engineering Intelligence, [7] Q&A |

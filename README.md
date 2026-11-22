@@ -1,15 +1,127 @@
 # RGPIS-HDE PCB Inspection
 
+> **Bharat AI-SoC Challenge 2026/27** — Fully offline, edge-deployable PCB defect inspection and engineering intelligence system.
+
 This repository contains:
-1. **Trained YOLO PCB Defect Detection Model** (`best.pt`) with **92.8% Precision** and **95.1% Recall** on held-out test designs.
-2. **OpenCV reference-guided inspection prototype** (homography registration, difference mapping, cleanup, and validation).
-3. **Full dataset release** with 5,100+ real PCB defect images and YOLO annotations.
+1. **Trained YOLO26n PCB Defect Detection Model** (`best.pt`) — **92.8% Precision**, **95.1% Recall**, mAP@50 96.57%.
+2. **CERI + CEIA Analysis** — Geometric risk scoring and counterfactual electrical impact (geometry-based proxies, IPC-A-600 grounded).
+3. **Engineering Intelligence Layer** — Llama 3.2 1B via ExecuTorch (100% offline, XNNPACK CPU) generating board-level reports, per-defect explanations, corrective action plans, process hypotheses, and an interactive Q&A interface.
+4. **OpenCV reference-guided inspection prototype** — homography registration, difference mapping, cleanup, and validation.
+5. **Full dataset release** with 5,100+ real PCB defect images and YOLO annotations.
 
 ---
 
-## 🚀 Quick Start: Run Inference
+## 🏗️ Full System Pipeline
 
-Test defect detection on any sample image using Apple MPS or CPU:
+```
+Test Image
+    │
+    ▼
+OpenCV (alignment & preprocessing)
+    │
+    ▼
+YOLO26n Defect Detection  ──► detections.json
+    │
+    ▼
+CERI (Geometric Risk)  +  CEIA (Electrical Proxy)
+    │
+    ▼
+Unified Defect Scoring & Board Decision  ──► unified_report.json
+    │
+    ▼
+Engineering Intelligence Layer (Llama 3.2 1B · ExecuTorch · XNNPACK)
+    │
+    ├── Board-Level Intelligence Report
+    ├── Per-Defect Engineering Analysis (all 6 defect classes)
+    ├── Prioritized Corrective Action Plan
+    ├── Manufacturing Process Hypotheses
+    └── Engineer Q&A Interface
+         │
+         ▼
+    HTML Dashboard  +  Markdown Traveler  +  JSON Export
+```
+
+---
+
+---
+
+## 🤖 Engineering Intelligence Layer (NEW)
+
+The Llama 3.2 1B model runs entirely **offline on-device** via ExecuTorch (XNNPACK CPU backend, SpinQuant INT4 quantization, ~1.03 GB model).
+
+### Setup
+
+```bash
+# One-time: create the llama_advisory venv (Python 3.11 required)
+python3.11 -m venv llama_advisory/venv
+llama_advisory/venv/bin/pip install executorch==1.6.0 torch==2.15.0
+
+# Download model (place at):
+# llama_advisory/models/llama_3_2_1b_xnnpack_spinquant.pte
+```
+
+### Run Engineering Intelligence
+
+```bash
+# Fast mode — deterministic analysis in <1 second (no model load needed)
+llama_advisory/venv/bin/python -m llama_advisory.run_engineering_intelligence --fast
+
+# Full Llama mode — all 5 intelligence layers via ExecuTorch (~50-60s, ~1.1 GB RAM)
+llama_advisory/venv/bin/python -m llama_advisory.run_engineering_intelligence
+
+# Different image
+llama_advisory/venv/bin/python -m llama_advisory.run_engineering_intelligence \
+    --image deep_50600035.jpg
+
+# Ask a specific question (Llama-powered Q&A)
+llama_advisory/venv/bin/python -m llama_advisory.run_engineering_intelligence \
+    --query "Why was this PCB rejected?"
+
+# Interactive Q&A session
+llama_advisory/venv/bin/python -m llama_advisory.run_engineering_intelligence --qa
+
+# Full demo menu (includes options [6] Engineering Intelligence + [7] Q&A)
+llama_advisory/venv/bin/python llama_advisory/demo.py
+```
+
+### Output Artifacts
+
+All outputs are written to `outputs/intelligence/`:
+
+| File | Description |
+| :--- | :--- |
+| `<board>_intelligence_dashboard.html` | Interactive HTML dashboard with defect map, risk charts, and per-defect cards |
+| `<board>_engineering_report.md` | Markdown traveler report (board decision, priorities, corrective actions) |
+| `<board>_engineering_intelligence.json` | Structured JSON export (all 5 intelligence layers, schema-validated) |
+
+### Intelligence Layers
+
+| Layer | Description | Engine |
+| :--- | :--- | :--- |
+| **Board-Level Report** | ACCEPT/REJECT decision, top risks, highest-priority defects | ExecuTorch Llama |
+| **Per-Defect Analysis** | What/why/consequences/corrective action/verification for every defect | ExecuTorch Llama |
+| **Corrective Action Plan** | IPC-A-600 grounded, ranked by unified score | Deterministic + Llama |
+| **Process Hypotheses** | Cross-defect manufacturing pattern analysis (framed as hypotheses only) | ExecuTorch Llama |
+| **Engineer Q&A** | Contextual answers grounded in actual CERI/CEIA/score data | Fast-path + Llama |
+
+> **Note:** CEIA electrical values are geometry-based proxies computed from bounding-box dimensions — they are **not** physical bench measurements. All process patterns are explicitly labelled as *hypotheses*, not confirmed root causes.
+
+### Verified Performance (Apple M-series CPU via XNNPACK)
+
+| Metric | Value |
+| :--- | :--- |
+| Model load time | ~4.4 s |
+| Board-level generation | ~17 s (307 prompt tokens) |
+| Per-defect generation | ~24 s (475 prompt tokens) |
+| Process intelligence | ~8 s (227 prompt tokens) |
+| Peak RAM | ~1.1 GB |
+| Fast-mode (deterministic) | <0.1 s |
+
+---
+
+## 🚀 Quick Start: YOLO Defect Detection
+
+Test YOLO defect detection on any sample image using Apple MPS or CPU:
 
 ```bash
 # Predict on a sample image

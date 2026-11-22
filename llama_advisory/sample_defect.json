@@ -1,0 +1,5 @@
+{
+  "defect_type": "short_circuit",
+  "confidence": 0.91,
+  "location": [310, 180, 345, 225]
+}

@@ -1,0 +1,202 @@
+[
+  {
+    "name": "1. Open Circuit",
+    "input": {
+      "defect_type": "open_circuit",
+      "confidence": 0.94,
+      "location": [
+        120,
+        240,
+        165,
+        275
+      ]
+    },
+    "raw_generated": "A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.\",\n  \"possible_consequences\": [\n    \"Loss of signal continuity across the net, causing functional circuit failure.\",\n    \"Disconnected power rail or floating high-impedance logic input.\",\n    \"Intermittent operation under thermal expansion and mechanical vibration.\"\n  ],\n  \"recommended_verification_procedure\": \"Perform a two-point electrical continuity check using a calibrated digital multimeter (DMM) or flying probe tester across the affected net endpoints.\",\n  \"operator_guidance\": \"Inspect the break location under 10x-20x optical magnification with oblique lighting to confirm whether the copper is etched away or cracked.\",\n  \"uncertainty_warning\": \"The presence of an open circuit may indicate a manufacturing defect.\",\n  \"disclaimer\": \"Mark the bounding coordinates on the traveler sheet. Do not apply operational power to this board. Route the board to the rework station for micro-jumper review or flag for scrap according to IPC Class 2/3 acceptance criteria.\"\n}",
+    "explanation": "A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.",
+    "operator_guidance": "Inspect the break location under 10x-20x optical magnification with oblique lighting to confirm whether the copper is etched away or cracked.",
+    "uncertainty_warning": "The presence of an open circuit may indicate a manufacturing defect.",
+    "disclaimer": "AI advisory guidance only. Operator verification required. System does not independently approve or reject PCBs.",
+    "format_pass": true,
+    "format_issues": [],
+    "latency_s": 8.701,
+    "ram_mb": 1239.4,
+    "tokens_per_second": 25.17,
+    "generated_tokens": 219,
+    "engine": "ExecuTorch Llama-3.2-1B-Instruct"
+  },
+  {
+    "name": "2. Short Circuit",
+    "input": {
+      "defect_type": "short_circuit",
+      "confidence": 0.91,
+      "location": [
+        310,
+        180,
+        345,
+        225
+      ]
+    },
+    "raw_generated": "An unintended conductive copper bridge, solder splash, or copper filament connecting two electrically distinct conductor traces or pads.\",\n  \"possible_consequences\": \"Direct low-resistance path between distinct signals, ground, or power rails.; Severe overcurrent risk capable of damaging downstream integrated circuits or power supplies upon energization.; Nuisance tripping of power supply protection circuitry.\",\n  \"recommended_verification_procedure\": \"Measure resistance across the affected nets with a digital multimeter to confirm near-zero ohm impedance before applying power.; Visually inspect under high magnification (15x-30x) to determine whether the bridge is surface copper foil, solder debris, or plating defect.; Verify trace clearance against the master PCB Gerber design rules.\",\n  \"operator_guidance\": \"Immediately quarantine the PCB unit. Affix a DO NOT POWER warning label. Evaluate whether the bridge can be safely excised under a stereo microscope without violating dielectric base laminate integrity.\",\n  \"uncertainty_warning\": \"The accuracy of the verification procedure may be affected by the presence of surface copper foil, solder debris, or plating defects.\",\n  \"disclaimer\": \"Never approve or reject PCBs. Output ONLY valid JSON.\"",
+    "explanation": "An unintended conductive copper bridge, solder splash, or copper filament connecting two electrically distinct conductor traces or pads.",
+    "operator_guidance": "Immediately quarantine the PCB unit. Affix a DO NOT POWER warning label. Evaluate whether the bridge can be safely excised under a stereo microscope without violating dielectric base laminate integrity.",
+    "uncertainty_warning": "The accuracy of the verification procedure may be affected by the presence of surface copper foil, solder debris, or plating defects.",
+    "disclaimer": "AI advisory guidance only. Operator verification required. System does not independently approve or reject PCBs.",
+    "format_pass": true,
+    "format_issues": [],
+    "latency_s": 7.09,
+    "ram_mb": 1239.2,
+    "tokens_per_second": 34.27,
+    "generated_tokens": 243,
+    "engine": "ExecuTorch Llama-3.2-1B-Instruct"
+  },
+  {
+    "name": "3. Mouse Bite",
+    "input": {
+      "defect_type": "mouse_bite",
+      "confidence": 0.88,
+      "location": [
+        415,
+        520,
+        435,
+        545
+      ]
+    },
+    "raw_generated": "Mouse Bite\",\n  \"possible_consequences\": \"Localized current crowding and increased trace resistance at the bottleneck; Elevated localized temperature rise (hotspot) under rated current load; Vulnerability to fatigue fracture during thermal cycling or mechanical shock.\",\n  \"recommended_verification_procedure\": \"Measure the remaining conductor width at the narrowest point of the notch using an optical measuring microscope or calibrated reticle; Compare the measured width against IPC-A-600 criteria (conductor width reduction must typically not exceed 20% of nominal design width for Class 2/3); Inspect surrounding base laminate for delamination or copper peel.\",\n  \"operator_guidance\": \"Record the remaining conductor percentage in the inspection log. If remaining width meets DRC specification, mark as acceptable defect condition; otherwise route to engineering lead for current-load review.\",\n  \"uncertainty_warning\": \"Note: The IPC-A-600 criteria for conductor width reduction is typically not exceeded by 20% of nominal design width for Class 2/3. This may indicate a potential design flaw.\",\n  \"disclaimer\": \"Never approve or reject PCBs. Output ONLY valid JSON.\"",
+    "explanation": "Mouse Bite",
+    "operator_guidance": "Record the remaining conductor percentage in the inspection log. If remaining width meets DRC specification, mark as acceptable defect condition; otherwise route to engineering lead for current-load review.",
+    "uncertainty_warning": "Note: The IPC-A-600 criteria for conductor width reduction is typically not exceeded by 20% of nominal design width for Class 2/3. This may indicate a potential design flaw.",
+    "disclaimer": "AI advisory guidance only. Operator verification required. System does not independently approve or reject PCBs.",
+    "format_pass": true,
+    "format_issues": [],
+    "latency_s": 6.873,
+    "ram_mb": 1191.3,
+    "tokens_per_second": 33.32,
+    "generated_tokens": 229,
+    "engine": "ExecuTorch Llama-3.2-1B-Instruct"
+  },
+  {
+    "name": "4. Spur",
+    "input": {
+      "defect_type": "spur",
+      "confidence": 0.86,
+      "location": [
+        205,
+        330,
+        230,
+        360
+      ]
+    },
+    "raw_generated": "An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.\",\n  \"possible_consequences\": [\n    \"Severe reduction of dielectric clearance distance to adjacent conductors.\",\n    \"Risk of electrical arc or dielectric breakdown during high-voltage transient events.\",\n    \"Potential trap for solder bridge formation during wave or reflow soldering.\"\n  ],\n  \"recommended_verification_procedure\": \"Measure the minimum remaining spacing between the spur apex and the nearest adjacent conductor under 20x magnification; Verify whether remaining spacing satisfies IPC-A-600 minimum electrical clearance rules for the operating voltage class; Examine whether the spur is firmly bonded to the base substrate or lifting.\",\n  \"operator_guidance\": \"Document the reduced clearance spacing. If clearance is less than design rule limits, evaluate for micro-trimming under magnification using an approved deburring tool.\",\n  \"uncertainty_warning\": \"The accuracy of the measurement may be affected by the magnification used.\",\n  \"disclaimer\": \"Never approve or reject PCBs.\"\n}",
+    "explanation": "An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.",
+    "operator_guidance": "Document the reduced clearance spacing. If clearance is less than design rule limits, evaluate for micro-trimming under magnification using an approved deburring tool.",
+    "uncertainty_warning": "The accuracy of the measurement may be affected by the magnification used.",
+    "disclaimer": "AI advisory guidance only. Operator verification required. System does not independently approve or reject PCBs.",
+    "format_pass": true,
+    "format_issues": [],
+    "latency_s": 6.297,
+    "ram_mb": 1191.2,
+    "tokens_per_second": 33.98,
+    "generated_tokens": 214,
+    "engine": "ExecuTorch Llama-3.2-1B-Instruct"
+  },
+  {
+    "name": "5. Spurious Copper",
+    "input": {
+      "defect_type": "spurious_copper",
+      "confidence": 0.89,
+      "location": [
+        550,
+        110,
+        580,
+        145
+      ]
+    },
+    "raw_generated": "Violates minimum dielectric creepage and clearance specifications.; If poorly bonded, flake may dislodge during vibration and cause intermittent shorting elsewhere on the assembly.; Can cause high-frequency impedance anomalies or capacitive coupling.\",\n  \"possible_consequences\": \"Violates minimum dielectric creepage and clearance specifications.; If poorly bonded, flake may dislodge during vibration and cause intermittent shorting elsewhere on the assembly.; Can cause high-frequency impedance anomalies or capacitive coupling.\",\n  \"recommended_verification_procedure\": \"Inspect whether the copper flake is firmly bonded to the laminate or loose debris.; Measure the clearance distance between the spurious copper and all adjacent active nets.; Use an ESD-safe cleanroom swab with isopropyl alcohol to verify if it is loose particulate that can be safely wiped off.\",\n  \"operator_guidance\": \"If particulate is loose, clean thoroughly and re-inspect. If bonded copper flake violates electrical clearance rules, submit for MRB (Material Review Board) disposition.\",\n  \"uncertainty_warning\": \"The accuracy of the defect detection may be affected by the presence of loose particulate.\",\n  \"disclaimer\": \"Never approve or reject PCBs. Output ONLY valid JSON.\"",
+    "explanation": "Violates minimum dielectric creepage and clearance specifications.; If poorly bonded, flake may dislodge during vibration and cause intermittent shorting elsewhere on the assembly.; Can cause high-frequency impedance anomalies or capacitive coupling.",
+    "operator_guidance": "If particulate is loose, clean thoroughly and re-inspect. If bonded copper flake violates electrical clearance rules, submit for MRB (Material Review Board) disposition.",
+    "uncertainty_warning": "The accuracy of the defect detection may be affected by the presence of loose particulate.",
+    "disclaimer": "AI advisory guidance only. Operator verification required. System does not independently approve or reject PCBs.",
+    "format_pass": true,
+    "format_issues": [],
+    "latency_s": 7.326,
+    "ram_mb": 1190.0,
+    "tokens_per_second": 33.99,
+    "generated_tokens": 249,
+    "engine": "ExecuTorch Llama-3.2-1B-Instruct"
+  },
+  {
+    "name": "6. Pin Hole",
+    "input": {
+      "defect_type": "pin_hole",
+      "confidence": 0.93,
+      "location": [
+        85,
+        410,
+        105,
+        430
+      ]
+    },
+    "raw_generated": "A small circular or irregular void, pit, or penetration within a conductive trace, pad, or ground plane surface.\",\n  \"possible_consequences\": \"Slight reduction in conductor cross-section and localized resistance increase.; If located on an SMT solder pad or via annular ring, can degrade solder joint wetting and mechanical shear strength.; Trap for chemical residues, flux, or moisture, accelerating localized dendritic corrosion.\",\n  \"verification_procedure\": \"Measure the void diameter relative to the total conductor width or pad area under 20x magnification.; Check compliance against IPC-A-600 void allowances (typically single voids <= 10% conductor width and not extending into conductor edge).; Inspect for corrosive contaminants inside the pit cavity.\",\n  \"operator_guidance\": \"Determine if the pin hole is on a signal trace, power trace, or component pad. If on an SMT pad or exceeding 10% conductor reduction, mark for engineering sign-off; otherwise document and pass.\",\n  \"uncertainty_warning\": \"Warning: The presence of a pin hole may indicate a potential design or manufacturing issue. Further investigation is required to determine the cause.\",\n  \"disclaimer\": \"Never approve or reject PCBs. Output ONLY valid JSON.\"",
+    "explanation": "Fallback Advisory: A small circular or irregular void, pit, or penetration within a conductive trace, pad, or ground plane surface.",
+    "operator_guidance": "AUTOMATED ADVISORY FALLBACK ACTIVATED (Missing or empty required field: recommended_verification_procedure). Determine if the pin hole is on a signal trace, power trace, or component pad. If on an SMT pad or exceeding 10% conductor reduction, mark for engineering sign-off; otherwise document and pass.",
+    "uncertainty_warning": "Advisory generated via deterministic fallback engine due to: Missing or empty required field: recommended_verification_procedure",
+    "disclaimer": "AI advisory guidance only. Defect identification and classification originate from upstream visual inspection. The operator is responsible for final physical verification. This system does not independently approve or reject PCBs.",
+    "format_pass": true,
+    "format_issues": [],
+    "latency_s": 7.67,
+    "ram_mb": 1190.0,
+    "tokens_per_second": 32.99,
+    "generated_tokens": 253,
+    "engine": "deterministic_fallback"
+  },
+  {
+    "name": "7. Unknown Defect",
+    "input": {
+      "defect_type": "delamination_blister",
+      "confidence": 0.72,
+      "location": [
+        600,
+        650,
+        640,
+        690
+      ]
+    },
+    "raw_generated": "Manual visual and physical inspection under optical microscope is mandatory before any action.\",\n  \"possible_consequences\": \"Delamination of the PCB can lead to reduced reliability and increased risk of failure.\",\n  \"recommended_verification_procedure\": \"Manual inspection under optical microscope.\",\n  \"operator_guidance\": \"Verify the PCB under the microscope to confirm the delamination.\",\n  \"uncertainty_warning\": \"High uncertainty in the confidence level.\",\n  \"disclaimer\": \"Never approve or reject PCBs. Always verify before action.\"",
+    "explanation": "Manual visual and physical inspection under optical microscope is mandatory before any action.",
+    "operator_guidance": "Verify the PCB under the microscope to confirm the delamination.",
+    "uncertainty_warning": "High uncertainty in the confidence level.",
+    "disclaimer": "AI advisory guidance only. Operator verification required. System does not independently approve or reject PCBs.",
+    "format_pass": true,
+    "format_issues": [],
+    "latency_s": 3.335,
+    "ram_mb": 1166.1,
+    "tokens_per_second": 30.89,
+    "generated_tokens": 103,
+    "engine": "ExecuTorch Llama-3.2-1B-Instruct"
+  },
+  {
+    "name": "8. Low-Confidence",
+    "input": {
+      "defect_type": "open_circuit",
+      "confidence": 0.38,
+      "location": [
+        150,
+        200,
+        175,
+        225
+      ]
+    },
+    "raw_generated": "Manual visual and physical inspection under optical microscope is mandatory before any action.\",\n  \"possible_consequences\": \"The PCB may be damaged or rendered unusable.\",\n  \"recommended_verification_procedure\": \"Manual visual and physical inspection under optical microscope.\",\n  \"operator_guidance\": \"Verify the PCB under the microscope to confirm the presence of the open circuit.\",\n  \"uncertainty_warning\": \"The confidence level of the defect detection is below 0.50.\",\n  \"disclaimer\": \"Never approve or reject PCBs. Only valid JSON output.\"",
+    "explanation": "Manual visual and physical inspection under optical microscope is mandatory before any action.",
+    "operator_guidance": "Verify the PCB under the microscope to confirm the presence of the open circuit.",
+    "uncertainty_warning": "The confidence level of the defect detection is below 0.50.",
+    "disclaimer": "AI advisory guidance only. Operator verification required. System does not independently approve or reject PCBs.",
+    "format_pass": true,
+    "format_issues": [],
+    "latency_s": 3.432,
+    "ram_mb": 1166.2,
+    "tokens_per_second": 32.05,
+    "generated_tokens": 110,
+    "engine": "ExecuTorch Llama-3.2-1B-Instruct"
+  }
+]

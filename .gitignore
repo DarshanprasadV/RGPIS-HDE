@@ -2,6 +2,14 @@
 .venv/
 .uv-cache/
 __pycache__/
+
+# Llama advisory venv (Python 3.11, executorch — do not commit)
+llama_advisory/venv/
+
+# Large model files (download separately — not for git)
+*.pte
+*.bin
+*.gguf
 *.py[cod]
 *.egg-info/
 .pytest_cache/

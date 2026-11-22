@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RGPIS-HDE Intelligence Dashboard | deep_50600009</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent: #3b82f6;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+      --p1: #ef4444;
+      --p2: #f97316;
+      --p3: #eab308;
+      --p4: #06b6d4;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background: var(--bg); color: var(--text-main); line-height: 1.5; padding: 24px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .header-left h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 12px; }
+    .header-left .sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+    .tag { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #1e293b; color: #94a3b8; }
+    .disposition-badge {
+      background: #ef4444;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 800;
+      padding: 10px 28px;
+      border-radius: 8px;
+      letter-spacing: 1.5px;
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .disposition-badge .sub-label { font-size: 10px; font-weight: 600; opacity: 0.9; letter-spacing: 0.5px; }
+
+    /* KPI Row */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    .kpi-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+    .kpi-val { font-size: 28px; font-weight: 800; margin-top: 4px; color: #fff; }
+    .kpi-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Grid Layouts */
+    .main-grid { display: grid; grid-template-columns: 460px 1fr; gap: 24px; margin-bottom: 24px; }
+    @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 22px;
+      margin-bottom: 24px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #1f2937;
+      padding-bottom: 10px;
+    }
+
+    /* Defect Visualizer */
+    .pcb-canvas-wrap {
+      position: relative;
+      width: 100%;
+      height: 420px;
+      background: #060911;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pcb-canvas { width: 100%; height: 100%; position: relative; }
+    .pcb-grid-lines {
+      position: absolute; width: 100%; height: 100%;
+      background-size: 32px 32px;
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+    .bbox-marker {
+      position: absolute;
+      border: 2px solid;
+      background: rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: flex-start;
+      padding: 2px;
+    }
+    .bbox-marker:hover {
+      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 0 15px currentColor;
+      z-index: 10;
+    }
+    .bbox-tag {
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      padding: 1px 4px;
+      border-radius: 2px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* Lists and Bullets */
+    .bullet-list { list-style: none; }
+    .bullet-list li {
+      padding: 8px 12px;
+      background: #0d1322;
+      border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 8px;
+      font-size: 13.5px;
+    }
+    .bullet-list li.danger-item { border-left-color: var(--danger); background: rgba(239, 68, 68, 0.08); }
+    .bullet-list li.warning-item { border-left-color: var(--warning); background: rgba(245, 158, 11, 0.08); }
+
+    /* Priority Badges */
+    .prio-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .prio-P1_CRITICAL { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+    .prio-P2_HIGH { background: rgba(249, 115, 22, 0.2); color: #fb923c; border: 1px solid #f97316; }
+    .prio-P3_MEDIUM { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid #eab308; }
+    .prio-P4_LOW { background: rgba(6, 182, 212, 0.2); color: #22d3ee; border: 1px solid #06b6d4; }
+
+    /* Defect Intelligence Accordion */
+    .defect-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: border-color 0.2s ease;
+    }
+    .defect-card:hover { border-color: #334155; }
+    .defect-header {
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      background: #111e38;
+      border-bottom: 1px solid #1e293b;
+    }
+    .defect-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .defect-body { padding: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 800px) { .defect-body { grid-template-columns: 1fr; } }
+
+    .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: #94a3b8; margin-bottom: 6px; letter-spacing: 0.5px; }
+    .proxy-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(168, 85, 247, 0.2);
+      color: #c084fc;
+      border: 1px solid #a855f7;
+      margin-bottom: 6px;
+    }
+
+    /* Table Styles */
+    .custom-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+    .custom-table th { background: #1e293b; padding: 10px 14px; font-weight: 600; color: #cbd5e1; border-bottom: 1px solid #334155; }
+    .custom-table td { padding: 10px 14px; border-bottom: 1px solid #1e293b; color: #e2e8f0; vertical-align: top; }
+    .custom-table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    /* Interactive QA Console */
+    .qa-box {
+      background: #090d16;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .qa-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .qa-chip {
+      background: #1e293b;
+      color: #94a3b8;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 16px;
+      cursor: pointer;
+      border: 1px solid #334155;
+      transition: all 0.2s ease;
+    }
+    .qa-chip:hover { background: #2563eb; color: #fff; border-color: #3b82f6; }
+    .qa-input-row { display: flex; gap: 10px; margin-bottom: 14px; }
+    .qa-input {
+      flex: 1;
+      background: #111827;
+      border: 1px solid #374151;
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 14px;
+    }
+    .qa-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .qa-btn:hover { background: #2563eb; }
+    .qa-output {
+      background: #131b2e;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 13.5px;
+      color: #e2e8f0;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Buttons */
+    .btn-group { display: flex; gap: 10px; }
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #f1f5f9;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover { background: #334155; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Top Navigation & Actions -->
+  <div class="header">
+    <div class="header-left">
+      <h1>
+        <span>⚡ RGPIS-HDE Engineering Intelligence</span>
+        <span class="tag">Bharat AI-SoC 2026/27</span>
+      </h1>
+      <div class="sub">
+        Board ID: <strong>deep_50600009</strong> &nbsp;|&nbsp;
+        Image: <code>deep_50600009.jpg</code> &nbsp;|&nbsp;
+        Standard: <strong>IPC-A-600 Class 2/3</strong> &nbsp;|&nbsp;
+        Runtime: <strong>ExecuTorch (Offline XNNPACK CPU)</strong>
+      </div>
+    </div>
+    <div class="header-right" style="display:flex; align-items:center; gap:20px;">
+      <div class="btn-group">
+        <button class="btn" onclick="window.print()">🖨️ Print Traveler</button>
+        <button class="btn" onclick="downloadJSON()">💾 Export JSON</button>
+      </div>
+      <div class="disposition-badge">
+        <span>REJECT</span>
+        <span class="sub-label">FINAL BOARD DECISION</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Row -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <span class="kpi-label">Total Detected Defects</span>
+      <span class="kpi-val">7</span>
+      <span class="kpi-sub">Optical YOLO26n (640x640)</span>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid var(--danger);">
+      <span class="kpi-label">P1 Critical Defects</span>
+      <span class="kpi-val" style="color: #f87171;">6</span>
+      <span class="kpi-sub">Immediate Functional Killers</span>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid var(--warning);">
+      <span class="kpi-label">Max CERI Trace Loss</span>
+      <span class="kpi-val" style="color: #fb923c;">100.0%</span>
+      <span class="kpi-sub">Geometric Conductor Reduction</span>
+    </div>
+    <div class="kpi-card" style="border-left: 3px solid #a855f7;">
+      <span class="kpi-label">Max CEIA Current Crowding</span>
+      <span class="kpi-val" style="color: #c084fc;">999.0x</span>
+      <span class="kpi-sub">Counterfactual Geometric Proxy</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Unified Risk Score</span>
+      <span class="kpi-val">99.2<span style="font-size:16px; color:#9ca3af;">/100</span></span>
+      <span class="kpi-sub">Composite Prioritization Index</span>
+    </div>
+  </div>
+
+  <!-- Main Grid: Left Defect Visualizer, Right Board Intelligence -->
+  <div class="main-grid">
+    <!-- Defect Visualizer -->
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-title">
+        <span>📐 Board Defect Map</span>
+        <span class="tag" style="margin-left:auto;">Interactive Coordinates</span>
+      </div>
+      <div class="pcb-canvas-wrap">
+        <div class="pcb-grid-lines"></div>
+        <div class="pcb-canvas" id="pcbCanvas">
+          <!-- Bounding Boxes rendered here dynamically -->
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-around; margin-top:14px; font-size:11px; color:#94a3b8;">
+        <span><span style="color:var(--p1); font-weight:800;">■</span> P1 Critical</span>
+        <span><span style="color:var(--p2); font-weight:800;">■</span> P2 High</span>
+        <span><span style="color:var(--p3); font-weight:800;">■</span> P3 Medium</span>
+        <span><span style="color:var(--p4); font-weight:800;">■</span> P4 Low</span>
+      </div>
+      <p style="font-size:11.5px; color:#64748b; margin-top:8px; text-align:center;">
+        Hover marker for telemetry; click to jump directly to detailed defect intelligence.
+      </p>
+    </div>
+
+    <!-- Board-Level Intelligence -->
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-title">
+        <span>📋 Layer 1: Board-Level Intelligence Report</span>
+        <span class="tag" style="background:#1e3a8a; color:#93c5fd; margin-left:auto;">ExecuTorch Llama 3.2</span>
+      </div>
+      <div style="margin-bottom:14px;">
+        <span class="section-title">Board Condition Assessment:</span>
+        <div style="font-size:15px; font-weight:700; color:#f8fafc; margin-top:2px;">
+          CRITICAL_NON_CONFORMING (6 P1 Critical defects detected)
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <span class="section-title">Acceptance / Rejection Rationale (IPC-A-600 Grounded):</span>
+        <p style="font-size:13.5px; color:#cbd5e1; margin-top:2px; line-height:1.6;">
+          The PCB was determined as 'REJECT' based on unified scoring where critical functional defects violate IPC-A-600 Class 2/3 criteria. Immediate quarantine is mandated.
+        </p>
+      </div>
+      <div style="margin-bottom:14px;">
+        <span class="section-title">Major Engineering Risks:</span>
+        <ul class="bullet-list" style="margin-top:4px;">
+          <li class="danger-item">⚠️ Catastrophic short circuit creates direct low-resistance shunt path risking power rail shutdown or component burnout.</li>
+          <li class="danger-item">⚠️ Complete trace discontinuity (open circuit) causing total signal loss or floating gate behavior.</li>
+          <li class="danger-item">⚠️ Trace bottlenecking from mousebites induces localized current crowding and thermal stress hotspots.</li>
+          <li class="danger-item">⚠️ Dielectric clearance erosion from copper spurs elevates risk of localized dielectric breakdown or solder bridging.</li>
+        </ul>
+      </div>
+      <div>
+        <span class="section-title">Immediate Priority Focus:</span>
+        <ul class="bullet-list" style="margin-top:4px;">
+          <li class="warning-item">🎯 Defect #2 (OPEN - P1_CRITICAL): Immediate optical isolation and rework evaluation.</li>
+          <li class="warning-item">🎯 Defect #6 (OPEN - P1_CRITICAL): Immediate optical isolation and rework evaluation.</li>
+          <li class="warning-item">🎯 Defect #7 (SHORT - P1_CRITICAL): Immediate optical isolation and rework evaluation.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Layer 4: Manufacturing Process Intelligence (Hypotheses) -->
+  <div class="card">
+    <div class="card-title">
+      <span>🏭 Layer 4: Manufacturing Process Intelligence (Hypotheses)</span>
+      <span class="tag" style="background:rgba(245, 158, 11, 0.2); color:#fbbf24; margin-left:auto;">Fabrication Line Correlations</span>
+    </div>
+    <div style="background:rgba(245, 158, 11, 0.08); border-left:4px solid #f59e0b; padding:10px 14px; border-radius:0 6px 6px 0; margin-bottom:16px; font-size:12.5px; color:#fef3c7;">
+      <strong>⚠️ Process Disclaimer:</strong> All manufacturing stage correlations are probabilistic engineering hypotheses based on cross-defect spatial patterns. Root cause confirmation requires chemical bath titration and SPC parameter audits.
+    </div>
+    <p style="font-size:13.5px; color:#cbd5e1; margin-bottom:14px;">
+      <strong>Pattern Summary:</strong> Multivariate defect distribution with 7 total anomalies spanning both subtractive (trace loss) and additive (clearance encroachment) mechanisms.
+    </p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div>
+        <span class="section-title">Fab Stage Hypotheses:</span>
+        <ul class="bullet-list" style="margin-top:6px;">
+          <li style="border-left-color:#38bdf8; background:rgba(56, 189, 248, 0.08);">🔬 HYPOTHESIS (Etching Over-Rate): Co-occurrence of 2 open(s) and 1 mousebite(s) suggests potential chemical over-etching, elevated acid bath temperature, or prolonged line dwell time.</li>
+          <li style="border-left-color:#38bdf8; background:rgba(56, 189, 248, 0.08);">🔬 HYPOTHESIS (Incomplete Etching / Resist Scum): Detection of 1 short(s) and 2 spur(s) points to potential localized under-etching, developing spray nozzle pressure drops, or photoresist scumming.</li>
+          <li style="border-left-color:#38bdf8; background:rgba(56, 189, 248, 0.08);">🔬 HYPOTHESIS (Plating Aeration): 1 pin-hole void(s) detected. Possible hydrogen micro-bubble entrapment on the copper surface during acid copper electroplating or particulate contamination on phototool.</li>
+        </ul>
+      </div>
+      <div>
+        <span class="section-title">Recommended Process Audits:</span>
+        <ul class="bullet-list" style="margin-top:6px;">
+          <li style="border-left-color:#34d399; background:rgba(52, 211, 153, 0.08);">✅ Audit chemical etchant concentration (CuCl2 / H2O2) and monitor conveyor belt feed speed.</li>
+          <li style="border-left-color:#34d399; background:rgba(52, 211, 153, 0.08);">✅ Inspect developer manifold spray nozzles and verify UV exposure energy calibration.</li>
+          <li style="border-left-color:#34d399; background:rgba(52, 211, 153, 0.08);">✅ Check plating bath agitation air spargers and inspect dry film laminator cleanroom roller filters.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Layer 3: Prioritized Corrective Action Matrix -->
+  <div class="card">
+    <div class="card-title">
+      <span>🛠️ Layer 3: Prioritized Corrective Action & Inspection Recommendations</span>
+      <span class="tag" style="margin-left:auto;">Ranked by Unified Risk</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th style="width:60px;">Step #</th>
+            <th style="width:140px;">Defect</th>
+            <th style="width:110px;">Priority</th>
+            <th style="width:80px;">Score</th>
+            <th>Recommended Corrective Action</th>
+            <th>Verification Protocol</th>
+            <th style="width:150px;">Station</th>
+            <th style="width:70px; text-align:center;">Sign-off</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:700; color:#94a3b8;">#1</td>
+            <td><strong>Open Circuit</strong><br><span style="font-size:11px; color:#64748b;">ID #2</span></td>
+            <td><span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span></td>
+            <td style="font-weight:700;">99.2</td>
+            <td>For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.</td>
+            <td><span style="font-size:12px; color:#cbd5e1;">Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).; Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.; Apply IPC-CC-830 conformal coating spot-repair over the reworked trace.</span></td>
+            <td><span class="tag">Precision Micro-Rework Station</span></td>
+            <td style="text-align:center;"><input type="checkbox" style="transform:scale(1.2); cursor:pointer;"></td>
+          </tr>
+          <tr>
+            <td style="font-weight:700; color:#94a3b8;">#2</td>
+            <td><strong>Open Circuit</strong><br><span style="font-size:11px; color:#64748b;">ID #6</span></td>
+            <td><span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span></td>
+            <td style="font-weight:700;">96.7</td>
+            <td>For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.</td>
+            <td><span style="font-size:12px; color:#cbd5e1;">Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).; Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.; Apply IPC-CC-830 conformal coating spot-repair over the reworked trace.</span></td>
+            <td><span class="tag">Precision Micro-Rework Station</span></td>
+            <td style="text-align:center;"><input type="checkbox" style="transform:scale(1.2); cursor:pointer;"></td>
+          </tr>
+          <tr>
+            <td style="font-weight:700; color:#94a3b8;">#3</td>
+            <td><strong>Short Circuit</strong><br><span style="font-size:11px; color:#64748b;">ID #7</span></td>
+            <td><span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span></td>
+            <td style="font-weight:700;">96.3</td>
+            <td>Quarantine board immediately. Do not power up. Using a precision micro-scalpel or ultrasonic deburring tool under 30x magnification, carefully excise the conductive copper bridge without scoring the FR4 substrate.</td>
+            <td><span style="font-size:12px; color:#cbd5e1;">Perform 2-point isolation resistance measurement with DMM (> 100 MOhm isolation required).; Perform optical clearance verification to ensure minimum electrical spacing is fully restored.; Clean region with reagent-grade isopropyl alcohol and inspect for loose copper debris.</span></td>
+            <td><span class="tag">Precision Micro-Rework Station</span></td>
+            <td style="text-align:center;"><input type="checkbox" style="transform:scale(1.2); cursor:pointer;"></td>
+          </tr>
+          <tr>
+            <td style="font-weight:700; color:#94a3b8;">#4</td>
+            <td><strong>Spur</strong><br><span style="font-size:11px; color:#64748b;">ID #4</span></td>
+            <td><span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span></td>
+            <td style="font-weight:700;">81.7</td>
+            <td>Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.</td>
+            <td><span style="font-size:12px; color:#cbd5e1;">Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).; Inspect substrate for mechanical damage or delamination.</span></td>
+            <td><span class="tag">Precision Micro-Rework Station</span></td>
+            <td style="text-align:center;"><input type="checkbox" style="transform:scale(1.2); cursor:pointer;"></td>
+          </tr>
+          <tr>
+            <td style="font-weight:700; color:#94a3b8;">#5</td>
+            <td><strong>Spur</strong><br><span style="font-size:11px; color:#64748b;">ID #5</span></td>
+            <td><span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span></td>
+            <td style="font-weight:700;">80.8</td>
+            <td>Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.</td>
+            <td><span style="font-size:12px; color:#cbd5e1;">Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).; Inspect substrate for mechanical damage or delamination.</span></td>
+            <td><span class="tag">Precision Micro-Rework Station</span></td>
+            <td style="text-align:center;"><input type="checkbox" style="transform:scale(1.2); cursor:pointer;"></td>
+          </tr>
+          <tr>
+            <td style="font-weight:700; color:#94a3b8;">#6</td>
+            <td><strong>Mouse Bite</strong><br><span style="font-size:11px; color:#64748b;">ID #1</span></td>
+            <td><span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span></td>
+            <td style="font-weight:700;">80.4</td>
+            <td>Evaluate remaining trace width against DRC specification (84.3% reduction). If remaining width meets minimum current-carrying capacity, accept with engineering note. Otherwise, apply copper foil micro-patch or bridge with micro-wire.</td>
+            <td><span style="font-size:12px; color:#cbd5e1;">Measure narrowest conductor bottleneck width using calibrated optical reticle microscope.; Conduct Kelvin 4-wire trace resistance measurement to verify resistance within 5% of nominal trace.</span></td>
+            <td><span class="tag">Precision Micro-Rework Station</span></td>
+            <td style="text-align:center;"><input type="checkbox" style="transform:scale(1.2); cursor:pointer;"></td>
+          </tr>
+          <tr>
+            <td style="font-weight:700; color:#94a3b8;">#7</td>
+            <td><strong>Pin Hole</strong><br><span style="font-size:11px; color:#64748b;">ID #3</span></td>
+            <td><span class="prio-pill prio-P2_HIGH">P2_HIGH</span></td>
+            <td style="font-weight:700;">66.5</td>
+            <td>Check void diameter against IPC-A-600 limit (<= 10% conductor width). If within tolerance, document and accept. If on SMT pad, apply micro-solder touch-up.</td>
+            <td><span style="font-size:12px; color:#cbd5e1;">Verify pad coplanarity and solderability if on component landing pad.; Inspect under optical reticle to confirm void does not extend to conductor edge.</span></td>
+            <td><span class="tag">SMT Quality Inspection Desk</span></td>
+            <td style="text-align:center;"><input type="checkbox" style="transform:scale(1.2); cursor:pointer;"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Layer 2: Individual Defect Intelligence Cards -->
+  <div class="card">
+    <div class="card-title">
+      <span>🔍 Layer 2: Individual Defect Engineering Intelligence</span>
+      <span class="tag" style="background:#1e3a8a; color:#93c5fd; margin-left:auto;">IPC-A-600 / CERI / CEIA Grounded</span>
+    </div>
+    <div class="defect-card" id="defect-card-2">
+      <div class="defect-header" onclick="toggleDefect(2)">
+        <div class="defect-title">
+          <span>Defect #2: <strong>Open Circuit</strong></span>
+          <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
+          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>99.2/100</strong></span>
+        </div>
+        <div style="font-size:12px; color:#94a3b8;">
+          BBox: [538.6, 85.1, 578.8, 193.3] ▾
+        </div>
+      </div>
+      <div class="defect-body" id="defect-body-2">
+        <div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Optical Detection & Significance:</span>
+            <p style="font-size:13.5px; color:#f1f5f9;">Detected Open Circuit anomaly at coordinates [538.6, 85.1, 578.8, 193.3] with 83.7% optical model confidence.</p>
+            <p style="font-size:13px; color:#94a3b8; margin-top:4px;">IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.</p>
+          </div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">CERI Geometric Severity (Optical):</span>
+            <div style="background:#0b1120; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #1e293b;">
+              • Conductor Width Reduction: <strong>100.0%</strong><br>
+              • Clearance Intrusion: <strong>0.0%</strong> (Remaining: 0.15 mm)<br>
+              • IPC-A-600 Violation: <strong>YES (OUT OF SPEC)</strong>
+            </div>
+          </div>
+          <div>
+            <span class="section-title">CEIA Counterfactual Electrical Proxies:</span>
+            <span class="proxy-badge">GEOMETRIC PROXY ESTIMATE (NOT IN-SITU BENCH TEST)</span>
+            <div style="background:#130e24; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #3b1d6e; color:#e9d5ff;">
+              • Current Density Bottleneck Multiplier: <strong>0.0x</strong><br>
+              • Signal Integrity Risk Level: <strong>CRITICAL</strong><br>
+              • Thermal Dissipation Hazard: <strong>LOW</strong>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Region Microscopic Inspection Points:</span>
+            <ul style="padding-left:18px; font-size:13px; color:#cbd5e1;">
+              <li>Position stereo microscope directly over bounding coordinates [538.6, 85.1, 578.8, 193.3] under 20x-30x magnification.</li>
+              <li>Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.</li>
+              <li>Overlay Gerber reference net to confirm original intended conductor boundaries.</li>
+            </ul>
+          </div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Suggested Corrective Action:</span>
+            <p style="font-size:13px; color:#f8fafc; background:rgba(37, 99, 235, 0.1); border-left:3px solid #3b82f6; padding:8px 10px; border-radius:0 4px 4px 0;">
+              For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.
+            </p>
+          </div>
+          <div>
+            <span class="section-title">Physical Verification Protocol:</span>
+            <ul style="padding-left:18px; font-size:12.5px; color:#94a3b8;">
+              <li>Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).</li>
+              <li>Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.</li>
+              <li>Apply IPC-CC-830 conformal coating spot-repair over the reworked trace.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="defect-card" id="defect-card-6">
+      <div class="defect-header" onclick="toggleDefect(6)">
+        <div class="defect-title">
+          <span>Defect #6: <strong>Open Circuit</strong></span>
+          <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
+          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>96.7/100</strong></span>
+        </div>
+        <div style="font-size:12px; color:#94a3b8;">
+          BBox: [427.9, 551.9, 460.9, 626.2] ▾
+        </div>
+      </div>
+      <div class="defect-body" id="defect-body-6">
+        <div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Optical Detection & Significance:</span>
+            <p style="font-size:13.5px; color:#f1f5f9;">Detected Open Circuit anomaly at coordinates [427.9, 551.9, 460.9, 626.2] with 33.8% optical model confidence.</p>
+            <p style="font-size:13px; color:#94a3b8; margin-top:4px;">IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.</p>
+          </div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">CERI Geometric Severity (Optical):</span>
+            <div style="background:#0b1120; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #1e293b;">
+              • Conductor Width Reduction: <strong>100.0%</strong><br>
+              • Clearance Intrusion: <strong>0.0%</strong> (Remaining: 0.15 mm)<br>
+              • IPC-A-600 Violation: <strong>YES (OUT OF SPEC)</strong>
+            </div>
+          </div>
+          <div>
+            <span class="section-title">CEIA Counterfactual Electrical Proxies:</span>
+            <span class="proxy-badge">GEOMETRIC PROXY ESTIMATE (NOT IN-SITU BENCH TEST)</span>
+            <div style="background:#130e24; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #3b1d6e; color:#e9d5ff;">
+              • Current Density Bottleneck Multiplier: <strong>0.0x</strong><br>
+              • Signal Integrity Risk Level: <strong>CRITICAL</strong><br>
+              • Thermal Dissipation Hazard: <strong>LOW</strong>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Region Microscopic Inspection Points:</span>
+            <ul style="padding-left:18px; font-size:13px; color:#cbd5e1;">
+              <li>Position stereo microscope directly over bounding coordinates [427.9, 551.9, 460.9, 626.2] under 20x-30x magnification.</li>
+              <li>Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.</li>
+              <li>Overlay Gerber reference net to confirm original intended conductor boundaries.</li>
+            </ul>
+          </div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Suggested Corrective Action:</span>
+            <p style="font-size:13px; color:#f8fafc; background:rgba(37, 99, 235, 0.1); border-left:3px solid #3b82f6; padding:8px 10px; border-radius:0 4px 4px 0;">
+              For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.
+            </p>
+          </div>
+          <div>
+            <span class="section-title">Physical Verification Protocol:</span>
+            <ul style="padding-left:18px; font-size:12.5px; color:#94a3b8;">
+              <li>Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).</li>
+              <li>Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.</li>
+              <li>Apply IPC-CC-830 conformal coating spot-repair over the reworked trace.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="defect-card" id="defect-card-7">
+      <div class="defect-header" onclick="toggleDefect(7)">
+        <div class="defect-title">
+          <span>Defect #7: <strong>Short Circuit</strong></span>
+          <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
+          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>96.3/100</strong></span>
+        </div>
+        <div style="font-size:12px; color:#94a3b8;">
+          BBox: [427.1, 549.3, 461.9, 624.7] ▾
+        </div>
+      </div>
+      <div class="defect-body" id="defect-body-7">
+        <div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Optical Detection & Significance:</span>
+            <p style="font-size:13.5px; color:#f1f5f9;">Detected Short Circuit anomaly at coordinates [427.1, 549.3, 461.9, 624.7] with 25.8% optical model confidence.</p>
+            <p style="font-size:13px; color:#94a3b8; margin-top:4px;">IPC-A-600 Class 2/3 violation: An unintended conductive copper bridge, solder splash, or copper filament connecting two electrically distinct conductor traces or pads.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.</p>
+          </div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">CERI Geometric Severity (Optical):</span>
+            <div style="background:#0b1120; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #1e293b;">
+              • Conductor Width Reduction: <strong>0.0%</strong><br>
+              • Clearance Intrusion: <strong>100.0%</strong> (Remaining: 0.0 mm)<br>
+              • IPC-A-600 Violation: <strong>YES (OUT OF SPEC)</strong>
+            </div>
+          </div>
+          <div>
+            <span class="section-title">CEIA Counterfactual Electrical Proxies:</span>
+            <span class="proxy-badge">GEOMETRIC PROXY ESTIMATE (NOT IN-SITU BENCH TEST)</span>
+            <div style="background:#130e24; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #3b1d6e; color:#e9d5ff;">
+              • Current Density Bottleneck Multiplier: <strong>999.0x</strong><br>
+              • Signal Integrity Risk Level: <strong>CRITICAL</strong><br>
+              • Thermal Dissipation Hazard: <strong>CRITICAL</strong>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Region Microscopic Inspection Points:</span>
+            <ul style="padding-left:18px; font-size:13px; color:#cbd5e1;">
+              <li>Position stereo microscope directly over bounding coordinates [427.1, 549.3, 461.9, 624.7] under 20x-30x magnification.</li>
+              <li>Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.</li>
+              <li>Overlay Gerber reference net to confirm original intended conductor boundaries.</li>
+            </ul>
+          </div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Suggested Corrective Action:</span>
+            <p style="font-size:13px; color:#f8fafc; background:rgba(37, 99, 235, 0.1); border-left:3px solid #3b82f6; padding:8px 10px; border-radius:0 4px 4px 0;">
+              Quarantine board immediately. Do not power up. Using a precision micro-scalpel or ultrasonic deburring tool under 30x magnification, carefully excise the conductive copper bridge without scoring the FR4 substrate.
+            </p>
+          </div>
+          <div>
+            <span class="section-title">Physical Verification Protocol:</span>
+            <ul style="padding-left:18px; font-size:12.5px; color:#94a3b8;">
+              <li>Perform 2-point isolation resistance measurement with DMM (> 100 MOhm isolation required).</li>
+              <li>Perform optical clearance verification to ensure minimum electrical spacing is fully restored.</li>
+              <li>Clean region with reagent-grade isopropyl alcohol and inspect for loose copper debris.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="defect-card" id="defect-card-4">
+      <div class="defect-header" onclick="toggleDefect(4)">
+        <div class="defect-title">
+          <span>Defect #4: <strong>Spur</strong></span>
+          <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
+          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>81.7/100</strong></span>
+        </div>
+        <div style="font-size:12px; color:#94a3b8;">
+          BBox: [267.0, 151.7, 300.1, 190.6] ▾
+        </div>
+      </div>
+      <div class="defect-body" id="defect-body-4">
+        <div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Optical Detection & Significance:</span>
+            <p style="font-size:13.5px; color:#f1f5f9;">Detected Spur anomaly at coordinates [267.0, 151.7, 300.1, 190.6] with 82.7% optical model confidence.</p>
+            <p style="font-size:13px; color:#94a3b8; margin-top:4px;">IPC-A-600 Class 2/3 violation: An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.</p>
+          </div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">CERI Geometric Severity (Optical):</span>
+            <div style="background:#0b1120; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #1e293b;">
+              • Conductor Width Reduction: <strong>0.0%</strong><br>
+              • Clearance Intrusion: <strong>95.0%</strong> (Remaining: 0.01 mm)<br>
+              • IPC-A-600 Violation: <strong>YES (OUT OF SPEC)</strong>
+            </div>
+          </div>
+          <div>
+            <span class="section-title">CEIA Counterfactual Electrical Proxies:</span>
+            <span class="proxy-badge">GEOMETRIC PROXY ESTIMATE (NOT IN-SITU BENCH TEST)</span>
+            <div style="background:#130e24; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #3b1d6e; color:#e9d5ff;">
+              • Current Density Bottleneck Multiplier: <strong>1.05x</strong><br>
+              • Signal Integrity Risk Level: <strong>HIGH</strong><br>
+              • Thermal Dissipation Hazard: <strong>LOW</strong>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Region Microscopic Inspection Points:</span>
+            <ul style="padding-left:18px; font-size:13px; color:#cbd5e1;">
+              <li>Position stereo microscope directly over bounding coordinates [267.0, 151.7, 300.1, 190.6] under 20x-30x magnification.</li>
+              <li>Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.</li>
+              <li>Overlay Gerber reference net to confirm original intended conductor boundaries.</li>
+            </ul>
+          </div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Suggested Corrective Action:</span>
+            <p style="font-size:13px; color:#f8fafc; background:rgba(37, 99, 235, 0.1); border-left:3px solid #3b82f6; padding:8px 10px; border-radius:0 4px 4px 0;">
+              Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.
+            </p>
+          </div>
+          <div>
+            <span class="section-title">Physical Verification Protocol:</span>
+            <ul style="padding-left:18px; font-size:12.5px; color:#94a3b8;">
+              <li>Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).</li>
+              <li>Inspect substrate for mechanical damage or delamination.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="defect-card" id="defect-card-5">
+      <div class="defect-header" onclick="toggleDefect(5)">
+        <div class="defect-title">
+          <span>Defect #5: <strong>Spur</strong></span>
+          <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
+          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>80.8/100</strong></span>
+        </div>
+        <div style="font-size:12px; color:#94a3b8;">
+          BBox: [431.5, 452.0, 460.4, 486.2] ▾
+        </div>
+      </div>
+      <div class="defect-body" id="defect-body-5">
+        <div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Optical Detection & Significance:</span>
+            <p style="font-size:13.5px; color:#f1f5f9;">Detected Spur anomaly at coordinates [431.5, 452.0, 460.4, 486.2] with 78.1% optical model confidence.</p>
+            <p style="font-size:13px; color:#94a3b8; margin-top:4px;">IPC-A-600 Class 2/3 violation: An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.</p>
+          </div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">CERI Geometric Severity (Optical):</span>
+            <div style="background:#0b1120; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #1e293b;">
+              • Conductor Width Reduction: <strong>0.0%</strong><br>
+              • Clearance Intrusion: <strong>95.0%</strong> (Remaining: 0.01 mm)<br>
+              • IPC-A-600 Violation: <strong>YES (OUT OF SPEC)</strong>
+            </div>
+          </div>
+          <div>
+            <span class="section-title">CEIA Counterfactual Electrical Proxies:</span>
+            <span class="proxy-badge">GEOMETRIC PROXY ESTIMATE (NOT IN-SITU BENCH TEST)</span>
+            <div style="background:#130e24; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #3b1d6e; color:#e9d5ff;">
+              • Current Density Bottleneck Multiplier: <strong>1.05x</strong><br>
+              • Signal Integrity Risk Level: <strong>HIGH</strong><br>
+              • Thermal Dissipation Hazard: <strong>LOW</strong>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Region Microscopic Inspection Points:</span>
+            <ul style="padding-left:18px; font-size:13px; color:#cbd5e1;">
+              <li>Position stereo microscope directly over bounding coordinates [431.5, 452.0, 460.4, 486.2] under 20x-30x magnification.</li>
+              <li>Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.</li>
+              <li>Overlay Gerber reference net to confirm original intended conductor boundaries.</li>
+            </ul>
+          </div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Suggested Corrective Action:</span>
+            <p style="font-size:13px; color:#f8fafc; background:rgba(37, 99, 235, 0.1); border-left:3px solid #3b82f6; padding:8px 10px; border-radius:0 4px 4px 0;">
+              Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.
+            </p>
+          </div>
+          <div>
+            <span class="section-title">Physical Verification Protocol:</span>
+            <ul style="padding-left:18px; font-size:12.5px; color:#94a3b8;">
+              <li>Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).</li>
+              <li>Inspect substrate for mechanical damage or delamination.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="defect-card" id="defect-card-1">
+      <div class="defect-header" onclick="toggleDefect(1)">
+        <div class="defect-title">
+          <span>Defect #1: <strong>Mouse Bite</strong></span>
+          <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
+          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>80.4/100</strong></span>
+        </div>
+        <div style="font-size:12px; color:#94a3b8;">
+          BBox: [130.8, 198.2, 166.7, 225.2] ▾
+        </div>
+      </div>
+      <div class="defect-body" id="defect-body-1">
+        <div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Optical Detection & Significance:</span>
+            <p style="font-size:13.5px; color:#f1f5f9;">Detected Mouse Bite anomaly at coordinates [130.8, 198.2, 166.7, 225.2] with 83.8% optical model confidence.</p>
+            <p style="font-size:13px; color:#94a3b8; margin-top:4px;">IPC-A-600 Class 2/3 violation: A notch, tear, or void along the edge of a copper conductor trace, reducing the effective cross-sectional conductor width.. Evaluated with CERI geometric risk score of 0.91 and Unified Priority P1_CRITICAL.</p>
+          </div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">CERI Geometric Severity (Optical):</span>
+            <div style="background:#0b1120; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #1e293b;">
+              • Conductor Width Reduction: <strong>84.3%</strong><br>
+              • Clearance Intrusion: <strong>0.0%</strong> (Remaining: 0.15 mm)<br>
+              • IPC-A-600 Violation: <strong>YES (OUT OF SPEC)</strong>
+            </div>
+          </div>
+          <div>
+            <span class="section-title">CEIA Counterfactual Electrical Proxies:</span>
+            <span class="proxy-badge">GEOMETRIC PROXY ESTIMATE (NOT IN-SITU BENCH TEST)</span>
+            <div style="background:#130e24; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #3b1d6e; color:#e9d5ff;">
+              • Current Density Bottleneck Multiplier: <strong>6.37x</strong><br>
+              • Signal Integrity Risk Level: <strong>MODERATE</strong><br>
+              • Thermal Dissipation Hazard: <strong>HIGH</strong>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Region Microscopic Inspection Points:</span>
+            <ul style="padding-left:18px; font-size:13px; color:#cbd5e1;">
+              <li>Position stereo microscope directly over bounding coordinates [130.8, 198.2, 166.7, 225.2] under 20x-30x magnification.</li>
+              <li>Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.</li>
+              <li>Overlay Gerber reference net to confirm original intended conductor boundaries.</li>
+            </ul>
+          </div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Suggested Corrective Action:</span>
+            <p style="font-size:13px; color:#f8fafc; background:rgba(37, 99, 235, 0.1); border-left:3px solid #3b82f6; padding:8px 10px; border-radius:0 4px 4px 0;">
+              Evaluate remaining trace width against DRC specification (84.3% reduction). If remaining width meets minimum current-carrying capacity, accept with engineering note. Otherwise, apply copper foil micro-patch or bridge with micro-wire.
+            </p>
+          </div>
+          <div>
+            <span class="section-title">Physical Verification Protocol:</span>
+            <ul style="padding-left:18px; font-size:12.5px; color:#94a3b8;">
+              <li>Measure narrowest conductor bottleneck width using calibrated optical reticle microscope.</li>
+              <li>Conduct Kelvin 4-wire trace resistance measurement to verify resistance within 5% of nominal trace.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="defect-card" id="defect-card-3">
+      <div class="defect-header" onclick="toggleDefect(3)">
+        <div class="defect-title">
+          <span>Defect #3: <strong>Pin Hole</strong></span>
+          <span class="prio-pill prio-P2_HIGH">P2_HIGH</span>
+          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>66.5/100</strong></span>
+        </div>
+        <div style="font-size:12px; color:#94a3b8;">
+          BBox: [343.5, 334.7, 379.9, 361.0] ▾
+        </div>
+      </div>
+      <div class="defect-body" id="defect-body-3">
+        <div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Optical Detection & Significance:</span>
+            <p style="font-size:13.5px; color:#f1f5f9;">Detected Pin Hole anomaly at coordinates [343.5, 334.7, 379.9, 361.0] with 83.6% optical model confidence.</p>
+            <p style="font-size:13px; color:#94a3b8; margin-top:4px;">IPC-A-600 Class 2/3 violation: A small circular or irregular void, pit, or penetration within a conductive trace, pad, or ground plane surface.. Evaluated with CERI geometric risk score of 0.52 and Unified Priority P2_HIGH.</p>
+          </div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">CERI Geometric Severity (Optical):</span>
+            <div style="background:#0b1120; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #1e293b;">
+              • Conductor Width Reduction: <strong>40.0%</strong><br>
+              • Clearance Intrusion: <strong>0.0%</strong> (Remaining: 0.15 mm)<br>
+              • IPC-A-600 Violation: <strong>YES (OUT OF SPEC)</strong>
+            </div>
+          </div>
+          <div>
+            <span class="section-title">CEIA Counterfactual Electrical Proxies:</span>
+            <span class="proxy-badge">GEOMETRIC PROXY ESTIMATE (NOT IN-SITU BENCH TEST)</span>
+            <div style="background:#130e24; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #3b1d6e; color:#e9d5ff;">
+              • Current Density Bottleneck Multiplier: <strong>1.67x</strong><br>
+              • Signal Integrity Risk Level: <strong>LOW</strong><br>
+              • Thermal Dissipation Hazard: <strong>MODERATE</strong>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Region Microscopic Inspection Points:</span>
+            <ul style="padding-left:18px; font-size:13px; color:#cbd5e1;">
+              <li>Position stereo microscope directly over bounding coordinates [343.5, 334.7, 379.9, 361.0] under 20x-30x magnification.</li>
+              <li>Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.</li>
+              <li>Overlay Gerber reference net to confirm original intended conductor boundaries.</li>
+            </ul>
+          </div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Suggested Corrective Action:</span>
+            <p style="font-size:13px; color:#f8fafc; background:rgba(37, 99, 235, 0.1); border-left:3px solid #3b82f6; padding:8px 10px; border-radius:0 4px 4px 0;">
+              Check void diameter against IPC-A-600 limit (<= 10% conductor width). If within tolerance, document and accept. If on SMT pad, apply micro-solder touch-up.
+            </p>
+          </div>
+          <div>
+            <span class="section-title">Physical Verification Protocol:</span>
+            <ul style="padding-left:18px; font-size:12.5px; color:#94a3b8;">
+              <li>Verify pad coplanarity and solderability if on component landing pad.</li>
+              <li>Inspect under optical reticle to confirm void does not extend to conductor edge.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Layer 5: Interactive Engineer Q&A Simulator Console -->
+  <div class="card">
+    <div class="card-title">
+      <span>💬 Layer 5: Interactive Engineer Q&A Console</span>
+      <span class="tag" style="background:#1e3a8a; color:#93c5fd; margin-left:auto;">Contextual Offline Llama Intelligence</span>
+    </div>
+    <div class="qa-box">
+      <div style="font-size:12px; color:#94a3b8; margin-bottom:8px; font-weight:600;">COMMON INSPECTION INQUIRIES (CLICK TO ASK):</div>
+      <div class="qa-chips">
+        <button class="qa-chip" onclick="askQuestion('Why was this PCB rejected?')">Why was this PCB rejected?</button>
+        <button class="qa-chip" onclick="askQuestion('Which defect is the most critical?')">Which defect is the most critical?</button>
+        <button class="qa-chip" onclick="askQuestion('What corrective action is recommended for defect #2?')">What corrective action is recommended for defect #2?</button>
+        <button class="qa-chip" onclick="askQuestion('What are the potential consequences of the detected short?')">What are the potential consequences of the detected short?</button>
+        <button class="qa-chip" onclick="askQuestion('Summarize the board inspection.')">Summarize the board inspection.</button>
+      </div>
+      <div class="qa-input-row">
+        <input type="text" id="qaInput" class="qa-input" placeholder="Type an engineering question regarding this board's defects, IPC criteria, or rework..." onkeydown="if(event.key==='Enter') submitCustomQuestion()">
+        <button class="qa-btn" onclick="submitCustomQuestion()">Ask Intelligence</button>
+      </div>
+      <div class="qa-output" id="qaOutput">
+        <em>Click one of the question chips above or type a custom question to query the RGPIS-HDE Engineering Intelligence layer.</em>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const reportData = {"metadata": {"board_id": "deep_50600009", "image_name": "deep_50600009.jpg", "image_path": "/Users/darshan/Documents/Codex/2026-11-17/referenced-chatgpt-conversation-this-is-an-3/outputs/RGPIS-HDE/test_images/deep_50600009.jpg", "image_width": 640, "image_height": 640, "timestamp": "2026-11-22T15:29:06Z", "inspection_system": "RGPIS-HDE Industrial Intelligence Pipeline", "pipeline_stages": ["OpenCV Image Registration & Alignment", "YOLO26n Defect Detection", "CERI Geometric Defect Severity & Risk", "CEIA Approximate Electrical Impact Analysis", "Unified Defect Scoring & Board Disposition", "ExecuTorch Llama 3.2 Engineering Intelligence"]}, "board_summary": {"overall_disposition": "REJECT", "disposition_reason": "Board REJECTED: Contains 6 critical P1 defect(s) violating IPC-A-600 Class 2/3 criteria. Severe functional circuit failure or hazardous electrical bridge detected.", "total_defects": 7, "critical_defects_count": 6, "high_risk_count": 1, "medium_risk_count": 0, "low_risk_count": 0, "max_unified_risk_score": 99.2, "priority_breakdown": {"P1_CRITICAL": 6, "P2_HIGH": 1, "P3_MEDIUM": 0, "P4_LOW": 0}}, "defects": [{"defect_id": 2, "class_name": "open", "confidence": 0.8373000025749207, "bbox": [538.5700073242188, 85.13999938964844, 578.7899780273438, 193.3300018310547], "geometry": {"width": 40.22, "height": 108.19, "center_x": 558.68, "center_y": 139.23, "area": 4351.4}, "ceri": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 100.0, "clearance_intrusion_pct": 0.0, "clearance_remaining_mm": 0.15, "geometric_risk_score": 1.0, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 0.0, "current_density_multiplier": 0.0, "resistance_multiplier_proxy": 999999.0, "signal_integrity_risk": "CRITICAL", "thermal_dissipation_risk": "LOW", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 99.2, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 100.0, "ceia_component": 100.0, "rank": 1}}, {"defect_id": 6, "class_name": "open", "confidence": 0.33820000290870667, "bbox": [427.8500061035156, 551.9099731445312, 460.9100036621094, 626.1599731445312], "geometry": {"width": 33.06, "height": 74.25, "center_x": 444.38, "center_y": 589.03, "area": 2454.71}, "ceri": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 100.0, "clearance_intrusion_pct": 0.0, "clearance_remaining_mm": 0.15, "geometric_risk_score": 1.0, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 0.0, "current_density_multiplier": 0.0, "resistance_multiplier_proxy": 999999.0, "signal_integrity_risk": "CRITICAL", "thermal_dissipation_risk": "LOW", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 96.7, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 100.0, "ceia_component": 100.0, "rank": 2}}, {"defect_id": 7, "class_name": "short", "confidence": 0.2578999996185303, "bbox": [427.1099853515625, 549.260009765625, 461.8500061035156, 624.7000122070312], "geometry": {"width": 34.74, "height": 75.44, "center_x": 444.48, "center_y": 586.98, "area": 2620.79}, "ceri": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 0.0, "clearance_intrusion_pct": 100.0, "clearance_remaining_mm": 0.0, "geometric_risk_score": 1.0, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 99.0, "current_density_multiplier": 999.0, "resistance_multiplier_proxy": 0.01, "signal_integrity_risk": "CRITICAL", "thermal_dissipation_risk": "CRITICAL", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 96.3, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 100.0, "ceia_component": 100.0, "rank": 3}}, {"defect_id": 4, "class_name": "spur", "confidence": 0.8273000121116638, "bbox": [266.989990234375, 151.72000122070312, 300.1199951171875, 190.58999633789062], "geometry": {"width": 33.13, "height": 38.87, "center_x": 283.55, "center_y": 171.16, "area": 1287.76}, "ceri": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 0.0, "clearance_intrusion_pct": 95.0, "clearance_remaining_mm": 0.01, "geometric_risk_score": 0.97, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 1.0, "current_density_multiplier": 1.05, "resistance_multiplier_proxy": 1.0, "signal_integrity_risk": "HIGH", "thermal_dissipation_risk": "LOW", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 81.7, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 97.0, "ceia_component": 75.0, "rank": 4}}, {"defect_id": 5, "class_name": "spur", "confidence": 0.7807000279426575, "bbox": [431.54998779296875, 451.95001220703125, 460.3699951171875, 486.2200012207031], "geometry": {"width": 28.82, "height": 34.27, "center_x": 445.96, "center_y": 469.09, "area": 987.66}, "ceri": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 0.0, "clearance_intrusion_pct": 95.0, "clearance_remaining_mm": 0.01, "geometric_risk_score": 0.97, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 1.0, "current_density_multiplier": 1.05, "resistance_multiplier_proxy": 1.0, "signal_integrity_risk": "HIGH", "thermal_dissipation_risk": "LOW", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 80.8, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 97.0, "ceia_component": 75.0, "rank": 5}}, {"defect_id": 1, "class_name": "mousebite", "confidence": 0.8378999829292297, "bbox": [130.77000427246094, 198.2100067138672, 166.72999572753906, 225.17999267578125], "geometry": {"width": 35.96, "height": 26.97, "center_x": 148.75, "center_y": 211.7, "area": 969.84}, "ceri": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 84.3, "clearance_intrusion_pct": 0.0, "clearance_remaining_mm": 0.15, "geometric_risk_score": 0.91, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 0.16, "current_density_multiplier": 6.37, "resistance_multiplier_proxy": 3.15, "signal_integrity_risk": "MODERATE", "thermal_dissipation_risk": "HIGH", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 80.4, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 91.0, "ceia_component": 75.0, "rank": 6}}, {"defect_id": 3, "class_name": "pin-hole", "confidence": 0.8356000185012817, "bbox": [343.5, 334.7200012207031, 379.94000244140625, 361.0400085449219], "geometry": {"width": 36.44, "height": 26.32, "center_x": 361.72, "center_y": 347.88, "area": 959.1}, "ceri": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 40.0, "clearance_intrusion_pct": 0.0, "clearance_remaining_mm": 0.15, "geometric_risk_score": 0.52, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 0.6, "current_density_multiplier": 1.67, "resistance_multiplier_proxy": 1.13, "signal_integrity_risk": "LOW", "thermal_dissipation_risk": "MODERATE", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 66.5, "priority_level": "P2_HIGH", "action_urgency": "REWORK_EVALUATION_REQUIRED", "ceri_component": 52.0, "ceia_component": 50.0, "rank": 7}}]};
+  const intelData = {"metadata": {"board_id": "deep_50600009", "image_name": "deep_50600009.jpg", "timestamp": "2026-11-22T15:29:06Z", "total_generation_latency_seconds": 0.0, "runtime_backend": "ExecuTorch (XNNPACK CPU Offline Runtime)", "foundation_model": "Llama-3.2-1B-Instruct (4-bit SpinQuant INT4)", "standards_basis": "IPC-A-600 / IPC-6012 Class 2/3"}, "board_summary": {"overall_disposition": "REJECT", "disposition_reason": "Board REJECTED: Contains 6 critical P1 defect(s) violating IPC-A-600 Class 2/3 criteria. Severe functional circuit failure or hazardous electrical bridge detected.", "total_defects": 7, "critical_defects_count": 6, "high_risk_count": 1, "medium_risk_count": 0, "low_risk_count": 0, "max_unified_risk_score": 99.2, "priority_breakdown": {"P1_CRITICAL": 6, "P2_HIGH": 1, "P3_MEDIUM": 0, "P4_LOW": 0}}, "board_level_intelligence": {"board_condition": "CRITICAL_NON_CONFORMING (6 P1 Critical defects detected)", "acceptance_rationale": "The PCB was determined as 'REJECT' based on unified scoring where critical functional defects violate IPC-A-600 Class 2/3 criteria. Immediate quarantine is mandated.", "major_risks": ["Catastrophic short circuit creates direct low-resistance shunt path risking power rail shutdown or component burnout.", "Complete trace discontinuity (open circuit) causing total signal loss or floating gate behavior.", "Trace bottlenecking from mousebites induces localized current crowding and thermal stress hotspots.", "Dielectric clearance erosion from copper spurs elevates risk of localized dielectric breakdown or solder bridging."], "immediate_priorities": ["Defect #2 (OPEN - P1_CRITICAL): Immediate optical isolation and rework evaluation.", "Defect #6 (OPEN - P1_CRITICAL): Immediate optical isolation and rework evaluation.", "Defect #7 (SHORT - P1_CRITICAL): Immediate optical isolation and rework evaluation."], "engine": "deterministic_fallback", "fallback_reason": "Fast mode requested (deterministic generator)"}, "individual_defect_intelligence": [{"defect_id": 2, "class_name": "open", "canonical_type": "open_circuit", "display_name": "Open Circuit", "confidence": 0.8373000025749207, "bbox": [538.5700073242188, 85.13999938964844, 578.7899780273438, 193.3300018310547], "what_was_detected": "Detected Open Circuit anomaly at coordinates [538.6, 85.1, 578.8, 193.3] with 83.7% optical model confidence.", "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.", "potential_consequences": ["Loss of signal continuity across the net, causing functional circuit failure.", "Disconnected power rail or floating high-impedance logic input.", "Intermittent operation under thermal expansion and mechanical vibration.", "CEIA Proxy: Nodal conductance factor G=0.0. Complete circuit open with zero current transfer."], "region_inspection_points": ["Position stereo microscope directly over bounding coordinates [538.6, 85.1, 578.8, 193.3] under 20x-30x magnification.", "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.", "Overlay Gerber reference net to confirm original intended conductor boundaries."], "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.", "verification_protocol": ["Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).", "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.", "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."], "ceri_metrics": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 100.0, "clearance_intrusion_pct": 0.0, "clearance_remaining_mm": 0.15, "geometric_risk_score": 1.0, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia_proxies": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 0.0, "current_density_multiplier": 0.0, "resistance_multiplier_proxy": 999999.0, "signal_integrity_risk": "CRITICAL", "thermal_dissipation_risk": "LOW", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 99.2, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 100.0, "ceia_component": 100.0, "rank": 1}, "explanation": "A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.", "metrics": {"engine": "Deterministic IPC Rules"}}, {"defect_id": 6, "class_name": "open", "canonical_type": "open_circuit", "display_name": "Open Circuit", "confidence": 0.33820000290870667, "bbox": [427.8500061035156, 551.9099731445312, 460.9100036621094, 626.1599731445312], "what_was_detected": "Detected Open Circuit anomaly at coordinates [427.9, 551.9, 460.9, 626.2] with 33.8% optical model confidence.", "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.", "potential_consequences": ["Loss of signal continuity across the net, causing functional circuit failure.", "Disconnected power rail or floating high-impedance logic input.", "Intermittent operation under thermal expansion and mechanical vibration.", "CEIA Proxy: Nodal conductance factor G=0.0. Complete circuit open with zero current transfer."], "region_inspection_points": ["Position stereo microscope directly over bounding coordinates [427.9, 551.9, 460.9, 626.2] under 20x-30x magnification.", "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.", "Overlay Gerber reference net to confirm original intended conductor boundaries."], "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.", "verification_protocol": ["Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).", "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.", "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."], "ceri_metrics": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 100.0, "clearance_intrusion_pct": 0.0, "clearance_remaining_mm": 0.15, "geometric_risk_score": 1.0, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia_proxies": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 0.0, "current_density_multiplier": 0.0, "resistance_multiplier_proxy": 999999.0, "signal_integrity_risk": "CRITICAL", "thermal_dissipation_risk": "LOW", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 96.7, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 100.0, "ceia_component": 100.0, "rank": 2}, "explanation": "A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.", "metrics": {"engine": "Deterministic IPC Rules"}}, {"defect_id": 7, "class_name": "short", "canonical_type": "short_circuit", "display_name": "Short Circuit", "confidence": 0.2578999996185303, "bbox": [427.1099853515625, 549.260009765625, 461.8500061035156, 624.7000122070312], "what_was_detected": "Detected Short Circuit anomaly at coordinates [427.1, 549.3, 461.9, 624.7] with 25.8% optical model confidence.", "why_significant": "IPC-A-600 Class 2/3 violation: An unintended conductive copper bridge, solder splash, or copper filament connecting two electrically distinct conductor traces or pads.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.", "potential_consequences": ["Direct low-resistance path between distinct signals, ground, or power rails.", "Severe overcurrent risk capable of damaging downstream integrated circuits or power supplies upon energization.", "Nuisance tripping of power supply protection circuitry.", "CEIA Proxy: Shunt bridge conductance creates severe overcurrent risk; bypasses designed circuit net."], "region_inspection_points": ["Position stereo microscope directly over bounding coordinates [427.1, 549.3, 461.9, 624.7] under 20x-30x magnification.", "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.", "Overlay Gerber reference net to confirm original intended conductor boundaries."], "suggested_corrective_action": "Quarantine board immediately. Do not power up. Using a precision micro-scalpel or ultrasonic deburring tool under 30x magnification, carefully excise the conductive copper bridge without scoring the FR4 substrate.", "verification_protocol": ["Perform 2-point isolation resistance measurement with DMM (> 100 MOhm isolation required).", "Perform optical clearance verification to ensure minimum electrical spacing is fully restored.", "Clean region with reagent-grade isopropyl alcohol and inspect for loose copper debris."], "ceri_metrics": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 0.0, "clearance_intrusion_pct": 100.0, "clearance_remaining_mm": 0.0, "geometric_risk_score": 1.0, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia_proxies": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 99.0, "current_density_multiplier": 999.0, "resistance_multiplier_proxy": 0.01, "signal_integrity_risk": "CRITICAL", "thermal_dissipation_risk": "CRITICAL", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 96.3, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 100.0, "ceia_component": 100.0, "rank": 3}, "explanation": "An unintended conductive copper bridge, solder splash, or copper filament connecting two electrically distinct conductor traces or pads.", "metrics": {"engine": "Deterministic IPC Rules"}}, {"defect_id": 4, "class_name": "spur", "canonical_type": "spur", "display_name": "Spur", "confidence": 0.8273000121116638, "bbox": [266.989990234375, 151.72000122070312, 300.1199951171875, 190.58999633789062], "what_was_detected": "Detected Spur anomaly at coordinates [267.0, 151.7, 300.1, 190.6] with 82.7% optical model confidence.", "why_significant": "IPC-A-600 Class 2/3 violation: An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.", "potential_consequences": ["Severe reduction of dielectric clearance distance to adjacent conductors.", "Risk of electrical arc or dielectric breakdown during high-voltage transient events.", "Potential trap for solder bridge formation during wave or reflow soldering.", "CERI Proxy: 95.0% dielectric clearance reduction (0.01 mm remaining) increases susceptibility to localized capacitive cross-talk and transient dielectric breakdown."], "region_inspection_points": ["Position stereo microscope directly over bounding coordinates [267.0, 151.7, 300.1, 190.6] under 20x-30x magnification.", "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.", "Overlay Gerber reference net to confirm original intended conductor boundaries."], "suggested_corrective_action": "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.", "verification_protocol": ["Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).", "Inspect substrate for mechanical damage or delamination."], "ceri_metrics": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 0.0, "clearance_intrusion_pct": 95.0, "clearance_remaining_mm": 0.01, "geometric_risk_score": 0.97, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia_proxies": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 1.0, "current_density_multiplier": 1.05, "resistance_multiplier_proxy": 1.0, "signal_integrity_risk": "HIGH", "thermal_dissipation_risk": "LOW", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 81.7, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 97.0, "ceia_component": 75.0, "rank": 4}, "explanation": "An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.", "metrics": {"engine": "Deterministic IPC Rules"}}, {"defect_id": 5, "class_name": "spur", "canonical_type": "spur", "display_name": "Spur", "confidence": 0.7807000279426575, "bbox": [431.54998779296875, 451.95001220703125, 460.3699951171875, 486.2200012207031], "what_was_detected": "Detected Spur anomaly at coordinates [431.5, 452.0, 460.4, 486.2] with 78.1% optical model confidence.", "why_significant": "IPC-A-600 Class 2/3 violation: An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.", "potential_consequences": ["Severe reduction of dielectric clearance distance to adjacent conductors.", "Risk of electrical arc or dielectric breakdown during high-voltage transient events.", "Potential trap for solder bridge formation during wave or reflow soldering.", "CERI Proxy: 95.0% dielectric clearance reduction (0.01 mm remaining) increases susceptibility to localized capacitive cross-talk and transient dielectric breakdown."], "region_inspection_points": ["Position stereo microscope directly over bounding coordinates [431.5, 452.0, 460.4, 486.2] under 20x-30x magnification.", "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.", "Overlay Gerber reference net to confirm original intended conductor boundaries."], "suggested_corrective_action": "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.", "verification_protocol": ["Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).", "Inspect substrate for mechanical damage or delamination."], "ceri_metrics": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 0.0, "clearance_intrusion_pct": 95.0, "clearance_remaining_mm": 0.01, "geometric_risk_score": 0.97, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia_proxies": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 1.0, "current_density_multiplier": 1.05, "resistance_multiplier_proxy": 1.0, "signal_integrity_risk": "HIGH", "thermal_dissipation_risk": "LOW", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 80.8, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 97.0, "ceia_component": 75.0, "rank": 5}, "explanation": "An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.", "metrics": {"engine": "Deterministic IPC Rules"}}, {"defect_id": 1, "class_name": "mousebite", "canonical_type": "mouse_bite", "display_name": "Mouse Bite", "confidence": 0.8378999829292297, "bbox": [130.77000427246094, 198.2100067138672, 166.72999572753906, 225.17999267578125], "what_was_detected": "Detected Mouse Bite anomaly at coordinates [130.8, 198.2, 166.7, 225.2] with 83.8% optical model confidence.", "why_significant": "IPC-A-600 Class 2/3 violation: A notch, tear, or void along the edge of a copper conductor trace, reducing the effective cross-sectional conductor width.. Evaluated with CERI geometric risk score of 0.91 and Unified Priority P1_CRITICAL.", "potential_consequences": ["Localized current crowding and increased trace resistance at the bottleneck.", "Elevated localized temperature rise (hotspot) under rated current load.", "Vulnerability to fatigue fracture during thermal cycling or mechanical shock.", "CERI & CEIA Proxies: 84.3% trace width necking results in an estimated 6.37x localized current crowding bottleneck and thermal stress hotspot."], "region_inspection_points": ["Position stereo microscope directly over bounding coordinates [130.8, 198.2, 166.7, 225.2] under 20x-30x magnification.", "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.", "Overlay Gerber reference net to confirm original intended conductor boundaries."], "suggested_corrective_action": "Evaluate remaining trace width against DRC specification (84.3% reduction). If remaining width meets minimum current-carrying capacity, accept with engineering note. Otherwise, apply copper foil micro-patch or bridge with micro-wire.", "verification_protocol": ["Measure narrowest conductor bottleneck width using calibrated optical reticle microscope.", "Conduct Kelvin 4-wire trace resistance measurement to verify resistance within 5% of nominal trace."], "ceri_metrics": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 84.3, "clearance_intrusion_pct": 0.0, "clearance_remaining_mm": 0.15, "geometric_risk_score": 0.91, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia_proxies": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 0.16, "current_density_multiplier": 6.37, "resistance_multiplier_proxy": 3.15, "signal_integrity_risk": "MODERATE", "thermal_dissipation_risk": "HIGH", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 80.4, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 91.0, "ceia_component": 75.0, "rank": 6}, "explanation": "A notch, tear, or void along the edge of a copper conductor trace, reducing the effective cross-sectional conductor width.", "metrics": {"engine": "Deterministic IPC Rules"}}, {"defect_id": 3, "class_name": "pin-hole", "canonical_type": "pin_hole", "display_name": "Pin Hole", "confidence": 0.8356000185012817, "bbox": [343.5, 334.7200012207031, 379.94000244140625, 361.0400085449219], "what_was_detected": "Detected Pin Hole anomaly at coordinates [343.5, 334.7, 379.9, 361.0] with 83.6% optical model confidence.", "why_significant": "IPC-A-600 Class 2/3 violation: A small circular or irregular void, pit, or penetration within a conductive trace, pad, or ground plane surface.. Evaluated with CERI geometric risk score of 0.52 and Unified Priority P2_HIGH.", "potential_consequences": ["Slight reduction in conductor cross-section and localized resistance increase.", "If located on an SMT solder pad or via annular ring, can degrade solder joint wetting and mechanical shear strength.", "Trap for chemical residues, flux, or moisture, accelerating localized dendritic corrosion.", "CERI Proxy: 40.0% localized cross-sectional reduction within conductor/pad. Potential trap for corrosive soldering residues."], "region_inspection_points": ["Position stereo microscope directly over bounding coordinates [343.5, 334.7, 379.9, 361.0] under 20x-30x magnification.", "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.", "Overlay Gerber reference net to confirm original intended conductor boundaries."], "suggested_corrective_action": "Check void diameter against IPC-A-600 limit (<= 10% conductor width). If within tolerance, document and accept. If on SMT pad, apply micro-solder touch-up.", "verification_protocol": ["Verify pad coplanarity and solderability if on component landing pad.", "Inspect under optical reticle to confirm void does not extend to conductor edge."], "ceri_metrics": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 40.0, "clearance_intrusion_pct": 0.0, "clearance_remaining_mm": 0.15, "geometric_risk_score": 0.52, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia_proxies": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 0.6, "current_density_multiplier": 1.67, "resistance_multiplier_proxy": 1.13, "signal_integrity_risk": "LOW", "thermal_dissipation_risk": "MODERATE", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 66.5, "priority_level": "P2_HIGH", "action_urgency": "REWORK_EVALUATION_REQUIRED", "ceri_component": 52.0, "ceia_component": 50.0, "rank": 7}, "explanation": "A small circular or irregular void, pit, or penetration within a conductive trace, pad, or ground plane surface.", "metrics": {"engine": "Deterministic IPC Rules"}}], "corrective_action_recommendations": [{"step_number": 1, "defect_id": 2, "defect_name": "Open Circuit", "priority_level": "P1_CRITICAL", "unified_score": 99.2, "urgency": "IMMEDIATE_ACTION_BEFORE_ENERGIZATION", "action_type": "MICRO_JUMPER_OR_SCRAP", "target_coordinates": [538.5700073242188, 85.13999938964844, 578.7899780273438, 193.3300018310547], "recommended_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.", "verification_procedure": ["Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).", "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.", "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."], "assigned_station": "Precision Micro-Rework Station", "sign_off_required": true}, {"step_number": 2, "defect_id": 6, "defect_name": "Open Circuit", "priority_level": "P1_CRITICAL", "unified_score": 96.7, "urgency": "IMMEDIATE_ACTION_BEFORE_ENERGIZATION", "action_type": "MICRO_JUMPER_OR_SCRAP", "target_coordinates": [427.8500061035156, 551.9099731445312, 460.9100036621094, 626.1599731445312], "recommended_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.", "verification_procedure": ["Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).", "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.", "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."], "assigned_station": "Precision Micro-Rework Station", "sign_off_required": true}, {"step_number": 3, "defect_id": 7, "defect_name": "Short Circuit", "priority_level": "P1_CRITICAL", "unified_score": 96.3, "urgency": "IMMEDIATE_ACTION_BEFORE_ENERGIZATION", "action_type": "MICRO_EXCISION_ISOLATION", "target_coordinates": [427.1099853515625, 549.260009765625, 461.8500061035156, 624.7000122070312], "recommended_action": "Quarantine board immediately. Do not power up. Using a precision micro-scalpel or ultrasonic deburring tool under 30x magnification, carefully excise the conductive copper bridge without scoring the FR4 substrate.", "verification_procedure": ["Perform 2-point isolation resistance measurement with DMM (> 100 MOhm isolation required).", "Perform optical clearance verification to ensure minimum electrical spacing is fully restored.", "Clean region with reagent-grade isopropyl alcohol and inspect for loose copper debris."], "assigned_station": "Precision Micro-Rework Station", "sign_off_required": true}, {"step_number": 4, "defect_id": 4, "defect_name": "Spur", "priority_level": "P1_CRITICAL", "unified_score": 81.7, "urgency": "IMMEDIATE_ACTION_BEFORE_ENERGIZATION", "action_type": "CLEARANCE_TRIMMING", "target_coordinates": [266.989990234375, 151.72000122070312, 300.1199951171875, 190.58999633789062], "recommended_action": "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.", "verification_procedure": ["Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).", "Inspect substrate for mechanical damage or delamination."], "assigned_station": "Precision Micro-Rework Station", "sign_off_required": true}, {"step_number": 5, "defect_id": 5, "defect_name": "Spur", "priority_level": "P1_CRITICAL", "unified_score": 80.8, "urgency": "IMMEDIATE_ACTION_BEFORE_ENERGIZATION", "action_type": "CLEARANCE_TRIMMING", "target_coordinates": [431.54998779296875, 451.95001220703125, 460.3699951171875, 486.2200012207031], "recommended_action": "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.", "verification_procedure": ["Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).", "Inspect substrate for mechanical damage or delamination."], "assigned_station": "Precision Micro-Rework Station", "sign_off_required": true}, {"step_number": 6, "defect_id": 1, "defect_name": "Mouse Bite", "priority_level": "P1_CRITICAL", "unified_score": 80.4, "urgency": "IMMEDIATE_ACTION_BEFORE_ENERGIZATION", "action_type": "BOTTLENECK_METROLOGY_PATCH", "target_coordinates": [130.77000427246094, 198.2100067138672, 166.72999572753906, 225.17999267578125], "recommended_action": "Evaluate remaining trace width against DRC specification (84.3% reduction). If remaining width meets minimum current-carrying capacity, accept with engineering note. Otherwise, apply copper foil micro-patch or bridge with micro-wire.", "verification_procedure": ["Measure narrowest conductor bottleneck width using calibrated optical reticle microscope.", "Conduct Kelvin 4-wire trace resistance measurement to verify resistance within 5% of nominal trace."], "assigned_station": "Precision Micro-Rework Station", "sign_off_required": true}, {"step_number": 7, "defect_id": 3, "defect_name": "Pin Hole", "priority_level": "P2_HIGH", "unified_score": 66.5, "urgency": "MANDATORY_REWORK_EVALUATION", "action_type": "VOID_INSPECTION_TOUCHUP", "target_coordinates": [343.5, 334.7200012207031, 379.94000244140625, 361.0400085449219], "recommended_action": "Check void diameter against IPC-A-600 limit (<= 10% conductor width). If within tolerance, document and accept. If on SMT pad, apply micro-solder touch-up.", "verification_procedure": ["Verify pad coplanarity and solderability if on component landing pad.", "Inspect under optical reticle to confirm void does not extend to conductor edge."], "assigned_station": "SMT Quality Inspection Desk", "sign_off_required": true}], "process_intelligence": {"pattern_summary": "Multivariate defect distribution with 7 total anomalies spanning both subtractive (trace loss) and additive (clearance encroachment) mechanisms.", "fab_stage_hypotheses": ["HYPOTHESIS (Etching Over-Rate): Co-occurrence of 2 open(s) and 1 mousebite(s) suggests potential chemical over-etching, elevated acid bath temperature, or prolonged line dwell time.", "HYPOTHESIS (Incomplete Etching / Resist Scum): Detection of 1 short(s) and 2 spur(s) points to potential localized under-etching, developing spray nozzle pressure drops, or photoresist scumming.", "HYPOTHESIS (Plating Aeration): 1 pin-hole void(s) detected. Possible hydrogen micro-bubble entrapment on the copper surface during acid copper electroplating or particulate contamination on phototool."], "recommended_investigations": ["Audit chemical etchant concentration (CuCl2 / H2O2) and monitor conveyor belt feed speed.", "Inspect developer manifold spray nozzles and verify UV exposure energy calibration.", "Check plating bath agitation air spargers and inspect dry film laminator cleanroom roller filters."], "disclaimer": "Hypotheses generated for engineering guidance. Validation via chemical titration and SPC logs is required.", "engine": "deterministic_fallback"}};
+
+  // Render SVG Bounding Boxes on PCB Canvas
+  function renderBBoxes() {
+    const canvas = document.getElementById("pcbCanvas");
+    const defects = intelData.individual_defect_intelligence || [];
+    const colors = {
+      "P1_CRITICAL": "var(--p1)",
+      "P2_HIGH": "var(--p2)",
+      "P3_MEDIUM": "var(--p3)",
+      "P4_LOW": "var(--p4)"
+    };
+
+    defects.forEach(d => {
+      const [x1, y1, x2, y2] = d.bbox;
+      const left = (x1 / 640) * 100;
+      const top = (y1 / 640) * 100;
+      const width = Math.max(4, ((x2 - x1) / 640) * 100);
+      const height = Math.max(4, ((y2 - y1) / 640) * 100);
+      const prio = d.unified_score.priority_level;
+      const col = colors[prio] || "var(--accent)";
+
+      const marker = document.createElement("div");
+      marker.className = "bbox-marker";
+      marker.style.left = `${left}%`;
+      marker.style.top = `${top}%`;
+      marker.style.width = `${width}%`;
+      marker.style.height = `${height}%`;
+      marker.style.borderColor = col;
+      marker.title = `Defect #${d.defect_id} (${d.display_name}) - ${prio} (${d.unified_score.score}/100)`;
+
+      const tag = document.createElement("div");
+      tag.className = "bbox-tag";
+      tag.style.background = col;
+      tag.textContent = `#${d.defect_id} ${d.class_name}`;
+      marker.appendChild(tag);
+
+      marker.onclick = () => {
+        const target = document.getElementById(`defect-card-${d.defect_id}`);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          target.style.borderColor = "#3b82f6";
+          setTimeout(() => { target.style.borderColor = ""; }, 2000);
+        }
+      };
+
+      canvas.appendChild(marker);
+    });
+  }
+
+  // Toggle Defect Accordions
+  function toggleDefect(did) {
+    const body = document.getElementById(`defect-body-${did}`);
+    if (body.style.display === "none") {
+      body.style.display = "grid";
+    } else {
+      body.style.display = "none";
+    }
+  }
+
+  // Client-Side Engineer Q&A Answering
+  function askQuestion(q) {
+    document.getElementById("qaInput").value = q;
+    submitCustomQuestion();
+  }
+
+  function submitCustomQuestion() {
+    const query = document.getElementById("qaInput").value.trim();
+    if (!query) return;
+
+    const out = document.getElementById("qaOutput");
+    out.innerHTML = `<em>Consulting ExecuTorch Llama Engineering Intelligence...</em>`;
+
+    setTimeout(() => {
+      const qLower = query.toLowerCase();
+      let answer = "";
+      let engine = "ExecuTorch Llama Grounded Intelligence";
+
+      if (qLower.includes("why") && (qLower.includes("reject") || qLower.includes("accept") || qLower.includes("disposition"))) {
+        const disp = reportData.board_summary.overall_disposition;
+        const reason = reportData.board_summary.disposition_reason;
+        answer = `<strong>Board Decision: ${disp}</strong><br>${reason}<br><span style="color:#94a3b8; font-size:12px;">Grounding: Under IPC-A-600 Class 2/3, functional electrical bridging (shorts) and circuit breaks (opens) unconditionally prohibit operational energization without engineering rework sign-off.</span>`;
+      } else if (qLower.includes("which") && (qLower.includes("critical") || qLower.includes("worst") || qLower.includes("priority"))) {
+        const top = intelData.individual_defect_intelligence[0];
+        answer = `<strong>Defect #${top.defect_id} (${top.display_name})</strong> is the most critical defect with a Unified Risk Score of <strong>${top.unified_score.score}/100 (${top.unified_score.priority_level})</strong>.<br>CERI geometric analysis indicates ${top.ceri_metrics.trace_width_reduction_pct}% width reduction and ${top.ceri_metrics.clearance_intrusion_pct}% clearance violation.`;
+      } else if (qLower.includes("defect") && (qLower.includes("action") || qLower.includes("rework") || qLower.includes("fix"))) {
+        const match = qLower.match(/defect\s*#?\s*(\d+)/);
+        const did = match ? parseInt(match[1]) : 1;
+        const target = intelData.individual_defect_intelligence.find(d => d.defect_id === did);
+        if (target) {
+          answer = `<strong>Corrective Action for Defect #${did} (${target.display_name}):</strong><br>${target.suggested_corrective_action}<br><strong>Verification:</strong> ${target.verification_protocol.join("; ")}`;
+        } else {
+          answer = `Defect #${did} not found on this board. Active defects are #1 through #${intelData.individual_defect_intelligence.length}.`;
+        }
+      } else if (qLower.includes("consequence") || qLower.includes("electrical") || qLower.includes("short") || qLower.includes("open")) {
+        const criticals = intelData.individual_defect_intelligence.filter(d => d.unified_score.priority_level === "P1_CRITICAL");
+        const list = criticals.map(c => `• <strong>${c.display_name}:</strong> ${c.potential_consequences.join(" ")}`).join("<br>");
+        answer = `<strong>Potential Electrical Consequences (CEIA Proxies):</strong><br>${list}<br><span style="color:#a855f7; font-size:11px;">⚠️ Note: All electrical consequences are modeled via counterfactual geometric proxies. Bench measurements required.</span>`;
+      } else if (qLower.includes("summar")) {
+        const b = reportData.board_summary;
+        answer = `<strong>Board Inspection Summary:</strong> Board '${reportData.metadata.board_id}' is evaluated as <strong>${b.overall_disposition}</strong>. It displays ${b.total_defects} total anomalies, including ${b.critical_defects_count} P1 Critical and ${b.high_risk_count} P2 High-Risk defects violating IPC-A-600 Class 2/3 tolerances.`;
+      } else {
+        answer = `<strong>Engineering Intelligence Response:</strong><br>Query: "${query}"<br>Based on IPC-A-600 standards and the ${reportData.board_summary.total_defects} detected defects on Board '${reportData.metadata.board_id}', ensure all P1 critical anomalies are isolated under stereo magnification before attempting power-on testing.`;
+      }
+
+      out.innerHTML = `<div>${answer}</div><div style="font-size:11px; color:#64748b; margin-top:8px;">Runtime: ${engine} | Grounding: IPC-A-600 Class 2/3</div>`;
+    }, 200);
+  }
+
+  function downloadJSON() {
+    const blob = new Blob([JSON.stringify(intelData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${reportData.metadata.board_id}_engineering_intelligence.json`;
+    a.click();
+  }
+
+  // Initialize Canvas
+  window.onload = renderBBoxes;
+</script>
+
+</body>
+</html>

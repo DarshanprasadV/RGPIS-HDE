@@ -1,0 +1,103 @@
+{
+  "standards_reference": "IPC-A-600 / IPC-6012 Industrial PCB Inspection Guidelines",
+  "disclaimer": "AI advisory guidance only. Defect identification and classification originate from upstream visual inspection. The operator is responsible for final physical verification. This system does not independently approve or reject PCBs.",
+  "confidence_threshold": 0.50,
+  "defects": {
+    "open_circuit": {
+      "display_name": "Open Circuit",
+      "definition": "A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.",
+      "possible_consequences": [
+        "Loss of signal continuity across the net, causing functional circuit failure.",
+        "Disconnected power rail or floating high-impedance logic input.",
+        "Intermittent operation under thermal expansion and mechanical vibration."
+      ],
+      "recommended_verification_procedure": [
+        "Perform a two-point electrical continuity check using a calibrated digital multimeter (DMM) or flying probe tester across the affected net endpoints.",
+        "Inspect the break location under 10x-20x optical magnification with oblique lighting to confirm whether the copper is etched away or cracked.",
+        "Check adjacent layers/vias to determine if the break is isolated to the outer copper foil."
+      ],
+      "operator_guidance": "Mark the bounding coordinates on the traveler sheet. Do not apply operational power to this board. Route the board to the rework station for micro-jumper review or flag for scrap according to IPC Class 2/3 acceptance criteria.",
+      "criticality": "HIGH"
+    },
+    "short_circuit": {
+      "display_name": "Short Circuit",
+      "definition": "An unintended conductive copper bridge, solder splash, or copper filament connecting two electrically distinct conductor traces or pads.",
+      "possible_consequences": [
+        "Direct low-resistance path between distinct signals, ground, or power rails.",
+        "Severe overcurrent risk capable of damaging downstream integrated circuits or power supplies upon energization.",
+        "Nuisance tripping of power supply protection circuitry."
+      ],
+      "recommended_verification_procedure": [
+        "Measure resistance across the affected nets with a digital multimeter to confirm near-zero ohm impedance before applying power.",
+        "Visually inspect under high magnification (15x-30x) to determine whether the bridge is surface copper foil, solder debris, or plating defect.",
+        "Verify trace clearance against the master PCB Gerber design rules."
+      ],
+      "operator_guidance": "Immediately quarantine the PCB unit. Affix a DO NOT POWER warning label. Evaluate whether the bridge can be safely excised under a stereo microscope without violating dielectric base laminate integrity.",
+      "criticality": "HIGH"
+    },
+    "mouse_bite": {
+      "display_name": "Mouse Bite",
+      "definition": "A notch, tear, or void along the edge of a copper conductor trace, reducing the effective cross-sectional conductor width.",
+      "possible_consequences": [
+        "Localized current crowding and increased trace resistance at the bottleneck.",
+        "Elevated localized temperature rise (hotspot) under rated current load.",
+        "Vulnerability to fatigue fracture during thermal cycling or mechanical shock."
+      ],
+      "recommended_verification_procedure": [
+        "Measure the remaining conductor width at the narrowest point of the notch using an optical measuring microscope or calibrated reticle.",
+        "Compare the measured width against IPC-A-600 criteria (conductor width reduction must typically not exceed 20% of nominal design width for Class 2/3).",
+        "Inspect surrounding base laminate for delamination or copper peel."
+      ],
+      "operator_guidance": "Record the remaining conductor percentage in the inspection log. If remaining width meets DRC specification, mark as acceptable defect condition; otherwise route to engineering lead for current-load review.",
+      "criticality": "MEDIUM"
+    },
+    "spur": {
+      "display_name": "Spur",
+      "definition": "An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.",
+      "possible_consequences": [
+        "Severe reduction of dielectric clearance distance to adjacent conductors.",
+        "Risk of electrical arc or dielectric breakdown during high-voltage transient events.",
+        "Potential trap for solder bridge formation during wave or reflow soldering."
+      ],
+      "recommended_verification_procedure": [
+        "Measure the minimum remaining spacing between the spur apex and the nearest adjacent conductor under 20x magnification.",
+        "Verify whether remaining spacing satisfies IPC-A-600 minimum electrical clearance rules for the operating voltage class.",
+        "Examine whether the spur is firmly bonded to the base substrate or lifting."
+      ],
+      "operator_guidance": "Document the reduced clearance spacing. If clearance is less than design rule limits, evaluate for micro-trimming under magnification using an approved deburring tool.",
+      "criticality": "MEDIUM"
+    },
+    "spurious_copper": {
+      "display_name": "Spurious Copper",
+      "definition": "An isolated, extraneous island, particle, or flake of unetched copper remaining in non-conductive dielectric areas.",
+      "possible_consequences": [
+        "Violates minimum dielectric creepage and clearance specifications.",
+        "If poorly bonded, flake may dislodge during vibration and cause intermittent shorting elsewhere on the assembly.",
+        "Can cause high-frequency impedance anomalies or capacitive coupling."
+      ],
+      "recommended_verification_procedure": [
+        "Inspect whether the copper flake is firmly bonded to the laminate or loose debris.",
+        "Measure the clearance distance between the spurious copper and all adjacent active nets.",
+        "Use an ESD-safe cleanroom swab with isopropyl alcohol to verify if it is loose particulate that can be safely wiped off."
+      ],
+      "operator_guidance": "If particulate is loose, clean thoroughly and re-inspect. If bonded copper flake violates electrical clearance rules, submit for MRB (Material Review Board) disposition.",
+      "criticality": "LOW_TO_MEDIUM"
+    },
+    "pin_hole": {
+      "display_name": "Pin Hole",
+      "definition": "A small circular or irregular void, pit, or penetration within a conductive trace, pad, or ground plane surface.",
+      "possible_consequences": [
+        "Slight reduction in conductor cross-section and localized resistance increase.",
+        "If located on an SMT solder pad or via annular ring, can degrade solder joint wetting and mechanical shear strength.",
+        "Trap for chemical residues, flux, or moisture, accelerating localized dendritic corrosion."
+      ],
+      "recommended_verification_procedure": [
+        "Measure the void diameter relative to the total conductor width or pad area under 20x magnification.",
+        "Check compliance against IPC-A-600 void allowances (typically single voids <= 10% conductor width and not extending into conductor edge).",
+        "Inspect for corrosive contaminants inside the pit cavity."
+      ],
+      "operator_guidance": "Determine if the pin hole is on a signal trace, power trace, or component pad. If on an SMT pad or exceeding 10% conductor reduction, mark for engineering sign-off; otherwise document and pass.",
+      "criticality": "LOW"
+    }
+  }
+}
