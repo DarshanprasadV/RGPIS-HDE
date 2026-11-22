@@ -1,0 +1,180 @@
+{
+  "image_name": "test.png",
+  "image_path": "/mnt/c/Users/Gokul D/OneDrive/Documents/RGPIS-HDE/RGPIS-HDE/datasets/test/test.png",
+  "image_width": 640,
+  "image_height": 640,
+  "total_defects": 9,
+  "detections": [
+    {
+      "defect_id": 1,
+      "class_id": 4,
+      "class_name": "copper",
+      "confidence": 0.8938999772071838,
+      "bbox": {
+        "x_min": 89.37000274658203,
+        "y_min": 467.8399963378906,
+        "x_max": 128.25999450683594,
+        "y_max": 497.70001220703125
+      },
+      "geometry": {
+        "width": 38.89,
+        "height": 29.86,
+        "center_x": 108.82,
+        "center_y": 482.77,
+        "area": 1161.26
+      }
+    },
+    {
+      "defect_id": 2,
+      "class_id": 1,
+      "class_name": "short",
+      "confidence": 0.8712999820709229,
+      "bbox": {
+        "x_min": 455.55999755859375,
+        "y_min": 301.6000061035156,
+        "x_max": 493.1199951171875,
+        "y_max": 395.44000244140625
+      },
+      "geometry": {
+        "width": 37.56,
+        "height": 93.84,
+        "center_x": 474.34,
+        "center_y": 348.52,
+        "area": 3524.63
+      }
+    },
+    {
+      "defect_id": 3,
+      "class_id": 4,
+      "class_name": "copper",
+      "confidence": 0.8553000092506409,
+      "bbox": {
+        "x_min": 150.7100067138672,
+        "y_min": 147.8300018310547,
+        "x_max": 183.13999938964844,
+        "y_max": 175.5
+      },
+      "geometry": {
+        "width": 32.43,
+        "height": 27.67,
+        "center_x": 166.93,
+        "center_y": 161.67,
+        "area": 897.34
+      }
+    },
+    {
+      "defect_id": 4,
+      "class_id": 5,
+      "class_name": "pin-hole",
+      "confidence": 0.8485000133514404,
+      "bbox": {
+        "x_min": 492.510009765625,
+        "y_min": 27.8700008392334,
+        "x_max": 525.3900146484375,
+        "y_max": 55.27000045776367
+      },
+      "geometry": {
+        "width": 32.88,
+        "height": 27.4,
+        "center_x": 508.95,
+        "center_y": 41.57,
+        "area": 900.91
+      }
+    },
+    {
+      "defect_id": 5,
+      "class_id": 5,
+      "class_name": "pin-hole",
+      "confidence": 0.8456000089645386,
+      "bbox": {
+        "x_min": 250.66000366210938,
+        "y_min": 340.69000244140625,
+        "x_max": 278.8900146484375,
+        "y_max": 370.5199890136719
+      },
+      "geometry": {
+        "width": 28.23,
+        "height": 29.83,
+        "center_x": 264.78,
+        "center_y": 355.61,
+        "area": 842.1
+      }
+    },
+    {
+      "defect_id": 6,
+      "class_id": 5,
+      "class_name": "pin-hole",
+      "confidence": 0.8382999897003174,
+      "bbox": {
+        "x_min": 423.8999938964844,
+        "y_min": 23.90999984741211,
+        "x_max": 461.3900146484375,
+        "y_max": 52.650001525878906
+      },
+      "geometry": {
+        "width": 37.49,
+        "height": 28.74,
+        "center_x": 442.64,
+        "center_y": 38.28,
+        "area": 1077.46
+      }
+    },
+    {
+      "defect_id": 7,
+      "class_id": 2,
+      "class_name": "mousebite",
+      "confidence": 0.8349000215530396,
+      "bbox": {
+        "x_min": 466.82000732421875,
+        "y_min": 440.5899963378906,
+        "x_max": 495.8500061035156,
+        "y_max": 469.7900085449219
+      },
+      "geometry": {
+        "width": 29.03,
+        "height": 29.2,
+        "center_x": 481.34,
+        "center_y": 455.19,
+        "area": 847.68
+      }
+    },
+    {
+      "defect_id": 8,
+      "class_id": 3,
+      "class_name": "spur",
+      "confidence": 0.8306999802589417,
+      "bbox": {
+        "x_min": 331.1400146484375,
+        "y_min": 247.25,
+        "x_max": 365.239990234375,
+        "y_max": 285.2900085449219
+      },
+      "geometry": {
+        "width": 34.1,
+        "height": 38.04,
+        "center_x": 348.19,
+        "center_y": 266.27,
+        "area": 1297.16
+      }
+    },
+    {
+      "defect_id": 9,
+      "class_id": 0,
+      "class_name": "open",
+      "confidence": 0.8240000009536743,
+      "bbox": {
+        "x_min": 539.1300048828125,
+        "y_min": 256.9800109863281,
+        "x_max": 592.4099731445312,
+        "y_max": 316.2699890136719
+      },
+      "geometry": {
+        "width": 53.28,
+        "height": 59.29,
+        "center_x": 565.77,
+        "center_y": 286.63,
+        "area": 3158.97
+      }
+    }
+  ]
+}

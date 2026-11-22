@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RGPIS-HDE Unified Defect Intelligence</title>
+<style>
+body {
+    margin:0;
+    padding:28px;
+    background:#0f172a;
+    color:#e2e8f0;
+    font-family:Arial,Helvetica,sans-serif;
+}
+.container {max-width:1400px;margin:auto}
+h1 {margin-bottom:5px}
+.subtitle {color:#94a3b8;margin-bottom:25px}
+.status {
+    background:#1e293b;
+    border-left:5px solid #f59e0b;
+    padding:18px;
+    border-radius:8px;
+    margin-bottom:20px;
+}
+.cards {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:12px;margin:20px 0;
+}
+.card {
+    background:#1e293b;padding:18px;border-radius:10px;
+    text-align:center
+}
+.count {font-size:30px;font-weight:bold;margin-bottom:5px}
+.score {
+    background:#1e293b;padding:20px;border-radius:10px;
+    margin:15px 0;font-size:18px
+}
+table {
+    width:100%;border-collapse:collapse;background:#1e293b;
+    margin-top:20px
+}
+th,td {
+    padding:12px;text-align:left;border-bottom:1px solid #334155;
+}
+th {background:#334155}
+.priority {
+    padding:5px 10px;border-radius:6px;
+    color:white;font-weight:bold;font-size:12px
+}
+tr:hover {background:#273449}
+.note {
+    color:#94a3b8;font-size:13px;margin-top:20px;
+    line-height:1.6
+}
+@media(max-width:800px) {
+    body {padding:10px}
+    table {font-size:12px}
+    th,td {padding:7px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>RGPIS-HDE</h1>
+<div class="subtitle">Reference-Guided Dual-Domain Discrepancy
+& Heterogeneous Edge Process Intelligence System</div>
+
+<div class="status">
+<strong>PCB Assessment:</strong>
+REJECT - CRITICAL DEFECTS DETECTED
+</div>
+
+<div class="cards">
+<div class="card">
+<div class="count">9</div>
+<div>Total Defects</div>
+</div>
+
+        <div class="card">
+          <div class="count" style="color:#dc2626">2</div>
+          <div>CRITICAL</div>
+        </div>
+        
+
+        <div class="card">
+          <div class="count" style="color:#ea580c">0</div>
+          <div>HIGH</div>
+        </div>
+        
+
+        <div class="card">
+          <div class="count" style="color:#d97706">4</div>
+          <div>MODERATE</div>
+        </div>
+        
+
+        <div class="card">
+          <div class="count" style="color:#16a34a">3</div>
+          <div>LOW</div>
+        </div>
+        
+<div class="card">
+<div class="count">9</div>
+<div>CERI-CEIA Matched</div>
+</div>
+</div>
+
+<div class="score">
+<strong>Mean Unified Defect Score:</strong>
+54.23 / 100
+</div>
+
+<h2>Unified Defect Analysis</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th><th>Defect</th><th>Confidence</th>
+<th>CERI</th><th>CEIA</th><th>Unified</th>
+<th>Priority</th><th>Recommendation</th>
+</tr>
+</thead>
+<tbody>
+
+        <tr>
+          <td>2</td>
+          <td>SHORT</td>
+          <td>0.871</td>
+          <td>95.00</td>
+          <td>CRITICAL - SHORT CIRCUIT RISK</td>
+          <td><b>96.75</b></td>
+          <td><span class="priority" style="background:#dc2626">
+              CRITICAL</span></td>
+          <td>CRITICAL: Inspect potential copper bridging and verify isolation between conductors.</td>
+        </tr>
+        
+
+        <tr>
+          <td>9</td>
+          <td>OPEN</td>
+          <td>0.824</td>
+          <td>90.00</td>
+          <td>CRITICAL - OPEN CIRCUIT RISK</td>
+          <td><b>95.00</b></td>
+          <td><span class="priority" style="background:#dc2626">
+              CRITICAL</span></td>
+          <td>CRITICAL: Perform continuity testing and verify whether the conductive path is interrupted.</td>
+        </tr>
+        
+
+        <tr>
+          <td>8</td>
+          <td>SPUR</td>
+          <td>0.831</td>
+          <td>51.32</td>
+          <td>COPPER GAIN / CLEARANCE / BRIDGE REVIEW</td>
+          <td><b>56.11</b></td>
+          <td><span class="priority" style="background:#d97706">
+              MODERATE</span></td>
+          <td>Inspect protruding copper and adjacent clearance. Check for potential bridging.</td>
+        </tr>
+        
+
+        <tr>
+          <td>7</td>
+          <td>MOUSEBITE</td>
+          <td>0.835</td>
+          <td>48.04</td>
+          <td>MODERATE GEOMETRIC COPPER LOSS</td>
+          <td><b>50.48</b></td>
+          <td><span class="priority" style="background:#d97706">
+              MODERATE</span></td>
+          <td>Inspect edge damage and remaining trace width. Check whether a critical current path is affected.</td>
+        </tr>
+        
+
+        <tr>
+          <td>1</td>
+          <td>COPPER</td>
+          <td>0.894</td>
+          <td>42.99</td>
+          <td>UNQUANTIFIED - GEOMETRY REVIEW REQUIRED</td>
+          <td><b>45.44</b></td>
+          <td><span class="priority" style="background:#d97706">
+              MODERATE</span></td>
+          <td>Review copper geometry discrepancy, trace width, clearance, and possible unintended connections.</td>
+        </tr>
+        
+
+        <tr>
+          <td>3</td>
+          <td>COPPER</td>
+          <td>0.855</td>
+          <td>40.11</td>
+          <td>UNQUANTIFIED - GEOMETRY REVIEW REQUIRED</td>
+          <td><b>43.57</b></td>
+          <td><span class="priority" style="background:#d97706">
+              MODERATE</span></td>
+          <td>Review copper geometry discrepancy, trace width, clearance, and possible unintended connections.</td>
+        </tr>
+        
+
+        <tr>
+          <td>4</td>
+          <td>PIN-HOLE</td>
+          <td>0.849</td>
+          <td>35.93</td>
+          <td>LOW GEOMETRIC CHANGE - REVIEW</td>
+          <td><b>33.85</b></td>
+          <td><span class="priority" style="background:#16a34a">
+              LOW</span></td>
+          <td>Inspect the copper void and determine whether it intersects a critical conductor or pad.</td>
+        </tr>
+        
+
+        <tr>
+          <td>5</td>
+          <td>PIN-HOLE</td>
+          <td>0.846</td>
+          <td>35.48</td>
+          <td>LOW GEOMETRIC CHANGE - REVIEW</td>
+          <td><b>33.56</b></td>
+          <td><span class="priority" style="background:#16a34a">
+              LOW</span></td>
+          <td>Inspect the copper void and determine whether it intersects a critical conductor or pad.</td>
+        </tr>
+        
+
+        <tr>
+          <td>6</td>
+          <td>PIN-HOLE</td>
+          <td>0.838</td>
+          <td>35.10</td>
+          <td>LOW GEOMETRIC CHANGE - REVIEW</td>
+          <td><b>33.31</b></td>
+          <td><span class="priority" style="background:#16a34a">
+              LOW</span></td>
+          <td>Inspect the copper void and determine whether it intersects a critical conductor or pad.</td>
+        </tr>
+        
+</tbody>
+</table>
+
+<div class="note">
+Unified score formula: 65% CERI geometry/risk score + 35% CEIA
+electrical impact score. Open and short detections receive critical
+priority overrides. This is an experimental prototype score, not a
+validated manufacturing acceptance standard. Image-based geometry
+and electrical approximations require engineering verification.
+</div>
+</div>
+</body>
+</html>
