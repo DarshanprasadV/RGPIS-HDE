@@ -2,7 +2,7 @@
   "metadata": {
     "board_id": "deep_50600035",
     "image_name": "deep_50600035.jpg",
-    "timestamp": "2026-11-22T16:30:02Z",
+    "timestamp": "2026-11-22T17:01:06Z",
     "total_generation_latency_seconds": 0.0,
     "runtime_backend": "ExecuTorch (XNNPACK CPU Offline Runtime)",
     "foundation_model": "Llama-3.2-1B-Instruct (4-bit SpinQuant INT4)",
@@ -59,7 +59,7 @@
         "Loss of signal continuity across the net, causing functional circuit failure.",
         "Disconnected power rail or floating high-impedance logic input.",
         "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0. Complete circuit open with zero current transfer."
+        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
       ],
       "region_inspection_points": [
         "Position stereo microscope directly over bounding coordinates [188.9, 485.2, 228.5, 519.9] under 20x-30x magnification.",
@@ -85,7 +85,11 @@
         "metric_name": "Counterfactual Electrical Impact Analysis (CEIA)",
         "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY",
         "nodal_conductance_factor": 0.0,
+        "current_density_A_m2": 0.0,
+        "current_density_str": "0.0 A\u00b7m\u207b\u00b2 (Open Circuit / Zero Conduction)",
+        "current_density_unit": "A\u00b7m\u207b\u00b2",
         "current_density_multiplier": 0.0,
+        "nominal_baseline_J0_A_m2": 112485939.26,
         "resistance_multiplier_proxy": 999999.0,
         "signal_integrity_risk": "CRITICAL",
         "thermal_dissipation_risk": "LOW",
@@ -122,7 +126,7 @@
         "Loss of signal continuity across the net, causing functional circuit failure.",
         "Disconnected power rail or floating high-impedance logic input.",
         "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0. Complete circuit open with zero current transfer."
+        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
       ],
       "region_inspection_points": [
         "Position stereo microscope directly over bounding coordinates [489.4, 462.1, 590.2, 496.1] under 20x-30x magnification.",
@@ -148,7 +152,11 @@
         "metric_name": "Counterfactual Electrical Impact Analysis (CEIA)",
         "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY",
         "nodal_conductance_factor": 0.0,
+        "current_density_A_m2": 0.0,
+        "current_density_str": "0.0 A\u00b7m\u207b\u00b2 (Open Circuit / Zero Conduction)",
+        "current_density_unit": "A\u00b7m\u207b\u00b2",
         "current_density_multiplier": 0.0,
+        "nominal_baseline_J0_A_m2": 112485939.26,
         "resistance_multiplier_proxy": 999999.0,
         "signal_integrity_risk": "CRITICAL",
         "thermal_dissipation_risk": "LOW",
@@ -185,7 +193,7 @@
         "Loss of signal continuity across the net, causing functional circuit failure.",
         "Disconnected power rail or floating high-impedance logic input.",
         "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0. Complete circuit open with zero current transfer."
+        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
       ],
       "region_inspection_points": [
         "Position stereo microscope directly over bounding coordinates [84.4, 462.3, 185.9, 495.8] under 20x-30x magnification.",
@@ -211,7 +219,11 @@
         "metric_name": "Counterfactual Electrical Impact Analysis (CEIA)",
         "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY",
         "nodal_conductance_factor": 0.0,
+        "current_density_A_m2": 0.0,
+        "current_density_str": "0.0 A\u00b7m\u207b\u00b2 (Open Circuit / Zero Conduction)",
+        "current_density_unit": "A\u00b7m\u207b\u00b2",
         "current_density_multiplier": 0.0,
+        "nominal_baseline_J0_A_m2": 112485939.26,
         "resistance_multiplier_proxy": 999999.0,
         "signal_integrity_risk": "CRITICAL",
         "thermal_dissipation_risk": "LOW",
@@ -248,7 +260,7 @@
         "Loss of signal continuity across the net, causing functional circuit failure.",
         "Disconnected power rail or floating high-impedance logic input.",
         "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0. Complete circuit open with zero current transfer."
+        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
       ],
       "region_inspection_points": [
         "Position stereo microscope directly over bounding coordinates [123.4, 365.6, 184.1, 426.0] under 20x-30x magnification.",
@@ -274,7 +286,11 @@
         "metric_name": "Counterfactual Electrical Impact Analysis (CEIA)",
         "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY",
         "nodal_conductance_factor": 0.0,
+        "current_density_A_m2": 0.0,
+        "current_density_str": "0.0 A\u00b7m\u207b\u00b2 (Open Circuit / Zero Conduction)",
+        "current_density_unit": "A\u00b7m\u207b\u00b2",
         "current_density_multiplier": 0.0,
+        "nominal_baseline_J0_A_m2": 112485939.26,
         "resistance_multiplier_proxy": 999999.0,
         "signal_integrity_risk": "CRITICAL",
         "thermal_dissipation_risk": "LOW",
@@ -311,7 +327,7 @@
         "Loss of signal continuity across the net, causing functional circuit failure.",
         "Disconnected power rail or floating high-impedance logic input.",
         "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0. Complete circuit open with zero current transfer."
+        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
       ],
       "region_inspection_points": [
         "Position stereo microscope directly over bounding coordinates [82.4, 258.1, 160.5, 288.1] under 20x-30x magnification.",
@@ -337,7 +353,11 @@
         "metric_name": "Counterfactual Electrical Impact Analysis (CEIA)",
         "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY",
         "nodal_conductance_factor": 0.0,
+        "current_density_A_m2": 0.0,
+        "current_density_str": "0.0 A\u00b7m\u207b\u00b2 (Open Circuit / Zero Conduction)",
+        "current_density_unit": "A\u00b7m\u207b\u00b2",
         "current_density_multiplier": 0.0,
+        "nominal_baseline_J0_A_m2": 112485939.26,
         "resistance_multiplier_proxy": 999999.0,
         "signal_integrity_risk": "CRITICAL",
         "thermal_dissipation_risk": "LOW",
@@ -374,7 +394,7 @@
         "Direct low-resistance path between distinct signals, ground, or power rails.",
         "Severe overcurrent risk capable of damaging downstream integrated circuits or power supplies upon energization.",
         "Nuisance tripping of power supply protection circuitry.",
-        "CEIA Proxy: Shunt bridge conductance creates severe overcurrent risk; bypasses designed circuit net."
+        "CEIA Proxy: Shunt bridge creates severe surge current density (1.07 \u00d7 10\u2079 A\u00b7m\u207b\u00b2), risking power rail shutdown and catastrophic conductor trace vaporization."
       ],
       "region_inspection_points": [
         "Position stereo microscope directly over bounding coordinates [175.9, 267.5, 219.2, 298.5] under 20x-30x magnification.",
@@ -400,7 +420,11 @@
         "metric_name": "Counterfactual Electrical Impact Analysis (CEIA)",
         "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY",
         "nodal_conductance_factor": 99.0,
-        "current_density_multiplier": 999.0,
+        "current_density_A_m2": 1071428571.43,
+        "current_density_str": "1.07 \u00d7 10\u2079 A\u00b7m\u207b\u00b2",
+        "current_density_unit": "A\u00b7m\u207b\u00b2",
+        "current_density_multiplier": 9.52,
+        "nominal_baseline_J0_A_m2": 112485939.26,
         "resistance_multiplier_proxy": 0.01,
         "signal_integrity_risk": "CRITICAL",
         "thermal_dissipation_risk": "CRITICAL",
@@ -437,7 +461,7 @@
         "Loss of signal continuity across the net, causing functional circuit failure.",
         "Disconnected power rail or floating high-impedance logic input.",
         "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0. Complete circuit open with zero current transfer."
+        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
       ],
       "region_inspection_points": [
         "Position stereo microscope directly over bounding coordinates [486.1, 47.1, 592.0, 83.8] under 20x-30x magnification.",
@@ -463,7 +487,11 @@
         "metric_name": "Counterfactual Electrical Impact Analysis (CEIA)",
         "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY",
         "nodal_conductance_factor": 0.0,
+        "current_density_A_m2": 0.0,
+        "current_density_str": "0.0 A\u00b7m\u207b\u00b2 (Open Circuit / Zero Conduction)",
+        "current_density_unit": "A\u00b7m\u207b\u00b2",
         "current_density_multiplier": 0.0,
+        "nominal_baseline_J0_A_m2": 112485939.26,
         "resistance_multiplier_proxy": 999999.0,
         "signal_integrity_risk": "CRITICAL",
         "thermal_dissipation_risk": "LOW",
@@ -500,7 +528,7 @@
         "Loss of signal continuity across the net, causing functional circuit failure.",
         "Disconnected power rail or floating high-impedance logic input.",
         "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0. Complete circuit open with zero current transfer."
+        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
       ],
       "region_inspection_points": [
         "Position stereo microscope directly over bounding coordinates [17.8, 48.8, 163.1, 82.5] under 20x-30x magnification.",
@@ -526,7 +554,11 @@
         "metric_name": "Counterfactual Electrical Impact Analysis (CEIA)",
         "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY",
         "nodal_conductance_factor": 0.0,
+        "current_density_A_m2": 0.0,
+        "current_density_str": "0.0 A\u00b7m\u207b\u00b2 (Open Circuit / Zero Conduction)",
+        "current_density_unit": "A\u00b7m\u207b\u00b2",
         "current_density_multiplier": 0.0,
+        "nominal_baseline_J0_A_m2": 112485939.26,
         "resistance_multiplier_proxy": 999999.0,
         "signal_integrity_risk": "CRITICAL",
         "thermal_dissipation_risk": "LOW",
@@ -563,7 +595,7 @@
         "Loss of signal continuity across the net, causing functional circuit failure.",
         "Disconnected power rail or floating high-impedance logic input.",
         "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0. Complete circuit open with zero current transfer."
+        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
       ],
       "region_inspection_points": [
         "Position stereo microscope directly over bounding coordinates [284.7, 517.7, 365.9, 547.0] under 20x-30x magnification.",
@@ -589,7 +621,11 @@
         "metric_name": "Counterfactual Electrical Impact Analysis (CEIA)",
         "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY",
         "nodal_conductance_factor": 0.0,
+        "current_density_A_m2": 0.0,
+        "current_density_str": "0.0 A\u00b7m\u207b\u00b2 (Open Circuit / Zero Conduction)",
+        "current_density_unit": "A\u00b7m\u207b\u00b2",
         "current_density_multiplier": 0.0,
+        "nominal_baseline_J0_A_m2": 112485939.26,
         "resistance_multiplier_proxy": 999999.0,
         "signal_integrity_risk": "CRITICAL",
         "thermal_dissipation_risk": "LOW",
@@ -626,7 +662,7 @@
         "Loss of signal continuity across the net, causing functional circuit failure.",
         "Disconnected power rail or floating high-impedance logic input.",
         "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0. Complete circuit open with zero current transfer."
+        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
       ],
       "region_inspection_points": [
         "Position stereo microscope directly over bounding coordinates [0.0, 515.0, 26.2, 550.5] under 20x-30x magnification.",
@@ -652,7 +688,11 @@
         "metric_name": "Counterfactual Electrical Impact Analysis (CEIA)",
         "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY",
         "nodal_conductance_factor": 0.0,
+        "current_density_A_m2": 0.0,
+        "current_density_str": "0.0 A\u00b7m\u207b\u00b2 (Open Circuit / Zero Conduction)",
+        "current_density_unit": "A\u00b7m\u207b\u00b2",
         "current_density_multiplier": 0.0,
+        "nominal_baseline_J0_A_m2": 112485939.26,
         "resistance_multiplier_proxy": 999999.0,
         "signal_integrity_risk": "CRITICAL",
         "thermal_dissipation_risk": "LOW",
@@ -689,7 +729,7 @@
         "Loss of signal continuity across the net, causing functional circuit failure.",
         "Disconnected power rail or floating high-impedance logic input.",
         "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0. Complete circuit open with zero current transfer."
+        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
       ],
       "region_inspection_points": [
         "Position stereo microscope directly over bounding coordinates [460.3, 256.7, 571.8, 288.4] under 20x-30x magnification.",
@@ -715,7 +755,11 @@
         "metric_name": "Counterfactual Electrical Impact Analysis (CEIA)",
         "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY",
         "nodal_conductance_factor": 0.0,
+        "current_density_A_m2": 0.0,
+        "current_density_str": "0.0 A\u00b7m\u207b\u00b2 (Open Circuit / Zero Conduction)",
+        "current_density_unit": "A\u00b7m\u207b\u00b2",
         "current_density_multiplier": 0.0,
+        "nominal_baseline_J0_A_m2": 112485939.26,
         "resistance_multiplier_proxy": 999999.0,
         "signal_integrity_risk": "CRITICAL",
         "thermal_dissipation_risk": "LOW",
@@ -752,7 +796,7 @@
         "Loss of signal continuity across the net, causing functional circuit failure.",
         "Disconnected power rail or floating high-impedance logic input.",
         "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0. Complete circuit open with zero current transfer."
+        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
       ],
       "region_inspection_points": [
         "Position stereo microscope directly over bounding coordinates [283.4, 102.6, 431.2, 136.9] under 20x-30x magnification.",
@@ -778,7 +822,11 @@
         "metric_name": "Counterfactual Electrical Impact Analysis (CEIA)",
         "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY",
         "nodal_conductance_factor": 0.0,
+        "current_density_A_m2": 0.0,
+        "current_density_str": "0.0 A\u00b7m\u207b\u00b2 (Open Circuit / Zero Conduction)",
+        "current_density_unit": "A\u00b7m\u207b\u00b2",
         "current_density_multiplier": 0.0,
+        "nominal_baseline_J0_A_m2": 112485939.26,
         "resistance_multiplier_proxy": 999999.0,
         "signal_integrity_risk": "CRITICAL",
         "thermal_dissipation_risk": "LOW",
@@ -815,7 +863,7 @@
         "Loss of signal continuity across the net, causing functional circuit failure.",
         "Disconnected power rail or floating high-impedance logic input.",
         "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0. Complete circuit open with zero current transfer."
+        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
       ],
       "region_inspection_points": [
         "Position stereo microscope directly over bounding coordinates [282.4, 311.3, 362.3, 340.6] under 20x-30x magnification.",
@@ -841,7 +889,11 @@
         "metric_name": "Counterfactual Electrical Impact Analysis (CEIA)",
         "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY",
         "nodal_conductance_factor": 0.0,
+        "current_density_A_m2": 0.0,
+        "current_density_str": "0.0 A\u00b7m\u207b\u00b2 (Open Circuit / Zero Conduction)",
+        "current_density_unit": "A\u00b7m\u207b\u00b2",
         "current_density_multiplier": 0.0,
+        "nominal_baseline_J0_A_m2": 112485939.26,
         "resistance_multiplier_proxy": 999999.0,
         "signal_integrity_risk": "CRITICAL",
         "thermal_dissipation_risk": "LOW",
@@ -903,7 +955,11 @@
         "metric_name": "Counterfactual Electrical Impact Analysis (CEIA)",
         "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY",
         "nodal_conductance_factor": 1.0,
+        "current_density_A_m2": 118110236.22,
+        "current_density_str": "1.18 \u00d7 10\u2078 A\u00b7m\u207b\u00b2",
+        "current_density_unit": "A\u00b7m\u207b\u00b2",
         "current_density_multiplier": 1.05,
+        "nominal_baseline_J0_A_m2": 112485939.26,
         "resistance_multiplier_proxy": 1.0,
         "signal_integrity_risk": "HIGH",
         "thermal_dissipation_risk": "LOW",
@@ -965,7 +1021,11 @@
         "metric_name": "Counterfactual Electrical Impact Analysis (CEIA)",
         "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY",
         "nodal_conductance_factor": 0.6,
+        "current_density_A_m2": 187476565.43,
+        "current_density_str": "1.87 \u00d7 10\u2078 A\u00b7m\u207b\u00b2",
+        "current_density_unit": "A\u00b7m\u207b\u00b2",
         "current_density_multiplier": 1.67,
+        "nominal_baseline_J0_A_m2": 112485939.26,
         "resistance_multiplier_proxy": 1.13,
         "signal_integrity_risk": "LOW",
         "thermal_dissipation_risk": "MODERATE",

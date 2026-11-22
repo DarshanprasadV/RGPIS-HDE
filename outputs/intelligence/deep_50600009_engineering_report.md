@@ -1,5 +1,5 @@
 # RGPIS-HDE PCB Engineering Intelligence Traveler Report
-**Board ID:** `deep_50600009` | **Image:** `deep_50600009.jpg` | **Date:** `2026-11-22T16:30:02Z`
+**Board ID:** `deep_50600009` | **Image:** `deep_50600009.jpg` | **Date:** `2026-11-22T17:01:06Z`
 **Inspection Standard:** IPC-A-600 / IPC-6012 Class 2/3 | **Engine:** ExecuTorch Offline Llama 3.2 1B (INT4 SpinQuant)
 
 ---
@@ -43,7 +43,7 @@
 - **Optical Detection:** Detected Open Circuit anomaly at coordinates [538.6, 85.1, 578.8, 193.3] with 83.7% optical model confidence.
 - **Physical Significance:** IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.
 - **CERI Geometric Metrics:** Trace Width Reduction = 100.0%, Clearance Intrusion = 0.0%, Clearance Remaining = 0.15 mm, IPC Violation = True
-- **CEIA Electrical Proxies:** *(Geometric proxy, not physical bench test)* Current Density Bottleneck = 0.0x, SI Risk = CRITICAL, Thermal Risk = LOW
+- **CEIA Electrical Proxies:** *(Geometric proxy, not physical bench test)* Current Density J = 0.0 A·m⁻² (Open Circuit / Zero Conduction), SI Risk = CRITICAL, Thermal Risk = LOW
 - **Suggested Corrective Action:** For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.
 - **Verification Protocol:** Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).; Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.; Apply IPC-CC-830 conformal coating spot-repair over the reworked trace.
 
@@ -52,7 +52,7 @@
 - **Optical Detection:** Detected Open Circuit anomaly at coordinates [427.9, 551.9, 460.9, 626.2] with 33.8% optical model confidence.
 - **Physical Significance:** IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.
 - **CERI Geometric Metrics:** Trace Width Reduction = 100.0%, Clearance Intrusion = 0.0%, Clearance Remaining = 0.15 mm, IPC Violation = True
-- **CEIA Electrical Proxies:** *(Geometric proxy, not physical bench test)* Current Density Bottleneck = 0.0x, SI Risk = CRITICAL, Thermal Risk = LOW
+- **CEIA Electrical Proxies:** *(Geometric proxy, not physical bench test)* Current Density J = 0.0 A·m⁻² (Open Circuit / Zero Conduction), SI Risk = CRITICAL, Thermal Risk = LOW
 - **Suggested Corrective Action:** For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.
 - **Verification Protocol:** Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).; Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.; Apply IPC-CC-830 conformal coating spot-repair over the reworked trace.
 
@@ -61,7 +61,7 @@
 - **Optical Detection:** Detected Short Circuit anomaly at coordinates [427.1, 549.3, 461.9, 624.7] with 25.8% optical model confidence.
 - **Physical Significance:** IPC-A-600 Class 2/3 violation: An unintended conductive copper bridge, solder splash, or copper filament connecting two electrically distinct conductor traces or pads.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.
 - **CERI Geometric Metrics:** Trace Width Reduction = 0.0%, Clearance Intrusion = 100.0%, Clearance Remaining = 0.0 mm, IPC Violation = True
-- **CEIA Electrical Proxies:** *(Geometric proxy, not physical bench test)* Current Density Bottleneck = 999.0x, SI Risk = CRITICAL, Thermal Risk = CRITICAL
+- **CEIA Electrical Proxies:** *(Geometric proxy, not physical bench test)* Current Density J = 1.07 × 10⁹ A·m⁻², SI Risk = CRITICAL, Thermal Risk = CRITICAL
 - **Suggested Corrective Action:** Quarantine board immediately. Do not power up. Using a precision micro-scalpel or ultrasonic deburring tool under 30x magnification, carefully excise the conductive copper bridge without scoring the FR4 substrate.
 - **Verification Protocol:** Perform 2-point isolation resistance measurement with DMM (> 100 MOhm isolation required).; Perform optical clearance verification to ensure minimum electrical spacing is fully restored.; Clean region with reagent-grade isopropyl alcohol and inspect for loose copper debris.
 
@@ -70,7 +70,7 @@
 - **Optical Detection:** Detected Spur anomaly at coordinates [267.0, 151.7, 300.1, 190.6] with 82.7% optical model confidence.
 - **Physical Significance:** IPC-A-600 Class 2/3 violation: An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.
 - **CERI Geometric Metrics:** Trace Width Reduction = 0.0%, Clearance Intrusion = 95.0%, Clearance Remaining = 0.01 mm, IPC Violation = True
-- **CEIA Electrical Proxies:** *(Geometric proxy, not physical bench test)* Current Density Bottleneck = 1.05x, SI Risk = HIGH, Thermal Risk = LOW
+- **CEIA Electrical Proxies:** *(Geometric proxy, not physical bench test)* Current Density J = 1.18 × 10⁸ A·m⁻², SI Risk = HIGH, Thermal Risk = LOW
 - **Suggested Corrective Action:** Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.
 - **Verification Protocol:** Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).; Inspect substrate for mechanical damage or delamination.
 
@@ -79,7 +79,7 @@
 - **Optical Detection:** Detected Spur anomaly at coordinates [431.5, 452.0, 460.4, 486.2] with 78.1% optical model confidence.
 - **Physical Significance:** IPC-A-600 Class 2/3 violation: An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.
 - **CERI Geometric Metrics:** Trace Width Reduction = 0.0%, Clearance Intrusion = 95.0%, Clearance Remaining = 0.01 mm, IPC Violation = True
-- **CEIA Electrical Proxies:** *(Geometric proxy, not physical bench test)* Current Density Bottleneck = 1.05x, SI Risk = HIGH, Thermal Risk = LOW
+- **CEIA Electrical Proxies:** *(Geometric proxy, not physical bench test)* Current Density J = 1.18 × 10⁸ A·m⁻², SI Risk = HIGH, Thermal Risk = LOW
 - **Suggested Corrective Action:** Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.
 - **Verification Protocol:** Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).; Inspect substrate for mechanical damage or delamination.
 
@@ -88,7 +88,7 @@
 - **Optical Detection:** Detected Mouse Bite anomaly at coordinates [130.8, 198.2, 166.7, 225.2] with 83.8% optical model confidence.
 - **Physical Significance:** IPC-A-600 Class 2/3 violation: A notch, tear, or void along the edge of a copper conductor trace, reducing the effective cross-sectional conductor width.. Evaluated with CERI geometric risk score of 0.91 and Unified Priority P1_CRITICAL.
 - **CERI Geometric Metrics:** Trace Width Reduction = 84.3%, Clearance Intrusion = 0.0%, Clearance Remaining = 0.15 mm, IPC Violation = True
-- **CEIA Electrical Proxies:** *(Geometric proxy, not physical bench test)* Current Density Bottleneck = 6.37x, SI Risk = MODERATE, Thermal Risk = HIGH
+- **CEIA Electrical Proxies:** *(Geometric proxy, not physical bench test)* Current Density J = 7.16 × 10⁸ A·m⁻², SI Risk = MODERATE, Thermal Risk = HIGH
 - **Suggested Corrective Action:** Evaluate remaining trace width against DRC specification (84.3% reduction). If remaining width meets minimum current-carrying capacity, accept with engineering note. Otherwise, apply copper foil micro-patch or bridge with micro-wire.
 - **Verification Protocol:** Measure narrowest conductor bottleneck width using calibrated optical reticle microscope.; Conduct Kelvin 4-wire trace resistance measurement to verify resistance within 5% of nominal trace.
 
@@ -97,7 +97,7 @@
 - **Optical Detection:** Detected Pin Hole anomaly at coordinates [343.5, 334.7, 379.9, 361.0] with 83.6% optical model confidence.
 - **Physical Significance:** IPC-A-600 Class 2/3 violation: A small circular or irregular void, pit, or penetration within a conductive trace, pad, or ground plane surface.. Evaluated with CERI geometric risk score of 0.52 and Unified Priority P2_HIGH.
 - **CERI Geometric Metrics:** Trace Width Reduction = 40.0%, Clearance Intrusion = 0.0%, Clearance Remaining = 0.15 mm, IPC Violation = True
-- **CEIA Electrical Proxies:** *(Geometric proxy, not physical bench test)* Current Density Bottleneck = 1.67x, SI Risk = LOW, Thermal Risk = MODERATE
+- **CEIA Electrical Proxies:** *(Geometric proxy, not physical bench test)* Current Density J = 1.87 × 10⁸ A·m⁻², SI Risk = LOW, Thermal Risk = MODERATE
 - **Suggested Corrective Action:** Check void diameter against IPC-A-600 limit (<= 10% conductor width). If within tolerance, document and accept. If on SMT pad, apply micro-solder touch-up.
 - **Verification Protocol:** Verify pad coplanarity and solderability if on component landing pad.; Inspect under optical reticle to confirm void does not extend to conductor edge.
 

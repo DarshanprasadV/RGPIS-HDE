@@ -12,6 +12,7 @@ Renders an enterprise-grade, standalone, interactive HTML dashboard visualizing:
 
 import base64
 import json
+import math
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -74,6 +75,22 @@ def generate_dashboard_html(
     # Calculate max CERI & CEIA values for KPI cards
     max_ceri_red = max([d.get("ceri_metrics", {}).get("trace_width_reduction_pct", 0) for d in defects] or [0])
     max_ceia_bottleneck = max([d.get("ceia_proxies", {}).get("current_density_multiplier", 1.0) for d in defects] or [1.0])
+
+    # Format max physical current density in standard SI unit (A·m⁻²)
+    max_current_density_A_m2 = max(
+        [d.get("ceia_proxies", {}).get("current_density_A_m2", 0.0) for d in defects] or [0.0]
+    )
+    if max_current_density_A_m2 == 0.0:
+        max_current_density_str = "0.0 A·m⁻²"
+    else:
+        exp = int(math.floor(math.log10(max_current_density_A_m2)))
+        mant = max_current_density_A_m2 / (10 ** exp)
+        superscripts = {
+            "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴",
+            "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹", "-": "⁻"
+        }
+        exp_str = "".join(superscripts.get(c, c) for c in str(exp))
+        max_current_density_str = f"{mant:.2f} × 10{exp_str} A·m⁻²"
 
     disp_color = "#ef4444" if disposition == "REJECT" else ("#f59e0b" if disposition == "REVIEW" else "#10b981")
     disp_glow = "rgba(239, 68, 68, 0.4)" if disposition == "REJECT" else ("rgba(245, 158, 11, 0.4)" if disposition == "REVIEW" else "rgba(16, 185, 129, 0.4)")
@@ -428,9 +445,9 @@ def generate_dashboard_html(
       <span class="kpi-sub">Geometric Conductor Reduction</span>
     </div>
     <div class="kpi-card" style="border-left: 3px solid #a855f7;">
-      <span class="kpi-label">Max CEIA Current Crowding</span>
-      <span class="kpi-val" style="color: #c084fc;">{max_ceia_bottleneck}x</span>
-      <span class="kpi-sub">Counterfactual Geometric Proxy</span>
+      <span class="kpi-label">Max Current Density (J)</span>
+      <span class="kpi-val" style="color: #c084fc; font-size: 20px;">{max_current_density_str}</span>
+      <span class="kpi-sub">SI Unit: A·m⁻² (IPC-2152 1A ref)</span>
     </div>
     <div class="kpi-card">
       <span class="kpi-label">Unified Risk Score</span>
@@ -627,7 +644,7 @@ def generate_dashboard_html(
             <span class="section-title">CEIA Counterfactual Electrical Proxies:</span>
             <span class="proxy-badge">GEOMETRIC PROXY ESTIMATE (NOT IN-SITU BENCH TEST)</span>
             <div style="background:#130e24; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #3b1d6e; color:#e9d5ff;">
-              • Current Density Bottleneck Multiplier: <strong>{ceia.get('current_density_multiplier', 1.0)}x</strong><br>
+              • Current Density (J): <strong>{ceia.get('current_density_str', str(ceia.get('current_density_multiplier', 1.0)) + 'x')}</strong> (Crowding factor: {ceia.get('current_density_multiplier', 1.0)}x vs J₀)<br>
               • Signal Integrity Risk Level: <strong>{ceia.get('signal_integrity_risk', 'LOW')}</strong><br>
               • Thermal Dissipation Hazard: <strong>{ceia.get('thermal_dissipation_risk', 'LOW')}</strong>
             </div>
@@ -901,7 +918,7 @@ def generate_markdown_report(
             f"- **Optical Detection:** {d.get('what_was_detected')}",
             f"- **Physical Significance:** {d.get('why_significant')}",
             f"- **CERI Geometric Metrics:** Trace Width Reduction = {ceri.get('trace_width_reduction_pct')}%, Clearance Intrusion = {ceri.get('clearance_intrusion_pct')}%, Clearance Remaining = {ceri.get('clearance_remaining_mm')} mm, IPC Violation = {ceri.get('ipc_violation')}",
-            f"- **CEIA Electrical Proxies:** *(Geometric proxy, not physical bench test)* Current Density Bottleneck = {ceia.get('current_density_multiplier')}x, SI Risk = {ceia.get('signal_integrity_risk')}, Thermal Risk = {ceia.get('thermal_dissipation_risk')}",
+            f"- **CEIA Electrical Proxies:** *(Geometric proxy, not physical bench test)* Current Density J = {ceia.get('current_density_str', str(ceia.get('current_density_multiplier', 1.0)) + 'x')}, SI Risk = {ceia.get('signal_integrity_risk')}, Thermal Risk = {ceia.get('thermal_dissipation_risk')}",
             f"- **Suggested Corrective Action:** {d.get('suggested_corrective_action')}",
             f"- **Verification Protocol:** {'; '.join(d.get('verification_protocol', []))}",
             "",

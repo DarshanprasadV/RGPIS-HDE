@@ -179,13 +179,13 @@ class EngineerQAInterface:
                 ceia = d.get("ceia", {})
                 si = ceia.get("signal_integrity_risk", "LOW")
                 th = ceia.get("thermal_dissipation_risk", "LOW")
-                j_mult = ceia.get("current_density_multiplier", 1.0)
+                j_str = ceia.get("current_density_str", f"{ceia.get('current_density_multiplier', 1.0)}x")
                 if "SHORT" in cname:
-                    parts.append(f"Defect #{did} (SHORT): Infinite current surge potential across bridged nets, tripping power protection or burning conductor traces.")
+                    parts.append(f"Defect #{did} (SHORT): Severe surge current density ({j_str}) across bridged conductors, risking power rail shutdown or thermal trace vaporization.")
                 elif "OPEN" in cname:
-                    parts.append(f"Defect #{did} (OPEN): Complete signal loss and infinite loop resistance (G=0.0), causing floating logic input and circuit inoperability.")
+                    parts.append(f"Defect #{did} (OPEN): Complete signal loss and zero current flow (J = 0.0 A·m⁻², G=0.0), causing floating logic input and total circuit inoperability.")
                 elif "MOUSEBITE" in cname:
-                    parts.append(f"Defect #{did} (MOUSEBITE): {j_mult}x current crowding bottleneck proxy, creating severe localized thermal hotspots and fatigue vulnerability.")
+                    parts.append(f"Defect #{did} (MOUSEBITE): Localized current density crowds to {j_str}, creating severe Joule heating hotspots and thermal fatigue vulnerability.")
                 elif "SPUR" in cname:
                     parts.append(f"Defect #{did} (SPUR): Dielectric clearance reduction with {si} signal integrity risk, susceptible to capacitive crosstalk and dielectric breakdown.")
             

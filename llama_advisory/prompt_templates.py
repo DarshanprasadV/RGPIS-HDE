@@ -91,7 +91,7 @@ def build_llama_prompt(defect_input: Dict[str, Any]) -> Tuple[str, Dict[str, Any
         ceri_ceia_str = (
             f"\nCERI Geometric Risk: trace width reduction = {ceri.get('trace_width_reduction_pct', 'N/A')}%, "
             f"clearance intrusion = {ceri.get('clearance_intrusion_pct', 'N/A')}%\n"
-            f"CEIA Electrical Proxy: current density multiplier = {ceia.get('current_density_multiplier', 'N/A')}x, "
+            f"CEIA Electrical Proxy: current density J = {ceia.get('current_density_str', str(ceia.get('current_density_multiplier', 'N/A')) + 'x')}, "
             f"signal integrity risk = {ceia.get('signal_integrity_risk', 'N/A')}"
         )
 

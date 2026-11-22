@@ -10,6 +10,7 @@ Grounding Policy:
 """
 
 import json
+import math
 import os
 import time
 from pathlib import Path
@@ -17,6 +18,34 @@ from typing import Any, Dict, List, Optional, Union
 
 PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 DETECTIONS_JSON = PROJECT_ROOT / "outputs" / "predictions" / "detections.json"
+
+# ==============================================================================
+# Physical PCB Conductor Constants (IPC-2152 Standard 1 oz Copper Foil)
+# ==============================================================================
+# Standard 1 oz/ft² copper thickness = 35 µm = 35e-6 m
+COPPER_THICKNESS_M = 35.0e-6
+# Standard nominal signal conductor width = 10 mil = 0.254 mm = 2.54e-4 m
+NOMINAL_TRACE_WIDTH_M = 0.254e-3
+# Nominal cross-sectional conductor area A₀ = w₀ * t = 8.89e-9 m²
+NOMINAL_TRACE_AREA_M2 = NOMINAL_TRACE_WIDTH_M * COPPER_THICKNESS_M
+# Nominal signal/test operating current I_nom = 1.0 A (IPC-2152 test baseline)
+NOMINAL_CURRENT_A = 1.0
+# Baseline nominal current density J₀ = I_nom / A₀ ≈ 1.125e+08 A·m⁻²
+NOMINAL_CURRENT_DENSITY_A_M2 = NOMINAL_CURRENT_A / NOMINAL_TRACE_AREA_M2
+
+
+def format_current_density_si(j_val: float) -> str:
+    """Formats current density in SI standard A·m⁻² with superscript exponent notation."""
+    if j_val == 0.0:
+        return "0.0 A·m⁻²"
+    exp = int(math.floor(math.log10(j_val)))
+    mant = j_val / (10 ** exp)
+    superscripts = {
+        "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴",
+        "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹", "-": "⁻"
+    }
+    exp_str = "".join(superscripts.get(c, c) for c in str(exp))
+    return f"{mant:.2f} × 10{exp_str} A·m⁻²"
 
 
 def compute_ceri_metrics(class_name: str, geometry: Dict[str, float], confidence: float) -> Dict[str, Any]:
@@ -94,6 +123,8 @@ def compute_ceri_metrics(class_name: str, geometry: Dict[str, float], confidence
 def compute_ceia_metrics(class_name: str, ceri: Dict[str, Any]) -> Dict[str, Any]:
     """
     Computes CEIA (Counterfactual Electrical Impact Analysis) geometric proxy indicators.
+    Current density J is computed in standard SI units (A·m⁻²), based on IPC-2152 
+    1 oz copper foil (thickness t = 35 µm) and nominal 10 mil trace width (0.254 mm).
     CRITICAL: Labeled strictly as geometric proxies, NOT bench electrical measurements.
     """
     cname = class_name.lower().replace("-", "").replace("_", "")
@@ -107,48 +138,72 @@ def compute_ceia_metrics(class_name: str, ceri: Dict[str, Any]) -> Dict[str, Any
     )
 
     if "open" in cname:
+        # Complete electrical discontinuity: zero current flow through gap
         nodal_conductance_factor = 0.0
+        current_density_A_m2 = 0.0
         current_density_multiplier = 0.0
+        current_density_str = "0.0 A·m⁻² (Open Circuit / Zero Conduction)"
         resistance_multiplier_proxy = 999999.0  # infinite impedance
         signal_integrity_risk = "CRITICAL"
         thermal_dissipation_risk = "LOW"  # zero current flow
     elif "short" in cname:
-        nodal_conductance_factor = 99.0  # high shunt conductance
-        current_density_multiplier = 999.0  # short circuit surge path
+        # Unintended copper bridge between traces: surge fault current through narrow bridge
+        nodal_conductance_factor = 99.0
+        # Model short bridge cross-section (w_bridge ≈ 0.08 mm, t = 35 µm) under 3.0 A surge fault
+        bridge_width_m = 0.08e-3
+        bridge_area_m2 = bridge_width_m * COPPER_THICKNESS_M
+        fault_surge_current_A = 3.0
+        current_density_A_m2 = fault_surge_current_A / bridge_area_m2  # ~1.07e+09 A·m⁻²
+        current_density_multiplier = round(current_density_A_m2 / NOMINAL_CURRENT_DENSITY_A_M2, 2)
+        current_density_str = format_current_density_si(current_density_A_m2)
         resistance_multiplier_proxy = 0.01  # bridge bypass
         signal_integrity_risk = "CRITICAL"
         thermal_dissipation_risk = "CRITICAL"  # severe overcurrent hazard
     elif "mousebite" in cname:
-        remaining_ratio = max(0.05, 1.0 - (t_red / 100.0))
+        # Conductor necking bottleneck: remaining cross-section must carry nominal line current
+        remaining_ratio = max(0.02, 1.0 - (t_red / 100.0))
         nodal_conductance_factor = round(remaining_ratio, 2)
-        # Current crowding bottleneck factor: J = I / (w * t)
+        effective_area_m2 = NOMINAL_TRACE_AREA_M2 * remaining_ratio
+        current_density_A_m2 = NOMINAL_CURRENT_A / effective_area_m2
         current_density_multiplier = round(1.0 / remaining_ratio, 2)
+        current_density_str = format_current_density_si(current_density_A_m2)
         resistance_multiplier_proxy = round(1.0 + (1.0 / remaining_ratio - 1.0) * 0.4, 2)
         signal_integrity_risk = "MODERATE" if t_red > 30.0 else "LOW"
         thermal_dissipation_risk = "HIGH" if current_density_multiplier >= 1.8 else "MODERATE"
     elif "spur" in cname:
+        # Spurious protrusion: nominal trace current flows with slight localized edge field crowding
         nodal_conductance_factor = 1.0
         current_density_multiplier = 1.05
+        current_density_A_m2 = NOMINAL_CURRENT_DENSITY_A_M2 * current_density_multiplier
+        current_density_str = format_current_density_si(current_density_A_m2)
         resistance_multiplier_proxy = 1.0
-        # Reduced spacing causes localized electric field intensification & capacitive coupling
         signal_integrity_risk = "HIGH" if c_red > 50.0 else "MODERATE"
         thermal_dissipation_risk = "LOW"
     elif "copper" in cname:
+        # Isolated spurious island: carries 0 operating DC current (floating conductor)
         nodal_conductance_factor = 1.0
-        current_density_multiplier = 1.0
+        current_density_multiplier = 0.0
+        current_density_A_m2 = 0.0
+        current_density_str = "0.0 A·m⁻² (Floating Conductor)"
         resistance_multiplier_proxy = 1.0
-        signal_integrity_risk = "HIGH" if c_red > 40.0 else "MODERATE"  # parasitic capacitance
+        signal_integrity_risk = "HIGH" if c_red > 40.0 else "MODERATE"
         thermal_dissipation_risk = "LOW"
     elif "pinhole" in cname:
+        # Microscopic void inside trace: effective width reduced by void diameter
         remaining_ratio = max(0.10, 1.0 - (t_red / 100.0))
         nodal_conductance_factor = round(remaining_ratio, 2)
+        effective_area_m2 = NOMINAL_TRACE_AREA_M2 * remaining_ratio
+        current_density_A_m2 = NOMINAL_CURRENT_A / effective_area_m2
         current_density_multiplier = round(1.0 / remaining_ratio, 2)
+        current_density_str = format_current_density_si(current_density_A_m2)
         resistance_multiplier_proxy = round(1.0 + (current_density_multiplier - 1.0) * 0.2, 2)
         signal_integrity_risk = "LOW"
         thermal_dissipation_risk = "MODERATE" if current_density_multiplier >= 1.3 else "LOW"
     else:
         nodal_conductance_factor = 1.0
         current_density_multiplier = 1.0
+        current_density_A_m2 = NOMINAL_CURRENT_DENSITY_A_M2
+        current_density_str = format_current_density_si(current_density_A_m2)
         resistance_multiplier_proxy = 1.0
         signal_integrity_risk = "LOW"
         thermal_dissipation_risk = "LOW"
@@ -157,7 +212,11 @@ def compute_ceia_metrics(class_name: str, ceri: Dict[str, Any]) -> Dict[str, Any
         "metric_name": "Counterfactual Electrical Impact Analysis (CEIA)",
         "proxy_indicator_type": proxy_indicator_type,
         "nodal_conductance_factor": nodal_conductance_factor,
+        "current_density_A_m2": round(current_density_A_m2, 2),
+        "current_density_str": current_density_str,
+        "current_density_unit": "A·m⁻²",
         "current_density_multiplier": current_density_multiplier,
+        "nominal_baseline_J0_A_m2": round(NOMINAL_CURRENT_DENSITY_A_M2, 2),
         "resistance_multiplier_proxy": resistance_multiplier_proxy,
         "signal_integrity_risk": signal_integrity_risk,
         "thermal_dissipation_risk": thermal_dissipation_risk,

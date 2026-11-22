@@ -172,15 +172,20 @@ class EngineeringIntelligenceEngine:
         consequences = list(ref.get("possible_consequences", []))
         # Append CERI & CEIA proxy groundings
         if "open" in canonical_type:
-            consequences.append("CEIA Proxy: Nodal conductance factor G=0.0. Complete circuit open with zero current transfer.")
+            consequences.append("CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A·m⁻²). Complete circuit open with zero current transfer.")
         elif "short" in canonical_type:
-            consequences.append("CEIA Proxy: Shunt bridge conductance creates severe overcurrent risk; bypasses designed circuit net.")
+            j_str = ceia.get("current_density_str", "1.07 × 10⁹ A·m⁻²")
+            consequences.append(
+                f"CEIA Proxy: Shunt bridge creates severe surge current density ({j_str}), "
+                "risking power rail shutdown and catastrophic conductor trace vaporization."
+            )
         elif "mouse" in canonical_type:
             red = ceri.get("trace_width_reduction_pct", 30)
+            j_str = ceia.get("current_density_str", f"{ceia.get('current_density_multiplier', 1.5)}x")
             j_mult = ceia.get("current_density_multiplier", 1.5)
             consequences.append(
-                f"CERI & CEIA Proxies: {red}% trace width necking results in an estimated {j_mult}x localized current crowding "
-                "bottleneck and thermal stress hotspot."
+                f"CERI & CEIA Proxies: {red}% trace width necking elevates localized current density to {j_str} "
+                f"({j_mult}x crowding vs nominal J₀), risking severe Joule heating and thermal stress hotspots."
             )
         elif "spur" in canonical_type:
             red = ceri.get("clearance_intrusion_pct", 50)
