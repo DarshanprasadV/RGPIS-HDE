@@ -1,0 +1,10 @@
+defect_id,class,confidence,ceri_score,ceri_category,ceia_impact,ceia_score,unified_score,priority,critical_override,match_status,recommendation
+2,short,0.8713,95.0,CRITICAL,CRITICAL - SHORT CIRCUIT RISK,100.0,96.75,CRITICAL,True,MATCHED,CRITICAL: Inspect potential copper bridging and verify isolation between conductors.
+9,open,0.824,90.0,CRITICAL,CRITICAL - OPEN CIRCUIT RISK,100.0,95.0,CRITICAL,True,MATCHED,CRITICAL: Perform continuity testing and verify whether the conductive path is interrupted.
+8,spur,0.8307,51.32,MODERATE,COPPER GAIN / CLEARANCE / BRIDGE REVIEW,65.0,56.11,MODERATE,False,MATCHED,Inspect protruding copper and adjacent clearance. Check for potential bridging.
+7,mousebite,0.8349,48.04,MODERATE,MODERATE GEOMETRIC COPPER LOSS,55.0,50.48,MODERATE,False,MATCHED,Inspect edge damage and remaining trace width. Check whether a critical current path is affected.
+1,copper,0.8939,42.99,MODERATE,UNQUANTIFIED - GEOMETRY REVIEW REQUIRED,50.0,45.44,MODERATE,False,MATCHED,"Review copper geometry discrepancy, trace width, clearance, and possible unintended connections."
+3,copper,0.8553,40.11,MODERATE,UNQUANTIFIED - GEOMETRY REVIEW REQUIRED,50.0,43.57,MODERATE,False,MATCHED,"Review copper geometry discrepancy, trace width, clearance, and possible unintended connections."
+4,pin-hole,0.8485,35.93,MODERATE,LOW GEOMETRIC CHANGE - REVIEW,30.0,33.85,LOW,False,MATCHED,Inspect the copper void and determine whether it intersects a critical conductor or pad.
+5,pin-hole,0.8456,35.48,MODERATE,LOW GEOMETRIC CHANGE - REVIEW,30.0,33.56,LOW,False,MATCHED,Inspect the copper void and determine whether it intersects a critical conductor or pad.
+6,pin-hole,0.8383,35.1,MODERATE,LOW GEOMETRIC CHANGE - REVIEW,30.0,33.31,LOW,False,MATCHED,Inspect the copper void and determine whether it intersects a critical conductor or pad.

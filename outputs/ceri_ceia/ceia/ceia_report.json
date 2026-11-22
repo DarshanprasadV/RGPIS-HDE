@@ -1,0 +1,429 @@
+{
+    "module": "CEIA",
+    "version": "0.2",
+    "description": "Counterfactual Electrical Impact Analysis",
+    "total_defects": 9,
+    "impact_distribution": {
+        "UNQUANTIFIED - GEOMETRY REVIEW REQUIRED": 2,
+        "CRITICAL - SHORT CIRCUIT RISK": 1,
+        "LOW GEOMETRIC CHANGE - REVIEW": 3,
+        "MODERATE GEOMETRIC COPPER LOSS": 1,
+        "COPPER GAIN / CLEARANCE / BRIDGE REVIEW": 1,
+        "CRITICAL - OPEN CIRCUIT RISK": 1
+    },
+    "parameters": {
+        "current_A": 1.0,
+        "nominal_trace_width_mm": 0.5,
+        "trace_length_mm": 50.0,
+        "copper_thickness_um": 35.0,
+        "copper_resistivity_ohm_m": 1.68e-08,
+        "roi_padding_pixels": 8,
+        "segmentation_threshold": 127
+    },
+    "assumptions": [
+        "Reference and test PCB images are aligned.",
+        "Dark pixels are treated as copper.",
+        "The segmentation threshold is fixed at 127.",
+        "Regional copper ratio is a geometry proxy.",
+        "Regional copper ratio is not actual trace cross-sectional area.",
+        "Nominal trace width and copper thickness are assumed.",
+        "Electrical estimation uses a uniform equivalent trace.",
+        "Current is assumed constant for the simplified model.",
+        "Open and short defects are not assigned fabricated resistance values.",
+        "Copper gain is not assumed to increase intended trace cross-section.",
+        "The model does not solve actual 2D current distribution.",
+        "The model does not calculate actual temperature rise.",
+        "The model does not establish circuit connectivity.",
+        "Electrical estimates are not experimentally validated.",
+        "Impact categories are prototype heuristics, not IPC standards."
+    ],
+    "results": [
+        {
+            "defect_id": 1,
+            "class": "copper",
+            "confidence": 0.8938999772071838,
+            "bbox": [
+                81,
+                459,
+                137,
+                506
+            ],
+            "geometry": {
+                "roi_pixels": 2632,
+                "reference_copper_pixels": 0,
+                "test_copper_pixels": 140,
+                "copper_ratio": null,
+                "copper_loss_percent": null,
+                "copper_gain_percent": null
+            },
+            "electrical": {
+                "analysis_status": "NOT_QUANTIFIED",
+                "analysis_reason": "Reference copper was not detected in this ROI. Regional copper ratio cannot be calculated.",
+                "healthy": {
+                    "conductive_area_m2": null,
+                    "resistance_ohm": null,
+                    "current_density_A_per_m2": null,
+                    "power_loss_W": null
+                },
+                "defective": {
+                    "conductive_area_m2": null,
+                    "resistance_ohm": null,
+                    "current_density_A_per_m2": null,
+                    "power_loss_W": null
+                },
+                "change": {
+                    "resistance_percent": null,
+                    "current_density_percent": null,
+                    "power_loss_percent": null
+                }
+            },
+            "impact": "UNQUANTIFIED - GEOMETRY REVIEW REQUIRED",
+            "recommendation": "Inspect the copper geometry discrepancy. Check for unintended copper, clearance violation, or trace-width variation.",
+            "model_note": "Regional copper ratio is an image-derived geometry proxy, not an actual trace cross-section. Electrical estimates use a simplified uniform-trace model and are not experimentally validated."
+        },
+        {
+            "defect_id": 2,
+            "class": "short",
+            "confidence": 0.8712999820709229,
+            "bbox": [
+                447,
+                293,
+                502,
+                404
+            ],
+            "geometry": {
+                "roi_pixels": 6105,
+                "reference_copper_pixels": 2146,
+                "test_copper_pixels": 2463,
+                "copper_ratio": 1.147716682199441,
+                "copper_loss_percent": 0.0,
+                "copper_gain_percent": 14.77166821994409
+            },
+            "electrical": {
+                "analysis_status": "NOT_QUANTIFIED",
+                "analysis_reason": "Possible unintended conductive bridge. Bridge resistance and actual circuit topology cannot be determined from the image ROI.",
+                "healthy": {
+                    "conductive_area_m2": null,
+                    "resistance_ohm": null,
+                    "current_density_A_per_m2": null,
+                    "power_loss_W": null
+                },
+                "defective": {
+                    "conductive_area_m2": null,
+                    "resistance_ohm": null,
+                    "current_density_A_per_m2": null,
+                    "power_loss_W": null
+                },
+                "change": {
+                    "resistance_percent": null,
+                    "current_density_percent": null,
+                    "power_loss_percent": null
+                }
+            },
+            "impact": "CRITICAL - SHORT CIRCUIT RISK",
+            "recommendation": "Inspect possible unintended copper bridging. Verify isolation between adjacent conductors.",
+            "model_note": "Regional copper ratio is an image-derived geometry proxy, not an actual trace cross-section. Electrical estimates use a simplified uniform-trace model and are not experimentally validated."
+        },
+        {
+            "defect_id": 3,
+            "class": "copper",
+            "confidence": 0.8553000092506409,
+            "bbox": [
+                142,
+                139,
+                192,
+                184
+            ],
+            "geometry": {
+                "roi_pixels": 2250,
+                "reference_copper_pixels": 0,
+                "test_copper_pixels": 70,
+                "copper_ratio": null,
+                "copper_loss_percent": null,
+                "copper_gain_percent": null
+            },
+            "electrical": {
+                "analysis_status": "NOT_QUANTIFIED",
+                "analysis_reason": "Reference copper was not detected in this ROI. Regional copper ratio cannot be calculated.",
+                "healthy": {
+                    "conductive_area_m2": null,
+                    "resistance_ohm": null,
+                    "current_density_A_per_m2": null,
+                    "power_loss_W": null
+                },
+                "defective": {
+                    "conductive_area_m2": null,
+                    "resistance_ohm": null,
+                    "current_density_A_per_m2": null,
+                    "power_loss_W": null
+                },
+                "change": {
+                    "resistance_percent": null,
+                    "current_density_percent": null,
+                    "power_loss_percent": null
+                }
+            },
+            "impact": "UNQUANTIFIED - GEOMETRY REVIEW REQUIRED",
+            "recommendation": "Inspect the copper geometry discrepancy. Check for unintended copper, clearance violation, or trace-width variation.",
+            "model_note": "Regional copper ratio is an image-derived geometry proxy, not an actual trace cross-section. Electrical estimates use a simplified uniform-trace model and are not experimentally validated."
+        },
+        {
+            "defect_id": 4,
+            "class": "pin-hole",
+            "confidence": 0.8485000133514404,
+            "bbox": [
+                484,
+                19,
+                534,
+                64
+            ],
+            "geometry": {
+                "roi_pixels": 2250,
+                "reference_copper_pixels": 2250,
+                "test_copper_pixels": 2164,
+                "copper_ratio": 0.9617777777777777,
+                "copper_loss_percent": 3.822222222222227,
+                "copper_gain_percent": 0.0
+            },
+            "electrical": {
+                "analysis_status": "ESTIMATED",
+                "analysis_reason": "Simplified uniform-trace model using an image-derived regional copper ratio.",
+                "healthy": {
+                    "conductive_area_m2": 1.7499999999999998e-08,
+                    "resistance_ohm": 0.04800000000000001,
+                    "current_density_A_per_m2": 57142857.14285715,
+                    "power_loss_W": 0.04800000000000001
+                },
+                "defective": {
+                    "conductive_area_m2": 1.6831111111111108e-08,
+                    "resistance_ohm": 0.04990757855822552,
+                    "current_density_A_per_m2": 59413783.99788752,
+                    "power_loss_W": 0.04990757855822552
+                },
+                "change": {
+                    "resistance_percent": 3.9741219963031544,
+                    "current_density_percent": 3.9741219963031518,
+                    "power_loss_percent": 3.9741219963031544
+                }
+            },
+            "impact": "LOW GEOMETRIC CHANGE - REVIEW",
+            "recommendation": "Inspect the localized copper void. Determine whether it intersects a conductive path or critical copper region.",
+            "model_note": "Regional copper ratio is an image-derived geometry proxy, not an actual trace cross-section. Electrical estimates use a simplified uniform-trace model and are not experimentally validated."
+        },
+        {
+            "defect_id": 5,
+            "class": "pin-hole",
+            "confidence": 0.8456000089645386,
+            "bbox": [
+                242,
+                332,
+                287,
+                379
+            ],
+            "geometry": {
+                "roi_pixels": 2115,
+                "reference_copper_pixels": 2115,
+                "test_copper_pixels": 2048,
+                "copper_ratio": 0.968321513002364,
+                "copper_loss_percent": 3.167848699763598,
+                "copper_gain_percent": 0.0
+            },
+            "electrical": {
+                "analysis_status": "ESTIMATED",
+                "analysis_reason": "Simplified uniform-trace model using an image-derived regional copper ratio.",
+                "healthy": {
+                    "conductive_area_m2": 1.7499999999999998e-08,
+                    "resistance_ohm": 0.04800000000000001,
+                    "current_density_A_per_m2": 57142857.14285715,
+                    "power_loss_W": 0.04800000000000001
+                },
+                "defective": {
+                    "conductive_area_m2": 1.6945626477541368e-08,
+                    "resistance_ohm": 0.04957031250000001,
+                    "current_density_A_per_m2": 59012276.7857143,
+                    "power_loss_W": 0.04957031250000001
+                },
+                "change": {
+                    "resistance_percent": 3.2714843750000075,
+                    "current_density_percent": 3.271484375000011,
+                    "power_loss_percent": 3.2714843750000075
+                }
+            },
+            "impact": "LOW GEOMETRIC CHANGE - REVIEW",
+            "recommendation": "Inspect the localized copper void. Determine whether it intersects a conductive path or critical copper region.",
+            "model_note": "Regional copper ratio is an image-derived geometry proxy, not an actual trace cross-section. Electrical estimates use a simplified uniform-trace model and are not experimentally validated."
+        },
+        {
+            "defect_id": 6,
+            "class": "pin-hole",
+            "confidence": 0.8382999897003174,
+            "bbox": [
+                415,
+                15,
+                470,
+                61
+            ],
+            "geometry": {
+                "roi_pixels": 2530,
+                "reference_copper_pixels": 2530,
+                "test_copper_pixels": 2454,
+                "copper_ratio": 0.9699604743083003,
+                "copper_loss_percent": 3.0039525691699653,
+                "copper_gain_percent": 0.0
+            },
+            "electrical": {
+                "analysis_status": "ESTIMATED",
+                "analysis_reason": "Simplified uniform-trace model using an image-derived regional copper ratio.",
+                "healthy": {
+                    "conductive_area_m2": 1.7499999999999998e-08,
+                    "resistance_ohm": 0.04800000000000001,
+                    "current_density_A_per_m2": 57142857.14285715,
+                    "power_loss_W": 0.04800000000000001
+                },
+                "defective": {
+                    "conductive_area_m2": 1.6974308300395254e-08,
+                    "resistance_ohm": 0.04948655256723718,
+                    "current_density_A_per_m2": 58912562.580044255,
+                    "power_loss_W": 0.04948655256723718
+                },
+                "change": {
+                    "resistance_percent": 3.096984515077435,
+                    "current_density_percent": 3.096984515077434,
+                    "power_loss_percent": 3.096984515077435
+                }
+            },
+            "impact": "LOW GEOMETRIC CHANGE - REVIEW",
+            "recommendation": "Inspect the localized copper void. Determine whether it intersects a conductive path or critical copper region.",
+            "model_note": "Regional copper ratio is an image-derived geometry proxy, not an actual trace cross-section. Electrical estimates use a simplified uniform-trace model and are not experimentally validated."
+        },
+        {
+            "defect_id": 7,
+            "class": "mousebite",
+            "confidence": 0.8349000215530396,
+            "bbox": [
+                458,
+                432,
+                504,
+                478
+            ],
+            "geometry": {
+                "roi_pixels": 2116,
+                "reference_copper_pixels": 785,
+                "test_copper_pixels": 698,
+                "copper_ratio": 0.889171974522293,
+                "copper_loss_percent": 11.082802547770697,
+                "copper_gain_percent": 0.0
+            },
+            "electrical": {
+                "analysis_status": "ESTIMATED",
+                "analysis_reason": "Simplified uniform-trace model using an image-derived regional copper ratio.",
+                "healthy": {
+                    "conductive_area_m2": 1.7499999999999998e-08,
+                    "resistance_ohm": 0.04800000000000001,
+                    "current_density_A_per_m2": 57142857.14285715,
+                    "power_loss_W": 0.04800000000000001
+                },
+                "defective": {
+                    "conductive_area_m2": 1.5560509554140126e-08,
+                    "resistance_ohm": 0.05398280802292265,
+                    "current_density_A_per_m2": 64265247.64633647,
+                    "power_loss_W": 0.05398280802292265
+                },
+                "change": {
+                    "resistance_percent": 12.464183381088837,
+                    "current_density_percent": 12.464183381088816,
+                    "power_loss_percent": 12.464183381088837
+                }
+            },
+            "impact": "MODERATE GEOMETRIC COPPER LOSS",
+            "recommendation": "Inspect edge copper loss and remaining trace width. Check whether the affected region intersects a current-carrying path.",
+            "model_note": "Regional copper ratio is an image-derived geometry proxy, not an actual trace cross-section. Electrical estimates use a simplified uniform-trace model and are not experimentally validated."
+        },
+        {
+            "defect_id": 8,
+            "class": "spur",
+            "confidence": 0.8306999802589417,
+            "bbox": [
+                323,
+                239,
+                374,
+                294
+            ],
+            "geometry": {
+                "roi_pixels": 2805,
+                "reference_copper_pixels": 1128,
+                "test_copper_pixels": 1194,
+                "copper_ratio": 1.0585106382978724,
+                "copper_loss_percent": 0.0,
+                "copper_gain_percent": 5.85106382978724
+            },
+            "electrical": {
+                "analysis_status": "ESTIMATED",
+                "analysis_reason": "Simplified uniform-trace model using an image-derived regional copper ratio.",
+                "healthy": {
+                    "conductive_area_m2": 1.7499999999999998e-08,
+                    "resistance_ohm": 0.04800000000000001,
+                    "current_density_A_per_m2": 57142857.14285715,
+                    "power_loss_W": 0.04800000000000001
+                },
+                "defective": {
+                    "conductive_area_m2": 1.7499999999999998e-08,
+                    "resistance_ohm": 0.04800000000000001,
+                    "current_density_A_per_m2": 57142857.14285715,
+                    "power_loss_W": 0.04800000000000001
+                },
+                "change": {
+                    "resistance_percent": 0.0,
+                    "current_density_percent": 0.0,
+                    "power_loss_percent": 0.0
+                }
+            },
+            "impact": "COPPER GAIN / CLEARANCE / BRIDGE REVIEW",
+            "recommendation": "Inspect protruding copper and nearby conductor clearance. Verify whether the copper extension creates a bridge risk.",
+            "model_note": "Regional copper ratio is an image-derived geometry proxy, not an actual trace cross-section. Electrical estimates use a simplified uniform-trace model and are not experimentally validated."
+        },
+        {
+            "defect_id": 9,
+            "class": "open",
+            "confidence": 0.8240000009536743,
+            "bbox": [
+                531,
+                248,
+                601,
+                325
+            ],
+            "geometry": {
+                "roi_pixels": 5390,
+                "reference_copper_pixels": 2285,
+                "test_copper_pixels": 1772,
+                "copper_ratio": 0.775492341356674,
+                "copper_loss_percent": 22.4507658643326,
+                "copper_gain_percent": 0.0
+            },
+            "electrical": {
+                "analysis_status": "NOT_QUANTIFIED",
+                "analysis_reason": "Possible conductive path interruption. Continuity and actual resistance cannot be determined from the image ROI.",
+                "healthy": {
+                    "conductive_area_m2": null,
+                    "resistance_ohm": null,
+                    "current_density_A_per_m2": null,
+                    "power_loss_W": null
+                },
+                "defective": {
+                    "conductive_area_m2": null,
+                    "resistance_ohm": null,
+                    "current_density_A_per_m2": null,
+                    "power_loss_W": null
+                },
+                "change": {
+                    "resistance_percent": null,
+                    "current_density_percent": null,
+                    "power_loss_percent": null
+                }
+            },
+            "impact": "CRITICAL - OPEN CIRCUIT RISK",
+            "recommendation": "Inspect the conductive path for interruption. Verify continuity using electrical testing.",
+            "model_note": "Regional copper ratio is an image-derived geometry proxy, not an actual trace cross-section. Electrical estimates use a simplified uniform-trace model and are not experimentally validated."
+        }
+    ]
+}

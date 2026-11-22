@@ -1,0 +1,641 @@
+{
+    "project": "RGPIS-HDE",
+    "module": "Unified Defect Intelligence",
+    "version": "0.1",
+    "scoring": {
+        "ceri_weight": 0.65,
+        "ceia_weight": 0.35,
+        "formula": "0.65*CERI + 0.35*CEIA",
+        "critical_override_classes": [
+            "open",
+            "short"
+        ],
+        "note": "Prototype score. CERI and CEIA partly use correlated image geometry; score is not calibrated or validated against production failure data."
+    },
+    "total_detections": 9,
+    "matched_detections": 9,
+    "unmatched_ceia_detections": 0,
+    "priority_distribution": {
+        "CRITICAL": 2,
+        "HIGH": 0,
+        "MODERATE": 4,
+        "LOW": 3
+    },
+    "mean_unified_score": 54.23,
+    "board_status": "REJECT - CRITICAL DEFECTS DETECTED",
+    "results": [
+        {
+            "defect_id": 2,
+            "class": "short",
+            "confidence": 0.8713,
+            "bbox": {
+                "x_min": 455.55999755859375,
+                "y_min": 301.6000061035156,
+                "x_max": 493.1199951171875,
+                "y_max": 395.44000244140625
+            },
+            "matching": {
+                "status": "MATCHED",
+                "method": "ID_AND_CLASS"
+            },
+            "ceri": {
+                "risk_score": 95.0,
+                "risk_category": "CRITICAL",
+                "geometry_metrics": {
+                    "reference_copper_pixels": 2057,
+                    "test_copper_pixels": 2376,
+                    "copper_area_loss_pixels": 0,
+                    "copper_area_gain_pixels": 319,
+                    "copper_area_loss_percent": 0.0,
+                    "copper_area_gain_percent": 15.51,
+                    "changed_pixels": 465,
+                    "changed_area_percent": 7.83
+                },
+                "measurement_status": "PIXEL_BASED_ESTIMATE"
+            },
+            "ceia": {
+                "impact": "CRITICAL - SHORT CIRCUIT RISK",
+                "impact_score": 100.0,
+                "geometry": {
+                    "roi_pixels": 6105,
+                    "reference_copper_pixels": 2146,
+                    "test_copper_pixels": 2463,
+                    "copper_ratio": 1.147716682199441,
+                    "copper_loss_percent": 0.0,
+                    "copper_gain_percent": 14.77166821994409
+                },
+                "electrical": {
+                    "analysis_status": "NOT_QUANTIFIED",
+                    "analysis_reason": "Possible unintended conductive bridge. Bridge resistance and actual circuit topology cannot be determined from the image ROI.",
+                    "healthy": {
+                        "conductive_area_m2": null,
+                        "resistance_ohm": null,
+                        "current_density_A_per_m2": null,
+                        "power_loss_W": null
+                    },
+                    "defective": {
+                        "conductive_area_m2": null,
+                        "resistance_ohm": null,
+                        "current_density_A_per_m2": null,
+                        "power_loss_W": null
+                    },
+                    "change": {
+                        "resistance_percent": null,
+                        "current_density_percent": null,
+                        "power_loss_percent": null
+                    }
+                },
+                "recommendation": "Inspect possible unintended copper bridging. Verify isolation between adjacent conductors."
+            },
+            "unified_score": 96.75,
+            "priority": "CRITICAL",
+            "critical_override": true,
+            "recommendation": "CRITICAL: Inspect potential copper bridging and verify isolation between conductors."
+        },
+        {
+            "defect_id": 9,
+            "class": "open",
+            "confidence": 0.824,
+            "bbox": {
+                "x_min": 539.1300048828125,
+                "y_min": 256.9800109863281,
+                "x_max": 592.4099731445312,
+                "y_max": 316.2699890136719
+            },
+            "matching": {
+                "status": "MATCHED",
+                "method": "ID_AND_CLASS"
+            },
+            "ceri": {
+                "risk_score": 90.0,
+                "risk_category": "CRITICAL",
+                "geometry_metrics": {
+                    "reference_copper_pixels": 2252,
+                    "test_copper_pixels": 1741,
+                    "copper_area_loss_pixels": 511,
+                    "copper_area_gain_pixels": 0,
+                    "copper_area_loss_percent": 22.69,
+                    "copper_area_gain_percent": 0.0,
+                    "changed_pixels": 511,
+                    "changed_area_percent": 9.74
+                },
+                "measurement_status": "PIXEL_BASED_ESTIMATE"
+            },
+            "ceia": {
+                "impact": "CRITICAL - OPEN CIRCUIT RISK",
+                "impact_score": 100.0,
+                "geometry": {
+                    "roi_pixels": 5390,
+                    "reference_copper_pixels": 2285,
+                    "test_copper_pixels": 1772,
+                    "copper_ratio": 0.775492341356674,
+                    "copper_loss_percent": 22.4507658643326,
+                    "copper_gain_percent": 0.0
+                },
+                "electrical": {
+                    "analysis_status": "NOT_QUANTIFIED",
+                    "analysis_reason": "Possible conductive path interruption. Continuity and actual resistance cannot be determined from the image ROI.",
+                    "healthy": {
+                        "conductive_area_m2": null,
+                        "resistance_ohm": null,
+                        "current_density_A_per_m2": null,
+                        "power_loss_W": null
+                    },
+                    "defective": {
+                        "conductive_area_m2": null,
+                        "resistance_ohm": null,
+                        "current_density_A_per_m2": null,
+                        "power_loss_W": null
+                    },
+                    "change": {
+                        "resistance_percent": null,
+                        "current_density_percent": null,
+                        "power_loss_percent": null
+                    }
+                },
+                "recommendation": "Inspect the conductive path for interruption. Verify continuity using electrical testing."
+            },
+            "unified_score": 95.0,
+            "priority": "CRITICAL",
+            "critical_override": true,
+            "recommendation": "CRITICAL: Perform continuity testing and verify whether the conductive path is interrupted."
+        },
+        {
+            "defect_id": 8,
+            "class": "spur",
+            "confidence": 0.8307,
+            "bbox": {
+                "x_min": 331.1400146484375,
+                "y_min": 247.25,
+                "x_max": 365.239990234375,
+                "y_max": 285.2900085449219
+            },
+            "matching": {
+                "status": "MATCHED",
+                "method": "ID_AND_CLASS"
+            },
+            "ceri": {
+                "risk_score": 51.32,
+                "risk_category": "MODERATE",
+                "geometry_metrics": {
+                    "reference_copper_pixels": 1056,
+                    "test_copper_pixels": 1122,
+                    "copper_area_loss_pixels": 0,
+                    "copper_area_gain_pixels": 66,
+                    "copper_area_loss_percent": 0.0,
+                    "copper_area_gain_percent": 6.25,
+                    "changed_pixels": 80,
+                    "changed_area_percent": 2.96
+                },
+                "measurement_status": "PIXEL_BASED_ESTIMATE"
+            },
+            "ceia": {
+                "impact": "COPPER GAIN / CLEARANCE / BRIDGE REVIEW",
+                "impact_score": 65.0,
+                "geometry": {
+                    "roi_pixels": 2805,
+                    "reference_copper_pixels": 1128,
+                    "test_copper_pixels": 1194,
+                    "copper_ratio": 1.0585106382978724,
+                    "copper_loss_percent": 0.0,
+                    "copper_gain_percent": 5.85106382978724
+                },
+                "electrical": {
+                    "analysis_status": "ESTIMATED",
+                    "analysis_reason": "Simplified uniform-trace model using an image-derived regional copper ratio.",
+                    "healthy": {
+                        "conductive_area_m2": 1.7499999999999998e-08,
+                        "resistance_ohm": 0.04800000000000001,
+                        "current_density_A_per_m2": 57142857.14285715,
+                        "power_loss_W": 0.04800000000000001
+                    },
+                    "defective": {
+                        "conductive_area_m2": 1.7499999999999998e-08,
+                        "resistance_ohm": 0.04800000000000001,
+                        "current_density_A_per_m2": 57142857.14285715,
+                        "power_loss_W": 0.04800000000000001
+                    },
+                    "change": {
+                        "resistance_percent": 0.0,
+                        "current_density_percent": 0.0,
+                        "power_loss_percent": 0.0
+                    }
+                },
+                "recommendation": "Inspect protruding copper and nearby conductor clearance. Verify whether the copper extension creates a bridge risk."
+            },
+            "unified_score": 56.11,
+            "priority": "MODERATE",
+            "critical_override": false,
+            "recommendation": "Inspect protruding copper and adjacent clearance. Check for potential bridging."
+        },
+        {
+            "defect_id": 7,
+            "class": "mousebite",
+            "confidence": 0.8349,
+            "bbox": {
+                "x_min": 466.82000732421875,
+                "y_min": 440.5899963378906,
+                "x_max": 495.8500061035156,
+                "y_max": 469.7900085449219
+            },
+            "matching": {
+                "status": "MATCHED",
+                "method": "ID_AND_CLASS"
+            },
+            "ceri": {
+                "risk_score": 48.04,
+                "risk_category": "MODERATE",
+                "geometry_metrics": {
+                    "reference_copper_pixels": 768,
+                    "test_copper_pixels": 682,
+                    "copper_area_loss_pixels": 86,
+                    "copper_area_gain_pixels": 0,
+                    "copper_area_loss_percent": 11.2,
+                    "copper_area_gain_percent": 0.0,
+                    "changed_pixels": 86,
+                    "changed_area_percent": 4.25
+                },
+                "measurement_status": "PIXEL_BASED_ESTIMATE"
+            },
+            "ceia": {
+                "impact": "MODERATE GEOMETRIC COPPER LOSS",
+                "impact_score": 55.0,
+                "geometry": {
+                    "roi_pixels": 2116,
+                    "reference_copper_pixels": 785,
+                    "test_copper_pixels": 698,
+                    "copper_ratio": 0.889171974522293,
+                    "copper_loss_percent": 11.082802547770697,
+                    "copper_gain_percent": 0.0
+                },
+                "electrical": {
+                    "analysis_status": "ESTIMATED",
+                    "analysis_reason": "Simplified uniform-trace model using an image-derived regional copper ratio.",
+                    "healthy": {
+                        "conductive_area_m2": 1.7499999999999998e-08,
+                        "resistance_ohm": 0.04800000000000001,
+                        "current_density_A_per_m2": 57142857.14285715,
+                        "power_loss_W": 0.04800000000000001
+                    },
+                    "defective": {
+                        "conductive_area_m2": 1.5560509554140126e-08,
+                        "resistance_ohm": 0.05398280802292265,
+                        "current_density_A_per_m2": 64265247.64633647,
+                        "power_loss_W": 0.05398280802292265
+                    },
+                    "change": {
+                        "resistance_percent": 12.464183381088837,
+                        "current_density_percent": 12.464183381088816,
+                        "power_loss_percent": 12.464183381088837
+                    }
+                },
+                "recommendation": "Inspect edge copper loss and remaining trace width. Check whether the affected region intersects a current-carrying path."
+            },
+            "unified_score": 50.48,
+            "priority": "MODERATE",
+            "critical_override": false,
+            "recommendation": "Inspect edge damage and remaining trace width. Check whether a critical current path is affected."
+        },
+        {
+            "defect_id": 1,
+            "class": "copper",
+            "confidence": 0.8939,
+            "bbox": {
+                "x_min": 89.37000274658203,
+                "y_min": 467.8399963378906,
+                "x_max": 128.25999450683594,
+                "y_max": 497.70001220703125
+            },
+            "matching": {
+                "status": "MATCHED",
+                "method": "ID_AND_CLASS"
+            },
+            "ceri": {
+                "risk_score": 42.99,
+                "risk_category": "MODERATE",
+                "geometry_metrics": {
+                    "reference_copper_pixels": 0,
+                    "test_copper_pixels": 140,
+                    "copper_area_loss_pixels": 0,
+                    "copper_area_gain_pixels": 140,
+                    "copper_area_loss_percent": 0,
+                    "copper_area_gain_percent": 0,
+                    "changed_pixels": 140,
+                    "changed_area_percent": 5.53
+                },
+                "measurement_status": "REFERENCE_COPPER_NOT_FOUND"
+            },
+            "ceia": {
+                "impact": "UNQUANTIFIED - GEOMETRY REVIEW REQUIRED",
+                "impact_score": 50.0,
+                "geometry": {
+                    "roi_pixels": 2632,
+                    "reference_copper_pixels": 0,
+                    "test_copper_pixels": 140,
+                    "copper_ratio": null,
+                    "copper_loss_percent": null,
+                    "copper_gain_percent": null
+                },
+                "electrical": {
+                    "analysis_status": "NOT_QUANTIFIED",
+                    "analysis_reason": "Reference copper was not detected in this ROI. Regional copper ratio cannot be calculated.",
+                    "healthy": {
+                        "conductive_area_m2": null,
+                        "resistance_ohm": null,
+                        "current_density_A_per_m2": null,
+                        "power_loss_W": null
+                    },
+                    "defective": {
+                        "conductive_area_m2": null,
+                        "resistance_ohm": null,
+                        "current_density_A_per_m2": null,
+                        "power_loss_W": null
+                    },
+                    "change": {
+                        "resistance_percent": null,
+                        "current_density_percent": null,
+                        "power_loss_percent": null
+                    }
+                },
+                "recommendation": "Inspect the copper geometry discrepancy. Check for unintended copper, clearance violation, or trace-width variation."
+            },
+            "unified_score": 45.44,
+            "priority": "MODERATE",
+            "critical_override": false,
+            "recommendation": "Review copper geometry discrepancy, trace width, clearance, and possible unintended connections."
+        },
+        {
+            "defect_id": 3,
+            "class": "copper",
+            "confidence": 0.8553,
+            "bbox": {
+                "x_min": 150.7100067138672,
+                "y_min": 147.8300018310547,
+                "x_max": 183.13999938964844,
+                "y_max": 175.5
+            },
+            "matching": {
+                "status": "MATCHED",
+                "method": "ID_AND_CLASS"
+            },
+            "ceri": {
+                "risk_score": 40.11,
+                "risk_category": "MODERATE",
+                "geometry_metrics": {
+                    "reference_copper_pixels": 0,
+                    "test_copper_pixels": 70,
+                    "copper_area_loss_pixels": 0,
+                    "copper_area_gain_pixels": 70,
+                    "copper_area_loss_percent": 0,
+                    "copper_area_gain_percent": 0,
+                    "changed_pixels": 70,
+                    "changed_area_percent": 3.25
+                },
+                "measurement_status": "REFERENCE_COPPER_NOT_FOUND"
+            },
+            "ceia": {
+                "impact": "UNQUANTIFIED - GEOMETRY REVIEW REQUIRED",
+                "impact_score": 50.0,
+                "geometry": {
+                    "roi_pixels": 2250,
+                    "reference_copper_pixels": 0,
+                    "test_copper_pixels": 70,
+                    "copper_ratio": null,
+                    "copper_loss_percent": null,
+                    "copper_gain_percent": null
+                },
+                "electrical": {
+                    "analysis_status": "NOT_QUANTIFIED",
+                    "analysis_reason": "Reference copper was not detected in this ROI. Regional copper ratio cannot be calculated.",
+                    "healthy": {
+                        "conductive_area_m2": null,
+                        "resistance_ohm": null,
+                        "current_density_A_per_m2": null,
+                        "power_loss_W": null
+                    },
+                    "defective": {
+                        "conductive_area_m2": null,
+                        "resistance_ohm": null,
+                        "current_density_A_per_m2": null,
+                        "power_loss_W": null
+                    },
+                    "change": {
+                        "resistance_percent": null,
+                        "current_density_percent": null,
+                        "power_loss_percent": null
+                    }
+                },
+                "recommendation": "Inspect the copper geometry discrepancy. Check for unintended copper, clearance violation, or trace-width variation."
+            },
+            "unified_score": 43.57,
+            "priority": "MODERATE",
+            "critical_override": false,
+            "recommendation": "Review copper geometry discrepancy, trace width, clearance, and possible unintended connections."
+        },
+        {
+            "defect_id": 4,
+            "class": "pin-hole",
+            "confidence": 0.8485,
+            "bbox": {
+                "x_min": 492.510009765625,
+                "y_min": 27.8700008392334,
+                "x_max": 525.3900146484375,
+                "y_max": 55.27000045776367
+            },
+            "matching": {
+                "status": "MATCHED",
+                "method": "ID_AND_CLASS"
+            },
+            "ceri": {
+                "risk_score": 35.93,
+                "risk_category": "MODERATE",
+                "geometry_metrics": {
+                    "reference_copper_pixels": 2156,
+                    "test_copper_pixels": 2070,
+                    "copper_area_loss_pixels": 86,
+                    "copper_area_gain_pixels": 0,
+                    "copper_area_loss_percent": 3.99,
+                    "copper_area_gain_percent": 0.0,
+                    "changed_pixels": 86,
+                    "changed_area_percent": 3.99
+                },
+                "measurement_status": "PIXEL_BASED_ESTIMATE"
+            },
+            "ceia": {
+                "impact": "LOW GEOMETRIC CHANGE - REVIEW",
+                "impact_score": 30.0,
+                "geometry": {
+                    "roi_pixels": 2250,
+                    "reference_copper_pixels": 2250,
+                    "test_copper_pixels": 2164,
+                    "copper_ratio": 0.9617777777777777,
+                    "copper_loss_percent": 3.822222222222227,
+                    "copper_gain_percent": 0.0
+                },
+                "electrical": {
+                    "analysis_status": "ESTIMATED",
+                    "analysis_reason": "Simplified uniform-trace model using an image-derived regional copper ratio.",
+                    "healthy": {
+                        "conductive_area_m2": 1.7499999999999998e-08,
+                        "resistance_ohm": 0.04800000000000001,
+                        "current_density_A_per_m2": 57142857.14285715,
+                        "power_loss_W": 0.04800000000000001
+                    },
+                    "defective": {
+                        "conductive_area_m2": 1.6831111111111108e-08,
+                        "resistance_ohm": 0.04990757855822552,
+                        "current_density_A_per_m2": 59413783.99788752,
+                        "power_loss_W": 0.04990757855822552
+                    },
+                    "change": {
+                        "resistance_percent": 3.9741219963031544,
+                        "current_density_percent": 3.9741219963031518,
+                        "power_loss_percent": 3.9741219963031544
+                    }
+                },
+                "recommendation": "Inspect the localized copper void. Determine whether it intersects a conductive path or critical copper region."
+            },
+            "unified_score": 33.85,
+            "priority": "LOW",
+            "critical_override": false,
+            "recommendation": "Inspect the copper void and determine whether it intersects a critical conductor or pad."
+        },
+        {
+            "defect_id": 5,
+            "class": "pin-hole",
+            "confidence": 0.8456,
+            "bbox": {
+                "x_min": 250.66000366210938,
+                "y_min": 340.69000244140625,
+                "x_max": 278.8900146484375,
+                "y_max": 370.5199890136719
+            },
+            "matching": {
+                "status": "MATCHED",
+                "method": "ID_AND_CLASS"
+            },
+            "ceri": {
+                "risk_score": 35.48,
+                "risk_category": "MODERATE",
+                "geometry_metrics": {
+                    "reference_copper_pixels": 2024,
+                    "test_copper_pixels": 1957,
+                    "copper_area_loss_pixels": 67,
+                    "copper_area_gain_pixels": 0,
+                    "copper_area_loss_percent": 3.31,
+                    "copper_area_gain_percent": 0.0,
+                    "changed_pixels": 67,
+                    "changed_area_percent": 3.31
+                },
+                "measurement_status": "PIXEL_BASED_ESTIMATE"
+            },
+            "ceia": {
+                "impact": "LOW GEOMETRIC CHANGE - REVIEW",
+                "impact_score": 30.0,
+                "geometry": {
+                    "roi_pixels": 2115,
+                    "reference_copper_pixels": 2115,
+                    "test_copper_pixels": 2048,
+                    "copper_ratio": 0.968321513002364,
+                    "copper_loss_percent": 3.167848699763598,
+                    "copper_gain_percent": 0.0
+                },
+                "electrical": {
+                    "analysis_status": "ESTIMATED",
+                    "analysis_reason": "Simplified uniform-trace model using an image-derived regional copper ratio.",
+                    "healthy": {
+                        "conductive_area_m2": 1.7499999999999998e-08,
+                        "resistance_ohm": 0.04800000000000001,
+                        "current_density_A_per_m2": 57142857.14285715,
+                        "power_loss_W": 0.04800000000000001
+                    },
+                    "defective": {
+                        "conductive_area_m2": 1.6945626477541368e-08,
+                        "resistance_ohm": 0.04957031250000001,
+                        "current_density_A_per_m2": 59012276.7857143,
+                        "power_loss_W": 0.04957031250000001
+                    },
+                    "change": {
+                        "resistance_percent": 3.2714843750000075,
+                        "current_density_percent": 3.271484375000011,
+                        "power_loss_percent": 3.2714843750000075
+                    }
+                },
+                "recommendation": "Inspect the localized copper void. Determine whether it intersects a conductive path or critical copper region."
+            },
+            "unified_score": 33.56,
+            "priority": "LOW",
+            "critical_override": false,
+            "recommendation": "Inspect the copper void and determine whether it intersects a critical conductor or pad."
+        },
+        {
+            "defect_id": 6,
+            "class": "pin-hole",
+            "confidence": 0.8383,
+            "bbox": {
+                "x_min": 423.8999938964844,
+                "y_min": 23.90999984741211,
+                "x_max": 461.3900146484375,
+                "y_max": 52.650001525878906
+            },
+            "matching": {
+                "status": "MATCHED",
+                "method": "ID_AND_CLASS"
+            },
+            "ceri": {
+                "risk_score": 35.1,
+                "risk_category": "MODERATE",
+                "geometry_metrics": {
+                    "reference_copper_pixels": 2430,
+                    "test_copper_pixels": 2354,
+                    "copper_area_loss_pixels": 76,
+                    "copper_area_gain_pixels": 0,
+                    "copper_area_loss_percent": 3.13,
+                    "copper_area_gain_percent": 0.0,
+                    "changed_pixels": 76,
+                    "changed_area_percent": 3.13
+                },
+                "measurement_status": "PIXEL_BASED_ESTIMATE"
+            },
+            "ceia": {
+                "impact": "LOW GEOMETRIC CHANGE - REVIEW",
+                "impact_score": 30.0,
+                "geometry": {
+                    "roi_pixels": 2530,
+                    "reference_copper_pixels": 2530,
+                    "test_copper_pixels": 2454,
+                    "copper_ratio": 0.9699604743083003,
+                    "copper_loss_percent": 3.0039525691699653,
+                    "copper_gain_percent": 0.0
+                },
+                "electrical": {
+                    "analysis_status": "ESTIMATED",
+                    "analysis_reason": "Simplified uniform-trace model using an image-derived regional copper ratio.",
+                    "healthy": {
+                        "conductive_area_m2": 1.7499999999999998e-08,
+                        "resistance_ohm": 0.04800000000000001,
+                        "current_density_A_per_m2": 57142857.14285715,
+                        "power_loss_W": 0.04800000000000001
+                    },
+                    "defective": {
+                        "conductive_area_m2": 1.6974308300395254e-08,
+                        "resistance_ohm": 0.04948655256723718,
+                        "current_density_A_per_m2": 58912562.580044255,
+                        "power_loss_W": 0.04948655256723718
+                    },
+                    "change": {
+                        "resistance_percent": 3.096984515077435,
+                        "current_density_percent": 3.096984515077434,
+                        "power_loss_percent": 3.096984515077435
+                    }
+                },
+                "recommendation": "Inspect the localized copper void. Determine whether it intersects a conductive path or critical copper region."
+            },
+            "unified_score": 33.31,
+            "priority": "LOW",
+            "critical_override": false,
+            "recommendation": "Inspect the copper void and determine whether it intersects a critical conductor or pad."
+        }
+    ],
+    "unmatched_ceia": []
+}
