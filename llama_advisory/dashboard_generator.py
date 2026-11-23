@@ -345,11 +345,43 @@ def generate_dashboard_html(
       inset: 0;
       width: 100%;
       height: 100%;
-      background-size: 100% 100%;
-      background-repeat: no-repeat;
-      background-position: center;
-      opacity: 0.92;
-      transition: opacity 0.3s ease;
+      object-fit: fill;
+      opacity: 0.96;
+      transition: opacity 0.3s ease, filter 0.2s ease;
+      filter: none !important;
+      -webkit-filter: none !important;
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
+    }}
+    .pcb-bg-image.is-inverted {{
+      filter: invert(1) !important;
+      -webkit-filter: invert(1) !important;
+    }}
+    .polarity-btn {{
+      background: #1e293b;
+      border: 1px solid #475569;
+      color: #cbd5e1;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+    }}
+    .polarity-btn:hover {{
+      background: #334155;
+      color: #ffffff;
+      border-color: #64748b;
+    }}
+    .polarity-btn.active {{
+      background: #2563eb;
+      border-color: #60a5fa;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
     }}
     .pcb-grid-lines {{
       position: absolute;
@@ -623,10 +655,15 @@ def generate_dashboard_html(
     <div class="card" style="margin-bottom:0;">
       <div class="card-title">
         <span>📐 Board Defect Map</span>
-        <span class="tag" style="margin-left:auto;">Interactive Coordinates</span>
+        <div style="display:flex; align-items:center; gap:8px; margin-left:auto;">
+          <button id="togglePolarityBtn" class="polarity-btn" onclick="toggleColorPolarity()" title="Click to invert colors between bright-field (white substrate) and dark-field (black substrate)">
+            <span id="polarityIcon">🌓</span> <span id="polarityText">Invert Colors (B/W)</span>
+          </button>
+          <span class="tag">Interactive Coordinates</span>
+        </div>
       </div>
       <div class="pcb-canvas-wrap">
-        <div class="pcb-bg-image" id="pcbBgImage" style="{pcb_bg_style}"></div>
+        <img class="pcb-bg-image" id="pcbBgImage" src="{pcb_image_b64}" alt="PCB Defect Map" draggable="false" data-darkreader-ignore="true" data-darkreader-inline-invert="false">
         <div class="pcb-grid-lines"></div>
         <div class="pcb-canvas" id="pcbCanvas">
           <!-- Bounding Boxes rendered here dynamically -->
@@ -882,6 +919,45 @@ def generate_dashboard_html(
   let currentIntel = {client_intel_json};
   let currentReport = {client_report_json};
 
+  // Inversion State Management
+  let isDisplayInverted = false;
+
+  function toggleColorPolarity() {{
+    isDisplayInverted = !isDisplayInverted;
+    const imgElem = document.getElementById("pcbBgImage");
+    const btn = document.getElementById("togglePolarityBtn");
+    const txt = document.getElementById("polarityText");
+    const icon = document.getElementById("polarityIcon");
+    if (!imgElem) return;
+
+    if (isDisplayInverted) {{
+      imgElem.classList.add("is-inverted");
+      if (btn) btn.classList.add("active");
+      if (txt) txt.textContent = "Inverted (B/W)";
+      if (icon) icon.textContent = "🌕";
+    }} else {{
+      imgElem.classList.remove("is-inverted");
+      if (btn) btn.classList.remove("active");
+      if (txt) txt.textContent = "Invert Colors (B/W)";
+      if (icon) icon.textContent = "🌓";
+    }}
+  }}
+
+  function setPcbImage(srcUrl) {{
+    const imgElem = document.getElementById("pcbBgImage");
+    if (!imgElem) return;
+    if (imgElem.tagName === "IMG") {{
+      imgElem.src = srcUrl;
+    }} else {{
+      imgElem.style.backgroundImage = `url('${{srcUrl}}')`;
+    }}
+    if (isDisplayInverted) {{
+      imgElem.classList.add("is-inverted");
+    }} else {{
+      imgElem.classList.remove("is-inverted");
+    }}
+  }}
+
   // Switch board on the spot
   function switchBoard(bid) {{
     if (!ALL_BOARDS[bid]) return;
@@ -1048,9 +1124,7 @@ def generate_dashboard_html(
     document.getElementById("kpiMaxScore").innerHTML = `—<span style="font-size:16px; color:#9ca3af;">/100</span>`;
 
     // Set Canvas background to the uploaded image and clear bounding boxes
-    const bgElem = document.getElementById("pcbBgImage");
-    bgElem.style.backgroundImage = `url('${{dataUrl}}')`;
-    bgElem.style.backgroundSize = "100% 100%";
+    setPcbImage(dataUrl);
     const canvas = document.getElementById("pcbCanvas");
     canvas.innerHTML = "";
 
@@ -1131,10 +1205,8 @@ def generate_dashboard_html(
     document.getElementById("kpiMaxScore").innerHTML = `${{maxScore}}<span style="font-size:16px; color:#9ca3af;">/100</span>`;
 
     // 3. Canvas background & Bounding boxes
-    const bgElem = document.getElementById("pcbBgImage");
     if (imageB64) {{
-      bgElem.style.backgroundImage = `url('${{imageB64}}')`;
-      bgElem.style.backgroundSize = "100% 100%";
+      setPcbImage(imageB64);
     }}
     renderBBoxes(defects);
 
