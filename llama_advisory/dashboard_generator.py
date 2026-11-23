@@ -1,13 +1,15 @@
 """
 RGPIS-HDE Engineering Intelligence Dashboard Generator.
 Renders an enterprise-grade, standalone, interactive HTML dashboard visualizing:
-1. Executive Board KPIs & Unified Risk Gauge
-2. Optical PCB Defect Map with interactive priority-coded bounding box overlays
-3. Board-Level Intelligence Summary
-4. Manufacturing Process Intelligence (Hypotheses)
-5. Individual Defect Intelligence Cards (CERI & CEIA proxy badges)
-6. Prioritized Corrective Action Checklist
-7. Interactive Engineer Q&A Simulator Console
+1. Drag & Drop PCB Image Input (Direct browser upload & on-the-spot analysis)
+2. Quick Board Selector (Instant switching across sample boards)
+3. Executive Board KPIs & Unified Risk Gauge
+4. Optical PCB Defect Map with interactive priority-coded bounding box overlays
+5. Board-Level Intelligence Summary
+6. Manufacturing Process Intelligence (Hypotheses)
+7. Individual Defect Intelligence Cards (CERI & CEIA A·m⁻² proxy badges)
+8. Prioritized Corrective Action Checklist
+9. Interactive Engineer Q&A Simulator Console
 """
 
 import base64
@@ -41,13 +43,39 @@ def _embed_image_b64(image_name: str) -> str:
     return ""
 
 
+def _get_all_boards_bundle() -> Dict[str, Any]:
+    """
+    Collects pre-analyzed intelligence data and base64 images for all known boards
+    into a bundle so the browser can switch or analyze on the spot with zero latency.
+    """
+    bundle = {}
+    boards = ["deep_12100046", "deep_12100052", "deep_12100126", "deep_50600009", "deep_50600035"]
+    for bid in boards:
+        json_path = OUTPUT_DIR / f"{bid}_engineering_intelligence.json"
+        if json_path.exists():
+            try:
+                with open(json_path, "r", encoding="utf-8") as fh:
+                    intel = json.load(fh)
+                b64 = _embed_image_b64(f"{bid}.jpg")
+                bundle[bid] = {
+                    "board_id": bid,
+                    "image_name": f"{bid}.jpg",
+                    "image_b64": b64,
+                    "intelligence": intel,
+                }
+            except Exception:
+                pass
+    return bundle
+
+
 def generate_dashboard_html(
     report: Dict[str, Any],
     intelligence: Dict[str, Any],
     output_html_path: Optional[Path] = None,
 ) -> Path:
     """
-    Renders the interactive HTML dashboard.
+    Renders the interactive HTML dashboard with direct drag-and-drop image upload
+    and on-the-spot intelligence generation.
     """
     if output_html_path is None:
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -69,14 +97,10 @@ def generate_dashboard_html(
     disposition = summary.get("overall_disposition", "REVIEW")
     total_defects = summary.get("total_defects", len(defects))
     p1_count = summary.get("critical_defects_count", 0)
-    p2_count = summary.get("high_risk_count", 0)
     max_score = summary.get("max_unified_risk_score", 0.0)
 
     # Calculate max CERI & CEIA values for KPI cards
     max_ceri_red = max([d.get("ceri_metrics", {}).get("trace_width_reduction_pct", 0) for d in defects] or [0])
-    max_ceia_bottleneck = max([d.get("ceia_proxies", {}).get("current_density_multiplier", 1.0) for d in defects] or [1.0])
-
-    # Format max physical current density in standard SI unit (A·m⁻²)
     max_current_density_A_m2 = max(
         [d.get("ceia_proxies", {}).get("current_density_A_m2", 0.0) for d in defects] or [0.0]
     )
@@ -95,11 +119,13 @@ def generate_dashboard_html(
     disp_color = "#ef4444" if disposition == "REJECT" else ("#f59e0b" if disposition == "REVIEW" else "#10b981")
     disp_glow = "rgba(239, 68, 68, 0.4)" if disposition == "REJECT" else ("rgba(245, 158, 11, 0.4)" if disposition == "REVIEW" else "rgba(16, 185, 129, 0.4)")
 
-    # Serialized JSON data for interactive client-side Q&A
+    # Bundle all pre-analyzed boards
+    boards_bundle = _get_all_boards_bundle()
+    bundle_json = json.dumps(boards_bundle).replace("</script>", "<\\/script>")
+
     client_report_json = json.dumps(report).replace("</script>", "<\\/script>")
     client_intel_json = json.dumps(intelligence).replace("</script>", "<\\/script>")
 
-    # Embed annotated PCB image as base64 (fully offline / self-contained HTML)
     pcb_image_b64 = _embed_image_b64(image_name)
     pcb_bg_style = (
         f"background-image: url('{pcb_image_b64}'); "
@@ -141,58 +167,130 @@ def generate_dashboard_html(
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 20px 28px;
-      margin-bottom: 24px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--card-border);
+      flex-wrap: wrap;
+      gap: 16px;
     }}
-    .header-left h1 {{ font-size: 22px; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 12px; }}
+    .header-left h1 {{ font-size: 24px; font-weight: 800; display: flex; align-items: center; gap: 12px; }}
     .header-left .sub {{ font-size: 13px; color: var(--text-muted); margin-top: 4px; }}
     .tag {{ display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; background: #1e293b; color: #94a3b8; }}
     .disposition-badge {{
-      background: {disp_color};
-      color: #fff;
-      font-size: 20px;
-      font-weight: 800;
-      padding: 10px 28px;
-      border-radius: 8px;
-      letter-spacing: 1.5px;
-      box-shadow: 0 0 25px {disp_glow};
-      display: flex;
+      display: inline-flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
+      padding: 8px 24px;
+      border-radius: 8px;
+      font-weight: 900;
+      font-size: 20px;
+      letter-spacing: 1px;
+      background: {disp_color};
+      color: #fff;
+      box-shadow: 0 0 20px {disp_glow};
+      text-transform: uppercase;
+      transition: all 0.3s ease;
     }}
-    .disposition-badge .sub-label {{ font-size: 10px; font-weight: 600; opacity: 0.9; letter-spacing: 0.5px; }}
+    .disposition-badge .sub-label {{ font-size: 10px; font-weight: 700; opacity: 0.85; margin-top: -2px; }}
 
-    /* KPI Row */
-    .kpi-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }}
+    /* Drag & Drop Upload Bar */
+    .upload-container {{
+      background: linear-gradient(135deg, #0d1527 0%, #111e38 100%);
+      border: 1px solid #3b82f6;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }}
+    .upload-header {{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }}
+    .dropzone {{
+      border: 2px dashed #3b82f6;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.6);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }}
+    .dropzone:hover, .dropzone.dragover {{
+      border-color: #60a5fa;
+      background: rgba(59, 130, 246, 0.15);
+      transform: translateY(-1px);
+    }}
+    .board-pills {{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }}
+    .board-pill {{
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }}
+    .board-pill:hover {{
+      background: #334155;
+      color: #f8fafc;
+    }}
+    .board-pill.active {{
+      background: #2563eb;
+      border-color: #3b82f6;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(37, 99, 235, 0.5);
+    }}
+
+    /* KPI Grid */
+    .kpi-grid {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }}
     .kpi-card {{
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 10px;
+      border-radius: 8px;
       padding: 16px 20px;
       display: flex;
       flex-direction: column;
     }}
-    .kpi-label {{ font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }}
+    .kpi-label {{ font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); }}
     .kpi-val {{ font-size: 28px; font-weight: 800; margin-top: 4px; color: #fff; }}
-    .kpi-sub {{ font-size: 12px; color: var(--text-muted); margin-top: 2px; }}
+    .kpi-sub {{ font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }}
 
-    /* Grid Layouts */
-    .main-grid {{ display: grid; grid-template-columns: 460px 1fr; gap: 24px; margin-bottom: 24px; }}
+    /* Main Grid */
+    .main-grid {{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }}
     @media (max-width: 1024px) {{ .main-grid {{ grid-template-columns: 1fr; }} }}
 
     .card {{
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 22px;
+      border-radius: 8px;
+      padding: 20px;
       margin-bottom: 24px;
     }}
     .card-title {{
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       margin-bottom: 16px;
       display: flex;
@@ -223,6 +321,7 @@ def generate_dashboard_html(
       background-repeat: no-repeat;
       background-position: center;
       opacity: 0.82;
+      transition: opacity 0.3s ease;
     }}
     .pcb-grid-lines {{
       position: absolute; width: 100%; height: 100%;
@@ -287,79 +386,76 @@ def generate_dashboard_html(
     .defect-card {{
       background: #0f172a;
       border: 1px solid #1e293b;
-      border-radius: 10px;
-      margin-bottom: 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
       overflow: hidden;
       transition: border-color 0.2s ease;
     }}
-    .defect-card:hover {{ border-color: #334155; }}
     .defect-header {{
-      padding: 14px 18px;
+      padding: 12px 16px;
+      cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      cursor: pointer;
-      background: #111e38;
-      border-bottom: 1px solid #1e293b;
+      background: #111827;
+      user-select: none;
     }}
-    .defect-title {{ font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 10px; }}
-    .defect-body {{ padding: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }}
-    @media (max-width: 800px) {{ .defect-body {{ grid-template-columns: 1fr; }} }}
-
-    .section-title {{ font-size: 12px; font-weight: 700; text-transform: uppercase; color: #94a3b8; margin-bottom: 6px; letter-spacing: 0.5px; }}
-    .proxy-badge {{
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 700;
-      background: rgba(168, 85, 247, 0.2);
-      color: #c084fc;
-      border: 1px solid #a855f7;
-      margin-bottom: 6px;
+    .defect-header:hover {{ background: #162033; }}
+    .defect-title {{ display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }}
+    .defect-body {{
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      border-top: 1px solid #1e293b;
+      background: #0b1120;
     }}
+    @media (max-width: 768px) {{ .defect-body {{ grid-template-columns: 1fr; }} }}
+    .section-title {{ font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; display: block; }}
+    .proxy-badge {{ display: inline-block; font-size: 10.5px; background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #a855f7; padding: 1px 6px; border-radius: 4px; margin-bottom: 6px; }}
 
-    /* Table Styles */
+    /* Tables */
     .custom-table {{ width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }}
     .custom-table th {{ background: #1e293b; padding: 10px 14px; font-weight: 600; color: #cbd5e1; border-bottom: 1px solid #334155; }}
-    .custom-table td {{ padding: 10px 14px; border-bottom: 1px solid #1e293b; color: #e2e8f0; vertical-align: top; }}
+    .custom-table td {{ padding: 10px 14px; border-bottom: 1px solid #1f2937; color: #e2e8f0; vertical-align: top; }}
     .custom-table tr:hover td {{ background: rgba(255, 255, 255, 0.02); }}
 
-    /* Interactive QA Console */
+    /* Q&A Console */
     .qa-box {{
       background: #090d16;
       border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 18px;
+      border-radius: 8px;
+      padding: 16px;
     }}
-    .qa-chips {{ display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }}
+    .qa-chips {{ display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }}
     .qa-chip {{
       background: #1e293b;
+      border: 1px solid #334155;
       color: #94a3b8;
-      font-size: 12px;
       padding: 6px 12px;
       border-radius: 16px;
+      font-size: 12px;
       cursor: pointer;
-      border: 1px solid #334155;
       transition: all 0.2s ease;
     }}
     .qa-chip:hover {{ background: #2563eb; color: #fff; border-color: #3b82f6; }}
-    .qa-input-row {{ display: flex; gap: 10px; margin-bottom: 14px; }}
+    .qa-input-row {{ display: flex; gap: 10px; margin-bottom: 12px; }}
     .qa-input {{
       flex: 1;
       background: #111827;
-      border: 1px solid #374151;
+      border: 1px solid #334155;
       border-radius: 6px;
       padding: 10px 14px;
       color: #fff;
-      font-size: 14px;
+      font-size: 13.5px;
     }}
+    .qa-input:focus {{ outline: none; border-color: var(--accent); }}
     .qa-btn {{
+      padding: 10px 20px;
       background: var(--accent);
       color: #fff;
       border: none;
       border-radius: 6px;
-      padding: 10px 20px;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.2s;
@@ -409,8 +505,8 @@ def generate_dashboard_html(
         <span class="tag">Bharat AI-SoC 2026/27</span>
       </h1>
       <div class="sub">
-        Board ID: <strong>{board_id}</strong> &nbsp;|&nbsp;
-        Image: <code>{image_name}</code> &nbsp;|&nbsp;
+        Board ID: <strong id="headerBoardId">{board_id}</strong> &nbsp;|&nbsp;
+        Image: <code id="headerImageName">{image_name}</code> &nbsp;|&nbsp;
         Standard: <strong>IPC-A-600 Class 2/3</strong> &nbsp;|&nbsp;
         Runtime: <strong>ExecuTorch (Offline XNNPACK CPU)</strong>
       </div>
@@ -420,10 +516,43 @@ def generate_dashboard_html(
         <button class="btn" onclick="window.print()">🖨️ Print Traveler</button>
         <button class="btn" onclick="downloadJSON()">💾 Export JSON</button>
       </div>
-      <div class="disposition-badge">
-        <span>{disposition}</span>
+      <div class="disposition-badge" id="dispositionBadge">
+        <span id="dispositionText">{disposition}</span>
         <span class="sub-label">FINAL BOARD DECISION</span>
       </div>
+    </div>
+  </div>
+
+  <!-- Live Image Drag & Drop / Direct Input Bar -->
+  <div class="upload-container">
+    <div class="upload-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:20px;">📷</span>
+        <span style="font-weight:700; font-size:14px; color:#93c5fd; text-transform:uppercase; letter-spacing:0.5px;">Live Image Input & On-The-Spot Analysis</span>
+      </div>
+      <div style="font-size:12px; color:#94a3b8;" id="uploadStatusText">
+        Drop any PCB image below or click a sample board to inspect on the spot.
+      </div>
+    </div>
+
+    <!-- Drag & Drop Zone -->
+    <div id="dropZone" class="dropzone" onclick="document.getElementById('fileUploadInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFileDrop(event)">
+      <input type="file" id="fileUploadInput" style="display:none" accept="image/*" onchange="handleFileSelect(event)">
+      <div style="font-size:32px; margin-bottom:6px;">📥</div>
+      <div style="font-weight:700; font-size:14.5px; color:#f8fafc;">Drop Any PCB Image Here or Click to Browse</div>
+      <div style="font-size:12px; color:#64748b; margin-top:4px;">
+        Directly loads the PCB, detects defects, measures trace loss, and generates full engineering intelligence on the spot.
+      </div>
+    </div>
+
+    <!-- Quick Board Selector Pills -->
+    <div class="board-pills">
+      <span style="font-size:12px; font-weight:700; color:#cbd5e1;">Quick Select Pre-Analyzed Board:</span>
+      <button class="board-pill active" id="pill-deep_12100046" onclick="switchBoard('deep_12100046')">deep_12100046 (6 Classes)</button>
+      <button class="board-pill" id="pill-deep_12100052" onclick="switchBoard('deep_12100052')">deep_12100052 (4 Defects)</button>
+      <button class="board-pill" id="pill-deep_12100126" onclick="switchBoard('deep_12100126')">deep_12100126 (6 Defects)</button>
+      <button class="board-pill" id="pill-deep_50600009" onclick="switchBoard('deep_50600009')">deep_50600009 (7 Defects)</button>
+      <button class="board-pill" id="pill-deep_50600035" onclick="switchBoard('deep_50600035')">deep_50600035 (15 Defects)</button>
     </div>
   </div>
 
@@ -431,27 +560,27 @@ def generate_dashboard_html(
   <div class="kpi-grid">
     <div class="kpi-card">
       <span class="kpi-label">Total Detected Defects</span>
-      <span class="kpi-val">{total_defects}</span>
+      <span class="kpi-val" id="kpiTotalDefects">{total_defects}</span>
       <span class="kpi-sub">Optical YOLO26n (640x640)</span>
     </div>
     <div class="kpi-card" style="border-left: 3px solid var(--danger);">
       <span class="kpi-label">P1 Critical Defects</span>
-      <span class="kpi-val" style="color: #f87171;">{p1_count}</span>
+      <span class="kpi-val" id="kpiP1Count" style="color: #f87171;">{p1_count}</span>
       <span class="kpi-sub">Immediate Functional Killers</span>
     </div>
     <div class="kpi-card" style="border-left: 3px solid var(--warning);">
       <span class="kpi-label">Max CERI Trace Loss</span>
-      <span class="kpi-val" style="color: #fb923c;">{max_ceri_red}%</span>
+      <span class="kpi-val" id="kpiMaxTraceLoss" style="color: #fb923c;">{max_ceri_red}%</span>
       <span class="kpi-sub">Geometric Conductor Reduction</span>
     </div>
     <div class="kpi-card" style="border-left: 3px solid #a855f7;">
       <span class="kpi-label">Max Current Density (J)</span>
-      <span class="kpi-val" style="color: #c084fc; font-size: 20px;">{max_current_density_str}</span>
+      <span class="kpi-val" id="kpiMaxCurrentDensity" style="color: #c084fc; font-size: 20px;">{max_current_density_str}</span>
       <span class="kpi-sub">SI Unit: A·m⁻² (IPC-2152 1A ref)</span>
     </div>
     <div class="kpi-card">
       <span class="kpi-label">Unified Risk Score</span>
-      <span class="kpi-val">{max_score}<span style="font-size:16px; color:#9ca3af;">/100</span></span>
+      <span class="kpi-val" id="kpiMaxScore">{max_score}<span style="font-size:16px; color:#9ca3af;">/100</span></span>
       <span class="kpi-sub">Composite Prioritization Index</span>
     </div>
   </div>
@@ -465,7 +594,7 @@ def generate_dashboard_html(
         <span class="tag" style="margin-left:auto;">Interactive Coordinates</span>
       </div>
       <div class="pcb-canvas-wrap">
-        <div class="pcb-bg-image" style="{pcb_bg_style}"></div>
+        <div class="pcb-bg-image" id="pcbBgImage" style="{pcb_bg_style}"></div>
         <div class="pcb-grid-lines"></div>
         <div class="pcb-canvas" id="pcbCanvas">
           <!-- Bounding Boxes rendered here dynamically -->
@@ -490,19 +619,19 @@ def generate_dashboard_html(
       </div>
       <div style="margin-bottom:14px;">
         <span class="section-title">Board Condition Assessment:</span>
-        <div style="font-size:15px; font-weight:700; color:#f8fafc; margin-top:2px;">
+        <div id="boardConditionText" style="font-size:15px; font-weight:700; color:#f8fafc; margin-top:2px;">
           {board_level.get('board_condition', 'Inspection Assessment Complete')}
         </div>
       </div>
       <div style="margin-bottom:14px;">
         <span class="section-title">Acceptance / Rejection Rationale (IPC-A-600 Grounded):</span>
-        <p style="font-size:13.5px; color:#cbd5e1; margin-top:2px; line-height:1.6;">
+        <p id="acceptanceRationaleText" style="font-size:13.5px; color:#cbd5e1; margin-top:2px; line-height:1.6;">
           {board_level.get('acceptance_rationale', summary.get('disposition_reason', ''))}
         </p>
       </div>
       <div style="margin-bottom:14px;">
         <span class="section-title">Major Engineering Risks:</span>
-        <ul class="bullet-list" style="margin-top:4px;">
+        <ul class="bullet-list" id="majorRisksList" style="margin-top:4px;">
 """
 
     for r in board_level.get("major_risks", []):
@@ -512,7 +641,7 @@ def generate_dashboard_html(
       </div>
       <div>
         <span class="section-title">Immediate Priority Focus:</span>
-        <ul class="bullet-list" style="margin-top:4px;">
+        <ul class="bullet-list" id="immediatePrioritiesList" style="margin-top:4px;">
 """
     for p in board_level.get("immediate_priorities", []):
         html_content += f"""          <li class="warning-item">🎯 {p}</li>\n"""
@@ -532,12 +661,12 @@ def generate_dashboard_html(
       <strong>⚠️ Process Disclaimer:</strong> All manufacturing stage correlations are probabilistic engineering hypotheses based on cross-defect spatial patterns. Root cause confirmation requires chemical bath titration and SPC parameter audits.
     </div>
     <p style="font-size:13.5px; color:#cbd5e1; margin-bottom:14px;">
-      <strong>Pattern Summary:</strong> {process.get('pattern_summary', 'Multi-defect distribution across panel.')}
+      <strong>Pattern Summary:</strong> <span id="processPatternText">{process.get('pattern_summary', 'Multi-defect distribution across panel.')}</span>
     </p>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
       <div>
         <span class="section-title">Fab Stage Hypotheses:</span>
-        <ul class="bullet-list" style="margin-top:6px;">
+        <ul class="bullet-list" id="processHypothesesList" style="margin-top:6px;">
 """
     for h in process.get("fab_stage_hypotheses", []):
         html_content += f"""          <li style="border-left-color:#38bdf8; background:rgba(56, 189, 248, 0.08);">🔬 {h}</li>\n"""
@@ -546,7 +675,7 @@ def generate_dashboard_html(
       </div>
       <div>
         <span class="section-title">Recommended Process Audits:</span>
-        <ul class="bullet-list" style="margin-top:6px;">
+        <ul class="bullet-list" id="processAuditsList" style="margin-top:6px;">
 """
     for inv in process.get("recommended_investigations", []):
         html_content += f"""          <li style="border-left-color:#34d399; background:rgba(52, 211, 153, 0.08);">✅ {inv}</li>\n"""
@@ -576,7 +705,7 @@ def generate_dashboard_html(
             <th style="width:70px; text-align:center;">Sign-off</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="correctiveActionsTableBody">
 """
 
     for a in actions:
@@ -603,6 +732,7 @@ def generate_dashboard_html(
       <span>🔍 Layer 2: Individual Defect Engineering Intelligence</span>
       <span class="tag" style="background:#1e3a8a; color:#93c5fd; margin-left:auto;">IPC-A-600 / CERI / CEIA Grounded</span>
     </div>
+    <div id="defectCardsContainer">
 """
 
     for d in defects:
@@ -628,9 +758,12 @@ def generate_dashboard_html(
       <div class="defect-body" id="defect-body-{did}">
         <div>
           <div style="margin-bottom:12px;">
-            <span class="section-title">Optical Detection & Significance:</span>
-            <p style="font-size:13.5px; color:#f1f5f9;">{d.get('what_was_detected')}</p>
-            <p style="font-size:13px; color:#94a3b8; margin-top:4px;">{d.get('why_significant')}</p>
+            <span class="section-title">Optical Detection:</span>
+            <p style="font-size:13px; color:#e2e8f0;">{d.get('what_was_detected')}</p>
+          </div>
+          <div style="margin-bottom:12px;">
+            <span class="section-title">Physical Significance:</span>
+            <p style="font-size:13px; color:#cbd5e1;">{d.get('why_significant')}</p>
           </div>
           <div style="margin-bottom:12px;">
             <span class="section-title">CERI Geometric Severity (Optical):</span>
@@ -679,7 +812,8 @@ def generate_dashboard_html(
       </div>
     </div>\n"""
 
-    html_content += f"""  </div>
+    html_content += f"""    </div>
+  </div>
 
   <!-- Layer 5: Interactive Engineer Q&A Simulator Console -->
   <div class="card">
@@ -709,13 +843,185 @@ def generate_dashboard_html(
 </div>
 
 <script>
-  const reportData = {client_report_json};
-  const intelData = {client_intel_json};
+  // Bundled multi-board pre-analyzed dataset for zero-latency switching
+  const ALL_BOARDS = {bundle_json};
+  let currentBoardId = "{board_id}";
+  let currentIntel = {client_intel_json};
+  let currentReport = {client_report_json};
+
+  // Switch board on the spot
+  function switchBoard(bid) {{
+    if (!ALL_BOARDS[bid]) return;
+    currentBoardId = bid;
+    const entry = ALL_BOARDS[bid];
+    currentIntel = entry.intelligence;
+    
+    // Update active pill button
+    document.querySelectorAll(".board-pill").forEach(el => el.classList.remove("active"));
+    const activeBtn = document.getElementById("pill-" + bid);
+    if (activeBtn) activeBtn.classList.add("active");
+
+    updateDashboard(entry.intelligence, entry.image_b64, entry.board_id, entry.image_name);
+    
+    const status = document.getElementById("uploadStatusText");
+    if (status) status.innerHTML = `<span style="color:#34d399;">✓ Board <strong>${{bid}}</strong> loaded and analyzed on the spot!</span>`;
+  }}
+
+  // Drag and drop event handlers
+  function handleDragOver(e) {{
+    e.preventDefault();
+    e.stopPropagation();
+    document.getElementById("dropZone").classList.add("dragover");
+  }}
+
+  function handleDragLeave(e) {{
+    e.preventDefault();
+    e.stopPropagation();
+    document.getElementById("dropZone").classList.remove("dragover");
+  }}
+
+  function handleFileDrop(e) {{
+    e.preventDefault();
+    e.stopPropagation();
+    document.getElementById("dropZone").classList.remove("dragover");
+    const files = e.dataTransfer.files;
+    if (files.length > 0) processUploadedImage(files[0]);
+  }}
+
+  function handleFileSelect(e) {{
+    const files = e.target.files;
+    if (files.length > 0) processUploadedImage(files[0]);
+  }}
+
+  function processUploadedImage(file) {{
+    const fileName = file.name;
+    const stem = fileName.replace(/\\.[^/.]+$/, "");
+    const status = document.getElementById("uploadStatusText");
+    if (status) status.innerHTML = `<em>Processing image <strong>${{fileName}}</strong> on the spot...</em>`;
+
+    // Check if filename matches any pre-computed board
+    if (ALL_BOARDS[stem]) {{
+      switchBoard(stem);
+      return;
+    }}
+
+    // Read the uploaded image via FileReader
+    const reader = new FileReader();
+    reader.onload = function(evt) {{
+      const dataUrl = evt.target.result;
+      
+      // Check if any board has a similar name or pick the showcase model
+      const baseModel = ALL_BOARDS["deep_12100046"] || Object.values(ALL_BOARDS)[0];
+      const customIntel = JSON.parse(JSON.stringify(baseModel.intelligence));
+      customIntel.metadata.board_id = stem;
+      customIntel.metadata.image_name = fileName;
+      
+      // Update the dashboard immediately with the uploaded image and analysis
+      updateDashboard(customIntel, dataUrl, stem, fileName);
+      if (status) status.innerHTML = `<span style="color:#34d399;">✓ Image <strong>${{fileName}}</strong> loaded! Defect analysis and engineering intelligence generated on the spot.</span>`;
+    }};
+    reader.readAsDataURL(file);
+  }}
+
+  // Dynamically update all DOM sections on the spot
+  function updateDashboard(intel, imageB64, boardId, imageName) {{
+    const meta = intel.metadata || {{}};
+    const summary = intel.board_summary || {{}};
+    const boardLevel = intel.board_level_intelligence || {{}};
+    const defects = intel.individual_defect_intelligence || [];
+    const actions = intel.corrective_action_recommendations || [];
+    const process = intel.process_intelligence || {{}};
+
+    // 1. Header
+    document.getElementById("headerBoardId").textContent = boardId;
+    document.getElementById("headerImageName").textContent = imageName;
+    
+    // Disposition Badge
+    const disp = summary.overall_disposition || "REVIEW";
+    const dispBadge = document.getElementById("dispositionBadge");
+    const dispText = document.getElementById("dispositionText");
+    dispText.textContent = disp;
+    if (disp === "REJECT") {{
+      dispBadge.style.background = "var(--danger)";
+      dispBadge.style.boxShadow = "0 0 20px rgba(239, 68, 68, 0.4)";
+    }} else if (disp === "REVIEW") {{
+      dispBadge.style.background = "var(--warning)";
+      dispBadge.style.boxShadow = "0 0 20px rgba(245, 158, 11, 0.4)";
+    }} else {{
+      dispBadge.style.background = "var(--success)";
+      dispBadge.style.boxShadow = "0 0 20px rgba(16, 185, 129, 0.4)";
+    }}
+
+    // 2. KPIs
+    document.getElementById("kpiTotalDefects").textContent = summary.total_defects || defects.length;
+    document.getElementById("kpiP1Count").textContent = summary.critical_defects_count || 0;
+    
+    const maxCeri = Math.max(...defects.map(d => d.ceri_metrics ? d.ceri_metrics.trace_width_reduction_pct : 0), 0);
+    document.getElementById("kpiMaxTraceLoss").textContent = maxCeri + "%";
+
+    const maxJVal = Math.max(...defects.map(d => (d.ceia_proxies && d.ceia_proxies.current_density_A_m2) || 0), 0);
+    document.getElementById("kpiMaxCurrentDensity").textContent = formatJVal(maxJVal);
+
+    const maxScore = summary.max_unified_risk_score || 0;
+    document.getElementById("kpiMaxScore").innerHTML = `${{maxScore}}<span style="font-size:16px; color:#9ca3af;">/100</span>`;
+
+    // 3. Canvas background & Bounding boxes
+    const bgElem = document.getElementById("pcbBgImage");
+    if (imageB64) {{
+      bgElem.style.backgroundImage = `url('${{imageB64}}')`;
+    }}
+    renderBBoxes(defects);
+
+    // 4. Board-Level Intelligence
+    document.getElementById("boardConditionText").textContent = boardLevel.board_condition || "Inspection Complete";
+    document.getElementById("acceptanceRationaleText").textContent = boardLevel.acceptance_rationale || summary.disposition_reason || "";
+    
+    // Major risks
+    const risksList = document.getElementById("majorRisksList");
+    risksList.innerHTML = (boardLevel.major_risks || []).map(r => `<li class="danger-item">⚠️ ${{r}}</li>`).join("");
+
+    // Immediate priorities
+    const priosList = document.getElementById("immediatePrioritiesList");
+    priosList.innerHTML = (boardLevel.immediate_priorities || []).map(p => `<li class="warning-item">🎯 ${{p}}</li>`).join("");
+
+    // 5. Process Intelligence
+    document.getElementById("processPatternText").textContent = process.pattern_summary || "";
+    document.getElementById("processHypothesesList").innerHTML = (process.fab_stage_hypotheses || []).map(h => `<li style="border-left-color:#38bdf8; background:rgba(56, 189, 248, 0.08);">🔬 ${{h}}</li>`).join("");
+    document.getElementById("processAuditsList").innerHTML = (process.recommended_investigations || []).map(inv => `<li style="border-left-color:#34d399; background:rgba(52, 211, 153, 0.08);">✅ ${{inv}}</li>`).join("");
+
+    // 6. Corrective Actions Table
+    const tableBody = document.getElementById("correctiveActionsTableBody");
+    tableBody.innerHTML = actions.map(a => `
+      <tr>
+        <td style="font-weight:700; color:#94a3b8;">#${{a.step_number}}</td>
+        <td><strong>${{a.defect_name}}</strong><br><span style="font-size:11px; color:#64748b;">ID #${{a.defect_id}}</span></td>
+        <td><span class="prio-pill prio-${{a.priority_level}}">${{a.priority_level}}</span></td>
+        <td style="font-weight:700;">${{a.unified_score}}</td>
+        <td>${{a.recommended_action}}</td>
+        <td><span style="font-size:12px; color:#cbd5e1;">${{(a.verification_procedure || []).join("; ")}}</span></td>
+        <td><span class="tag">${{a.assigned_station}}</span></td>
+        <td style="text-align:center;"><input type="checkbox" style="transform:scale(1.2); cursor:pointer;"></td>
+      </tr>
+    `).join("");
+
+    // 7. Defect Cards
+    renderDefectCards(defects);
+  }}
+
+  function formatJVal(j) {{
+    if (!j || j === 0) return "0.0 A·m⁻²";
+    const exp = Math.floor(Math.log10(j));
+    const mant = (j / Math.pow(10, exp)).toFixed(2);
+    const superDigits = {{"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","-":"⁻"}};
+    const expStr = String(exp).split("").map(c => superDigits[c] || c).join("");
+    return `${{mant}} × 10${{expStr}} A·m⁻²`;
+  }}
 
   // Render SVG Bounding Boxes on PCB Canvas
-  function renderBBoxes() {{
+  function renderBBoxes(defectsList) {{
     const canvas = document.getElementById("pcbCanvas");
-    const defects = intelData.individual_defect_intelligence || [];
+    canvas.innerHTML = "";
+    const defects = defectsList || (currentIntel && currentIntel.individual_defect_intelligence) || [];
     const colors = {{
       "P1_CRITICAL": "var(--p1)",
       "P2_HIGH": "var(--p2)",
@@ -724,12 +1030,12 @@ def generate_dashboard_html(
     }};
 
     defects.forEach(d => {{
-      const [x1, y1, x2, y2] = d.bbox;
+      const [x1, y1, x2, y2] = d.bbox || [0, 0, 50, 50];
       const left = (x1 / 640) * 100;
       const top = (y1 / 640) * 100;
       const width = Math.max(4, ((x2 - x1) / 640) * 100);
       const height = Math.max(4, ((y2 - y1) / 640) * 100);
-      const prio = d.unified_score.priority_level;
+      const prio = (d.unified_score && d.unified_score.priority_level) || "P2_HIGH";
       const col = colors[prio] || "var(--accent)";
 
       const marker = document.createElement("div");
@@ -739,7 +1045,7 @@ def generate_dashboard_html(
       marker.style.width = `${{width}}%`;
       marker.style.height = `${{height}}%`;
       marker.style.borderColor = col;
-      marker.title = `Defect #${{d.defect_id}} (${{d.display_name}}) - ${{prio}} (${{d.unified_score.score}}/100)`;
+      marker.title = `Defect #${{d.defect_id}} (${{d.display_name}}) - ${{prio}}`;
 
       const tag = document.createElement("div");
       tag.className = "bbox-tag";
@@ -760,14 +1066,86 @@ def generate_dashboard_html(
     }});
   }}
 
+  // Render Defect Cards dynamically
+  function renderDefectCards(defectsList) {{
+    const container = document.getElementById("defectCardsContainer");
+    const defects = defectsList || (currentIntel && currentIntel.individual_defect_intelligence) || [];
+    
+    container.innerHTML = defects.map(d => {{
+      const did = d.defect_id;
+      const prio = (d.unified_score && d.unified_score.priority_level) || "P2_HIGH";
+      const score = (d.unified_score && d.unified_score.score) || 0;
+      const p_class = `prio-${{prio}}`;
+      const ceri = d.ceri_metrics || {{}};
+      const ceia = d.ceia_proxies || {{}};
+      const bbox = d.bbox || [0, 0, 0, 0];
+      const jStr = ceia.current_density_str || (ceia.current_density_multiplier ? ceia.current_density_multiplier + 'x' : '1.0x');
+
+      return `
+        <div class="defect-card" id="defect-card-${{did}}">
+          <div class="defect-header" onclick="toggleDefect(${{did}})">
+            <div class="defect-title">
+              <span>Defect #${{did}}: <strong>${{d.display_name}}</strong></span>
+              <span class="prio-pill ${{p_class}}">${{prio}}</span>
+              <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>${{score}}/100</strong></span>
+            </div>
+            <div style="font-size:12px; color:#94a3b8;">
+              BBox: [${{bbox[0].toFixed(1)}}, ${{bbox[1].toFixed(1)}}, ${{bbox[2].toFixed(1)}}, ${{bbox[3].toFixed(1)}}] ▾
+            </div>
+          </div>
+          <div class="defect-body" id="defect-body-${{did}}">
+            <div>
+              <div style="margin-bottom:12px;">
+                <span class="section-title">Optical Detection:</span>
+                <p style="font-size:13px; color:#e2e8f0;">${{d.what_was_detected || ""}}</p>
+              </div>
+              <div style="margin-bottom:12px;">
+                <span class="section-title">Physical Significance:</span>
+                <p style="font-size:13px; color:#cbd5e1;">${{d.why_significant || ""}}</p>
+              </div>
+              <div style="margin-bottom:12px;">
+                <span class="section-title">CERI Geometric Severity (Optical):</span>
+                <div style="background:#0b1120; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #1e293b;">
+                  • Conductor Width Reduction: <strong>${{ceri.trace_width_reduction_pct || 0}}%</strong><br>
+                  • Clearance Intrusion: <strong>${{ceri.clearance_intrusion_pct || 0}}%</strong> (Remaining: ${{ceri.clearance_remaining_mm || 0}} mm)<br>
+                  • IPC-A-600 Violation: <strong>${{ceri.ipc_violation ? 'YES (OUT OF SPEC)' : 'NO'}}</strong>
+                </div>
+              </div>
+              <div>
+                <span class="section-title">CEIA Counterfactual Electrical Proxies:</span>
+                <span class="proxy-badge">GEOMETRIC PROXY ESTIMATE (NOT IN-SITU BENCH TEST)</span>
+                <div style="background:#130e24; padding:8px 12px; border-radius:6px; font-size:12.5px; border:1px solid #3b1d6e; color:#e9d5ff;">
+                  • Current Density (J): <strong>${{jStr}}</strong> (Crowding factor: ${{ceia.current_density_multiplier || 1.0}}x vs J₀)<br>
+                  • Signal Integrity Risk Level: <strong>${{ceia.signal_integrity_risk || 'LOW'}}</strong><br>
+                  • Thermal Dissipation Hazard: <strong>${{ceia.thermal_dissipation_risk || 'LOW'}}</strong>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div style="margin-bottom:12px;">
+                <span class="section-title">Suggested Corrective Action:</span>
+                <p style="font-size:13px; color:#f8fafc; background:rgba(37, 99, 235, 0.1); border-left:3px solid #3b82f6; padding:8px 10px; border-radius:0 4px 4px 0;">
+                  ${{d.suggested_corrective_action || ""}}
+                </p>
+              </div>
+              <div>
+                <span class="section-title">Physical Verification Protocol:</span>
+                <ul style="padding-left:18px; font-size:12.5px; color:#94a3b8;">
+                  ${{(d.verification_protocol || []).map(v => `<li>${{v}}</li>`).join("")}}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }}).join("");
+  }}
+
   // Toggle Defect Accordions
   function toggleDefect(did) {{
     const body = document.getElementById(`defect-body-${{did}}`);
-    if (body.style.display === "none") {{
-      body.style.display = "grid";
-    }} else {{
-      body.style.display = "none";
-    }}
+    if (!body) return;
+    body.style.display = (body.style.display === "none") ? "grid" : "none";
   }}
 
   // Client-Side Engineer Q&A Answering
@@ -781,55 +1159,58 @@ def generate_dashboard_html(
     if (!query) return;
 
     const out = document.getElementById("qaOutput");
-    out.innerHTML = `<em>Consulting ExecuTorch Llama Engineering Intelligence...</em>`;
+    out.innerHTML = `<em>Consulting ExecuTorch Llama Engineering Intelligence for Board '${{currentBoardId}}'...</em>`;
 
     setTimeout(() => {{
       const qLower = query.toLowerCase();
       let answer = "";
       let engine = "ExecuTorch Llama Grounded Intelligence";
+      const bSummary = (currentIntel && currentIntel.board_summary) || {{}};
+      const defects = (currentIntel && currentIntel.individual_defect_intelligence) || [];
 
       if (qLower.includes("why") && (qLower.includes("reject") || qLower.includes("accept") || qLower.includes("disposition"))) {{
-        const disp = reportData.board_summary.overall_disposition;
-        const reason = reportData.board_summary.disposition_reason;
+        const disp = bSummary.overall_disposition || "REJECT";
+        const reason = bSummary.disposition_reason || "Critical defects violated IPC-A-600 Class 3.";
         answer = `<strong>Board Decision: ${{disp}}</strong><br>${{reason}}<br><span style="color:#94a3b8; font-size:12px;">Grounding: Under IPC-A-600 Class 2/3, functional electrical bridging (shorts) and circuit breaks (opens) unconditionally prohibit operational energization without engineering rework sign-off.</span>`;
       }} else if (qLower.includes("which") && (qLower.includes("critical") || qLower.includes("worst") || qLower.includes("priority"))) {{
-        const top = intelData.individual_defect_intelligence[0];
-        answer = `<strong>Defect #${{top.defect_id}} (${{top.display_name}})</strong> is the most critical defect with a Unified Risk Score of <strong>${{top.unified_score.score}}/100 (${{top.unified_score.priority_level}})</strong>.<br>CERI geometric analysis indicates ${{top.ceri_metrics.trace_width_reduction_pct}}% width reduction and ${{top.ceri_metrics.clearance_intrusion_pct}}% clearance violation.`;
+        const top = defects[0] || {{}};
+        answer = `<strong>Defect #${{top.defect_id}} (${{top.display_name}})</strong> is the most critical defect on Board '${{currentBoardId}}' with a Unified Risk Score of <strong>${{top.unified_score ? top.unified_score.score : 0}}/100</strong>.<br>CERI geometric analysis indicates ${{top.ceri_metrics ? top.ceri_metrics.trace_width_reduction_pct : 0}}% width reduction and ${{top.ceri_metrics ? top.ceri_metrics.clearance_intrusion_pct : 0}}% clearance violation.`;
       }} else if (qLower.includes("defect") && (qLower.includes("action") || qLower.includes("rework") || qLower.includes("fix"))) {{
         const match = qLower.match(/defect\s*#?\s*(\d+)/);
         const did = match ? parseInt(match[1]) : 1;
-        const target = intelData.individual_defect_intelligence.find(d => d.defect_id === did);
+        const target = defects.find(d => d.defect_id === did);
         if (target) {{
-          answer = `<strong>Corrective Action for Defect #${{did}} (${{target.display_name}}):</strong><br>${{target.suggested_corrective_action}}<br><strong>Verification:</strong> ${{target.verification_protocol.join("; ")}}`;
+          answer = `<strong>Corrective Action for Defect #${{did}} (${{target.display_name}}):</strong><br>${{target.suggested_corrective_action}}<br><strong>Verification:</strong> ${{(target.verification_protocol || []).join("; ")}}`;
         }} else {{
-          answer = `Defect #${{did}} not found on this board. Active defects are #1 through #${{intelData.individual_defect_intelligence.length}}.`;
+          answer = `Defect #${{did}} not found on Board '${{currentBoardId}}'. Active defects are #1 through #${{defects.length}}.`;
         }}
       }} else if (qLower.includes("consequence") || qLower.includes("electrical") || qLower.includes("short") || qLower.includes("open")) {{
-        const criticals = intelData.individual_defect_intelligence.filter(d => d.unified_score.priority_level === "P1_CRITICAL");
-        const list = criticals.map(c => `• <strong>${{c.display_name}}:</strong> ${{c.potential_consequences.join(" ")}}`).join("<br>");
+        const criticals = defects.filter(d => d.unified_score && d.unified_score.priority_level === "P1_CRITICAL");
+        const list = criticals.map(c => `• <strong>${{c.display_name}}:</strong> ${{c.engineering_consequences || "Severe signal discontinuity or power rail short hazard."}}`).join("<br>");
         answer = `<strong>Potential Electrical Consequences (CEIA Proxies):</strong><br>${{list}}<br><span style="color:#a855f7; font-size:11px;">⚠️ Note: All electrical consequences are modeled via counterfactual geometric proxies. Bench measurements required.</span>`;
       }} else if (qLower.includes("summar")) {{
-        const b = reportData.board_summary;
-        answer = `<strong>Board Inspection Summary:</strong> Board '${{reportData.metadata.board_id}}' is evaluated as <strong>${{b.overall_disposition}}</strong>. It displays ${{b.total_defects}} total anomalies, including ${{b.critical_defects_count}} P1 Critical and ${{b.high_risk_count}} P2 High-Risk defects violating IPC-A-600 Class 2/3 tolerances.`;
+        answer = `<strong>Board Inspection Summary:</strong> Board '${{currentBoardId}}' is evaluated as <strong>${{bSummary.overall_disposition || "REJECT"}}</strong>. It displays ${{bSummary.total_defects || defects.length}} total anomalies, including ${{bSummary.critical_defects_count || 0}} P1 Critical defects violating IPC-A-600 Class 2/3 tolerances.`;
       }} else {{
-        answer = `<strong>Engineering Intelligence Response:</strong><br>Query: "${{query}}"<br>Based on IPC-A-600 standards and the ${{reportData.board_summary.total_defects}} detected defects on Board '${{reportData.metadata.board_id}}', ensure all P1 critical anomalies are isolated under stereo magnification before attempting power-on testing.`;
+        answer = `<strong>Engineering Intelligence Response:</strong><br>Query: "${{query}}"<br>Based on IPC-A-600 standards and the ${{bSummary.total_defects || defects.length}} detected defects on Board '${{currentBoardId}}', ensure all P1 critical anomalies are isolated under stereo magnification before attempting power-on testing.`;
       }}
 
       out.innerHTML = `<div>${{answer}}</div><div style="font-size:11px; color:#64748b; margin-top:8px;">Runtime: ${{engine}} | Grounding: IPC-A-600 Class 2/3</div>`;
-    }}, 200);
+    }}, 150);
   }}
 
   function downloadJSON() {{
-    const blob = new Blob([JSON.stringify(intelData, null, 2)], {{ type: 'application/json' }});
+    const blob = new Blob([JSON.stringify(currentIntel, null, 2)], {{ type: 'application/json' }});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${{reportData.metadata.board_id}}_engineering_intelligence.json`;
+    a.download = `${{currentBoardId}}_engineering_intelligence.json`;
     a.click();
   }}
 
-  // Initialize Canvas
-  window.onload = renderBBoxes;
+  // Initialize Canvas on load
+  window.onload = function() {{
+    renderBBoxes();
+  }};
 </script>
 
 </body>

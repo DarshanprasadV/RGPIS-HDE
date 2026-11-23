@@ -110,10 +110,11 @@ def main():
         print("  [5] Display Edge SoC Hardware Compatibility & Resource Audit")
         print("  [6] Full Board Engineering Intelligence & Interactive Dashboard (All 6 Defect Classes)")
         print("  [7] Live Contextual Engineer Q&A Session ('Why was this PCB rejected?', etc.)")
+        print("  [8] Launch Live Web App (Direct Image Drag & Drop in Browser)")
         print("  [q] Quit Demo")
         print("=" * 76)
 
-        choice = input("\nEnter choice [1-7, q]: ").strip().lower()
+        choice = input("\nEnter choice [1-8, q]: ").strip().lower()
 
         if choice == "1":
             inp = {"defect_type": "open_circuit", "confidence": 0.94, "location": [120, 240, 165, 275]}
@@ -150,6 +151,11 @@ def main():
             from llama_advisory.engineer_qa import run_interactive_qa_session
             print("\n>> Launching Contextual Engineer Q&A Session...")
             run_interactive_qa_session("deep_12100046.jpg")
+
+        elif choice == "8":
+            from llama_advisory.web_app import run_server
+            print("\n>> Launching Live Interactive Web App Server...")
+            run_server()
 
         elif choice in ("q", "quit", "exit"):
             print("\nDemo concluded. Best wishes for Bharat AI-SoC Challenge 2026/27!")
