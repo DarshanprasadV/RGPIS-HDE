@@ -643,9 +643,9 @@ def generate_dashboard_html(
       <span class="kpi-sub">SI Unit: A·m⁻² (IPC-2152 1A ref)</span>
     </div>
     <div class="kpi-card">
-      <span class="kpi-label">Unified Risk Score</span>
+      <span class="kpi-label">Anomaly Detection</span>
       <span class="kpi-val" id="kpiMaxScore">{max_score}<span style="font-size:16px; color:#9ca3af;">/100</span></span>
-      <span class="kpi-sub">Composite Prioritization Index</span>
+      <span class="kpi-sub">Peak Anomaly Severity Score</span>
     </div>
   </div>
 
@@ -758,7 +758,7 @@ def generate_dashboard_html(
   <div class="card">
     <div class="card-title">
       <span>🛠️ Layer 3: Prioritized Corrective Action & Inspection Recommendations</span>
-      <span class="tag" style="margin-left:auto;">Ranked by Unified Risk</span>
+      <span class="tag" style="margin-left:auto;">Ranked by Anomaly Score</span>
     </div>
     <div style="overflow-x:auto;">
       <table class="custom-table">
@@ -767,7 +767,7 @@ def generate_dashboard_html(
             <th style="width:60px;">Step #</th>
             <th style="width:140px;">Defect</th>
             <th style="width:110px;">Priority</th>
-            <th style="width:80px;">Score</th>
+            <th style="width:110px;">Anomaly Score</th>
             <th>Recommended Corrective Action</th>
             <th>Verification Protocol</th>
             <th style="width:150px;">Station</th>
@@ -818,7 +818,7 @@ def generate_dashboard_html(
         <div class="defect-title">
           <span>Defect #{did}: <strong>{d.get('display_name')}</strong></span>
           <span class="prio-pill {p_class}">{prio}</span>
-          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>{score}/100</strong></span>
+          <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>{score}/100</strong></span>
         </div>
         <div style="font-size:12px; color:#94a3b8;">
           BBox: [{bbox[0]:.1f}, {bbox[1]:.1f}, {bbox[2]:.1f}, {bbox[3]:.1f}] ▾
@@ -1325,7 +1325,7 @@ def generate_dashboard_html(
             <div class="defect-title">
               <span>Defect #${{did}}: <strong>${{d.display_name}}</strong></span>
               <span class="prio-pill ${{p_class}}">${{prio}}</span>
-              <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>${{score}}/100</strong></span>
+              <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>${{score}}/100</strong></span>
             </div>
             <div style="font-size:12px; color:#94a3b8;">
               BBox: [${{bbox[0].toFixed(1)}}, ${{bbox[1].toFixed(1)}}, ${{bbox[2].toFixed(1)}}, ${{bbox[3].toFixed(1)}}] ▾
@@ -1412,7 +1412,7 @@ def generate_dashboard_html(
         answer = `<strong>Board Decision: ${{disp}}</strong><br>${{reason}}<br><span style="color:#94a3b8; font-size:12px;">Grounding: Under IPC-A-600 Class 2/3, functional electrical bridging (shorts) and circuit breaks (opens) unconditionally prohibit operational energization without engineering rework sign-off.</span>`;
       }} else if (qLower.includes("which") && (qLower.includes("critical") || qLower.includes("worst") || qLower.includes("priority"))) {{
         const top = defects[0] || {{}};
-        answer = `<strong>Defect #${{top.defect_id}} (${{top.display_name}})</strong> is the most critical defect on Board '${{currentBoardId}}' with a Unified Risk Score of <strong>${{top.unified_score ? top.unified_score.score : 0}}/100</strong>.<br>CERI geometric analysis indicates ${{top.ceri_metrics ? top.ceri_metrics.trace_width_reduction_pct : 0}}% width reduction and ${{top.ceri_metrics ? top.ceri_metrics.clearance_intrusion_pct : 0}}% clearance violation.`;
+        answer = `<strong>Defect #${{top.defect_id}} (${{top.display_name}})</strong> is the most critical defect on Board '${{currentBoardId}}' with an Anomaly Detection Score of <strong>${{top.unified_score ? top.unified_score.score : 0}}/100</strong>.<br>CERI geometric analysis indicates ${{top.ceri_metrics ? top.ceri_metrics.trace_width_reduction_pct : 0}}% width reduction and ${{top.ceri_metrics ? top.ceri_metrics.clearance_intrusion_pct : 0}}% clearance violation.`;
       }} else if (qLower.includes("defect") && (qLower.includes("action") || qLower.includes("rework") || qLower.includes("fix"))) {{
         const match = qLower.match(/defect\\s*#?\\s*(\\d+)/);
         const did = match ? parseInt(match[1]) : 1;
@@ -1496,7 +1496,7 @@ def generate_markdown_report(
         f"- **Board Condition Assessment:** {board_level.get('board_condition')}",
         f"- **Upstream Rationale:** {board_level.get('acceptance_rationale')}",
         f"- **Total Detected Defects:** {summary.get('total_defects')} (P1: {summary.get('critical_defects_count')}, P2: {summary.get('high_risk_count')})",
-        f"- **Max Unified Risk Score:** {summary.get('max_unified_risk_score')}/100",
+        f"- **Max Anomaly Detection Score:** {summary.get('max_unified_risk_score')}/100",
         "",
         "### Major Engineering Risks:",
     ]
@@ -1533,7 +1533,7 @@ def generate_markdown_report(
         ceia = d.get("ceia_proxies", {})
         lines.extend([
             f"### Defect #{d.get('defect_id')}: {d.get('display_name')} ({d.get('unified_score', {}).get('priority_level')})",
-            f"- **Confidence:** {d.get('confidence') * 100:.1f}% | **BBox:** `{d.get('bbox')}` | **Unified Score:** {d.get('unified_score', {}).get('score')}/100",
+            f"- **Confidence:** {d.get('confidence') * 100:.1f}% | **BBox:** `{d.get('bbox')}` | **Anomaly Score:** {d.get('unified_score', {}).get('score')}/100",
             f"- **Optical Detection:** {d.get('what_was_detected')}",
             f"- **Physical Significance:** {d.get('why_significant')}",
             f"- **CERI Geometric Metrics:** Trace Width Reduction = {ceri.get('trace_width_reduction_pct')}%, Clearance Intrusion = {ceri.get('clearance_intrusion_pct')}%, Clearance Remaining = {ceri.get('clearance_remaining_mm')} mm, IPC Violation = {ceri.get('ipc_violation')}",

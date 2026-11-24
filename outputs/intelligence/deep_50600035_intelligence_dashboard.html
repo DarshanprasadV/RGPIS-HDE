@@ -486,9 +486,9 @@
       <span class="kpi-sub">SI Unit: A·m⁻² (IPC-2152 1A ref)</span>
     </div>
     <div class="kpi-card">
-      <span class="kpi-label">Unified Risk Score</span>
+      <span class="kpi-label">Anomaly Detection</span>
       <span class="kpi-val" id="kpiMaxScore">0.0<span style="font-size:16px; color:#9ca3af;">/100</span></span>
-      <span class="kpi-sub">Composite Prioritization Index</span>
+      <span class="kpi-sub">Peak Anomaly Severity Score</span>
     </div>
   </div>
 
@@ -596,7 +596,7 @@
   <div class="card">
     <div class="card-title">
       <span>🛠️ Layer 3: Prioritized Corrective Action & Inspection Recommendations</span>
-      <span class="tag" style="margin-left:auto;">Ranked by Unified Risk</span>
+      <span class="tag" style="margin-left:auto;">Ranked by Anomaly Score</span>
     </div>
     <div style="overflow-x:auto;">
       <table class="custom-table">
@@ -605,7 +605,7 @@
             <th style="width:60px;">Step #</th>
             <th style="width:140px;">Defect</th>
             <th style="width:110px;">Priority</th>
-            <th style="width:80px;">Score</th>
+            <th style="width:110px;">Anomaly Score</th>
             <th>Recommended Corrective Action</th>
             <th>Verification Protocol</th>
             <th style="width:150px;">Station</th>
@@ -780,7 +780,7 @@
         <div class="defect-title">
           <span>Defect #1: <strong>Open Circuit</strong></span>
           <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
-          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>99.2/100</strong></span>
+          <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>99.2/100</strong></span>
         </div>
         <div style="font-size:12px; color:#94a3b8;">
           BBox: [188.9, 485.2, 228.5, 519.9] ▾
@@ -845,7 +845,7 @@
         <div class="defect-title">
           <span>Defect #3: <strong>Open Circuit</strong></span>
           <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
-          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>99.1/100</strong></span>
+          <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>99.1/100</strong></span>
         </div>
         <div style="font-size:12px; color:#94a3b8;">
           BBox: [489.4, 462.1, 590.2, 496.1] ▾
@@ -910,7 +910,7 @@
         <div class="defect-title">
           <span>Defect #4: <strong>Open Circuit</strong></span>
           <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
-          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>98.9/100</strong></span>
+          <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>98.9/100</strong></span>
         </div>
         <div style="font-size:12px; color:#94a3b8;">
           BBox: [84.4, 462.3, 185.9, 495.8] ▾
@@ -975,7 +975,7 @@
         <div class="defect-title">
           <span>Defect #5: <strong>Open Circuit</strong></span>
           <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
-          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>98.9/100</strong></span>
+          <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>98.9/100</strong></span>
         </div>
         <div style="font-size:12px; color:#94a3b8;">
           BBox: [123.4, 365.6, 184.1, 426.0] ▾
@@ -1040,7 +1040,7 @@
         <div class="defect-title">
           <span>Defect #7: <strong>Open Circuit</strong></span>
           <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
-          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>98.9/100</strong></span>
+          <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>98.9/100</strong></span>
         </div>
         <div style="font-size:12px; color:#94a3b8;">
           BBox: [82.4, 258.1, 160.5, 288.1] ▾
@@ -1105,7 +1105,7 @@
         <div class="defect-title">
           <span>Defect #8: <strong>Short Circuit</strong></span>
           <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
-          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>98.7/100</strong></span>
+          <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>98.7/100</strong></span>
         </div>
         <div style="font-size:12px; color:#94a3b8;">
           BBox: [175.9, 267.5, 219.2, 298.5] ▾
@@ -1170,7 +1170,7 @@
         <div class="defect-title">
           <span>Defect #9: <strong>Open Circuit</strong></span>
           <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
-          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>98.7/100</strong></span>
+          <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>98.7/100</strong></span>
         </div>
         <div style="font-size:12px; color:#94a3b8;">
           BBox: [486.1, 47.1, 592.0, 83.8] ▾
@@ -1235,7 +1235,7 @@
         <div class="defect-title">
           <span>Defect #10: <strong>Open Circuit</strong></span>
           <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
-          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>98.7/100</strong></span>
+          <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>98.7/100</strong></span>
         </div>
         <div style="font-size:12px; color:#94a3b8;">
           BBox: [17.8, 48.8, 163.1, 82.5] ▾
@@ -1300,7 +1300,7 @@
         <div class="defect-title">
           <span>Defect #11: <strong>Open Circuit</strong></span>
           <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
-          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>98.6/100</strong></span>
+          <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>98.6/100</strong></span>
         </div>
         <div style="font-size:12px; color:#94a3b8;">
           BBox: [284.7, 517.7, 365.9, 547.0] ▾
@@ -1365,7 +1365,7 @@
         <div class="defect-title">
           <span>Defect #12: <strong>Open Circuit</strong></span>
           <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
-          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>98.5/100</strong></span>
+          <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>98.5/100</strong></span>
         </div>
         <div style="font-size:12px; color:#94a3b8;">
           BBox: [0.0, 515.0, 26.2, 550.5] ▾
@@ -1430,7 +1430,7 @@
         <div class="defect-title">
           <span>Defect #13: <strong>Open Circuit</strong></span>
           <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
-          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>98.2/100</strong></span>
+          <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>98.2/100</strong></span>
         </div>
         <div style="font-size:12px; color:#94a3b8;">
           BBox: [460.3, 256.7, 571.8, 288.4] ▾
@@ -1495,7 +1495,7 @@
         <div class="defect-title">
           <span>Defect #14: <strong>Open Circuit</strong></span>
           <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
-          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>97.8/100</strong></span>
+          <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>97.8/100</strong></span>
         </div>
         <div style="font-size:12px; color:#94a3b8;">
           BBox: [283.4, 102.6, 431.2, 136.9] ▾
@@ -1560,7 +1560,7 @@
         <div class="defect-title">
           <span>Defect #15: <strong>Open Circuit</strong></span>
           <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
-          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>97.6/100</strong></span>
+          <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>97.6/100</strong></span>
         </div>
         <div style="font-size:12px; color:#94a3b8;">
           BBox: [282.4, 311.3, 362.3, 340.6] ▾
@@ -1625,7 +1625,7 @@
         <div class="defect-title">
           <span>Defect #6: <strong>Spur</strong></span>
           <span class="prio-pill prio-P1_CRITICAL">P1_CRITICAL</span>
-          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>80.9/100</strong></span>
+          <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>80.9/100</strong></span>
         </div>
         <div style="font-size:12px; color:#94a3b8;">
           BBox: [213.4, 230.1, 250.6, 259.9] ▾
@@ -1689,7 +1689,7 @@
         <div class="defect-title">
           <span>Defect #2: <strong>Pin Hole</strong></span>
           <span class="prio-pill prio-P2_HIGH">P2_HIGH</span>
-          <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>66.6/100</strong></span>
+          <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>66.6/100</strong></span>
         </div>
         <div style="font-size:12px; color:#94a3b8;">
           BBox: [267.0, 127.3, 303.7, 160.0] ▾
@@ -2192,7 +2192,7 @@
             <div class="defect-title">
               <span>Defect #${did}: <strong>${d.display_name}</strong></span>
               <span class="prio-pill ${p_class}">${prio}</span>
-              <span style="font-size:12px; color:#94a3b8;">Risk Score: <strong>${score}/100</strong></span>
+              <span style="font-size:12px; color:#94a3b8;">Anomaly Score: <strong>${score}/100</strong></span>
             </div>
             <div style="font-size:12px; color:#94a3b8;">
               BBox: [${bbox[0].toFixed(1)}, ${bbox[1].toFixed(1)}, ${bbox[2].toFixed(1)}, ${bbox[3].toFixed(1)}] ▾
@@ -2279,7 +2279,7 @@
         answer = `<strong>Board Decision: ${disp}</strong><br>${reason}<br><span style="color:#94a3b8; font-size:12px;">Grounding: Under IPC-A-600 Class 2/3, functional electrical bridging (shorts) and circuit breaks (opens) unconditionally prohibit operational energization without engineering rework sign-off.</span>`;
       } else if (qLower.includes("which") && (qLower.includes("critical") || qLower.includes("worst") || qLower.includes("priority"))) {
         const top = defects[0] || {};
-        answer = `<strong>Defect #${top.defect_id} (${top.display_name})</strong> is the most critical defect on Board '${currentBoardId}' with a Unified Risk Score of <strong>${top.unified_score ? top.unified_score.score : 0}/100</strong>.<br>CERI geometric analysis indicates ${top.ceri_metrics ? top.ceri_metrics.trace_width_reduction_pct : 0}% width reduction and ${top.ceri_metrics ? top.ceri_metrics.clearance_intrusion_pct : 0}% clearance violation.`;
+        answer = `<strong>Defect #${top.defect_id} (${top.display_name})</strong> is the most critical defect on Board '${currentBoardId}' with an Anomaly Detection Score of <strong>${top.unified_score ? top.unified_score.score : 0}/100</strong>.<br>CERI geometric analysis indicates ${top.ceri_metrics ? top.ceri_metrics.trace_width_reduction_pct : 0}% width reduction and ${top.ceri_metrics ? top.ceri_metrics.clearance_intrusion_pct : 0}% clearance violation.`;
       } else if (qLower.includes("defect") && (qLower.includes("action") || qLower.includes("rework") || qLower.includes("fix"))) {
         const match = qLower.match(/defect\s*#?\s*(\d+)/);
         const did = match ? parseInt(match[1]) : 1;

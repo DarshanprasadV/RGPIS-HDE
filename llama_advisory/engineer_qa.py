@@ -95,7 +95,7 @@ class EngineerQAInterface:
                 ceri_w = top.get("ceri", {}).get("trace_width_reduction_pct")
                 ceri_c = top.get("ceri", {}).get("clearance_intrusion_pct")
                 answer_text = (
-                    f"Defect #{did} ({cname}) is the most critical anomaly on this board with a Unified Risk Score of "
+                    f"Defect #{did} ({cname}) is the most critical anomaly on this board with an Anomaly Detection Score of "
                     f"{score}/100 ({prio}). CERI analysis confirms trace width reduction of {ceri_w}% and clearance "
                     f"intrusion of {ceri_c}%, posing the highest immediate threat to board functionality."
                 )
