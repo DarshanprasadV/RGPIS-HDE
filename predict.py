@@ -58,7 +58,7 @@ class PCBDefectDetector:
         self,
         weights: Union[str, Path] = DEFAULT_WEIGHTS,
         device: Optional[str] = None,
-        conf_threshold: float = 0.30,
+        conf_threshold: float = 0.25,
         iou_threshold: float = 0.45,
     ):
         """
@@ -179,17 +179,6 @@ class PCBDefectDetector:
         result = results[0]
         detections: List[Dict[str, Any]] = []
 
-        # Compute biological skin mask for camera suppression
-        # Human skin features (fingers, thumbs, hands) must never be identified as PCB copper or spurs
-        try:
-            ycrcb = cv2.cvtColor(img, cv2.COLOR_BGR2YCrCb)
-            hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-            skin_ycrcb = cv2.inRange(ycrcb, np.array([0, 135, 80]), np.array([255, 175, 125]))
-            skin_hsv = cv2.inRange(hsv, np.array([0, 30, 30]), np.array([25, 255, 255]))
-            skin_mask = cv2.bitwise_and(skin_ycrcb, skin_hsv)
-        except Exception:
-            skin_mask = None
-
         if result.boxes is not None and len(result.boxes) > 0:
             boxes = result.boxes
             xyxy_arr = boxes.xyxy.cpu().numpy()  # original pixel coordinates
@@ -211,26 +200,10 @@ class PCBDefectDetector:
                 cy = round(y_min + h / 2.0, 2)
                 area = round(w * h, 2)
 
-                # Physical anomaly constraint check:
-                # Real PCB fabrication defects (open, short, mousebite, pinhole, spur, copper)
-                # are micro-defects. Reject boxes exceeding 5% of total image area or 35% of dimension.
-                area_ratio = (w * h) / (float(orig_w) * float(orig_h)) if (orig_w > 0 and orig_h > 0) else 0.0
-                if area_ratio > 0.05 or (orig_w > 0 and (w / orig_w) > 0.35) or (orig_h > 0 and (h / orig_h) > 0.35):
-                    continue
-
-                # Skin suppression: Reject boxes containing human skin (fingers/thumb holding board)
-                if skin_mask is not None:
-                    bx1, by1 = max(0, int(x_min)), max(0, int(y_min))
-                    bx2, by2 = min(int(orig_w), int(x_max)), min(int(orig_h), int(y_max))
-                    patch = skin_mask[by1:by2, bx1:bx2]
-                    patch_area = max(1, (bx2 - bx1) * (by2 - by1))
-                    if (np.count_nonzero(patch) / patch_area) > 0.15:
-                        continue
-
                 class_name = self.classes.get(cls_id, f"class_{cls_id}")
 
                 detections.append({
-                    "defect_id": len(detections) + 1,
+                    "defect_id": idx,
                     "class_id": int(cls_id),
                     "class_name": class_name,
                     "confidence": float(round(score, 4)),

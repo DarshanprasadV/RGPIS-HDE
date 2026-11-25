@@ -52,7 +52,7 @@ def get_detector() -> PCBDefectDetector:
     global _DETECTOR
     if _DETECTOR is None:
         print("  [INIT] Loading YOLO26n PCB Defect Detector into memory...")
-        _DETECTOR = PCBDefectDetector(conf_threshold=0.35)
+        _DETECTOR = PCBDefectDetector(conf_threshold=0.25)
         print("  [INIT] YOLO26n Detector ready.")
     return _DETECTOR
 
@@ -68,71 +68,26 @@ def get_engine() -> EngineeringIntelligenceEngine:
 
 def validate_pcb_domain(img: np.ndarray) -> tuple[bool, str, str]:
     """
-    Validates whether an input frame or upload belongs to the PCB domain.
-    Rejects human faces/skin, empty backgrounds, and blurry/featureless scenes.
-    Distinguishes genuine PCB boards (including copper tracks, gold ENIG, and yellow FR4)
-    from human faces or skin by checking for smooth, edge-free organic skin blobs
-    versus dense etched parallel circuit traces.
+    Validates whether an input frame or upload is valid for inspection.
+    Rejects corrupted images and completely dark / covered lens scenes.
+    Never blocks genuine PCB boards (including copper tracks, gold ENIG, or dark laminate).
     
     Returns: (is_pcb: bool, reason_code: str, user_friendly_message: str)
     """
     if img is None or img.size == 0:
         return False, "invalid_image", "Failed to decode camera or upload frame."
 
-    h, w = img.shape[:2]
-    total_pixels = h * w
-
-    # 1. Scene Contrast / Dynamic Range Check
+    # Minimum Scene Contrast / Dynamic Range Check
+    # Catches covered camera lenses or completely black frames
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     std_dev = float(np.std(gray))
-    if std_dev < 10.0:
+    if std_dev < 6.0:
         return False, "low_contrast", (
             f"Scene contrast too low (std={std_dev:.1f}). "
-            "Adjust lighting or move the circuit board closer to the camera lens."
+            "Please ensure camera has sufficient lighting and remove any lens obstruction."
         )
 
-    # 2. Circuit Structure & Trace Edge Energy (Canny)
-    edges = cv2.Canny(gray, 50, 150)
-    edge_density = (np.count_nonzero(edges) / total_pixels) * 100.0
-
-    # 3. Scale-Invariant Smooth Skin Blob Detection (Distinguishes faces/skin from copper traces)
-    # Human faces/cheeks/foreheads form large, smooth, edge-free skin blobs.
-    # Copper PCB traces have warm chrominance too, but are broken up by dense parallel track edges.
-    img_r = cv2.resize(img, (320, 320))
-    gray_r = cv2.cvtColor(img_r, cv2.COLOR_BGR2GRAY)
-    edges_r = cv2.Canny(gray_r, 50, 150)
-
-    ycrcb_r = cv2.cvtColor(img_r, cv2.COLOR_BGR2YCrCb)
-    hsv_r = cv2.cvtColor(img_r, cv2.COLOR_BGR2HSV)
-    skin_ycrcb_r = cv2.inRange(ycrcb_r, np.array([0, 135, 80]), np.array([255, 175, 125]))
-    skin_hsv_r = cv2.inRange(hsv_r, np.array([0, 30, 30]), np.array([25, 255, 255]))
-    skin_mask_r = cv2.bitwise_and(skin_ycrcb_r, skin_hsv_r)
-
-    edges_dil = cv2.dilate(edges_r, np.ones((5, 5), np.uint8))
-    smooth_skin = cv2.bitwise_and(skin_mask_r, cv2.bitwise_not(edges_dil))
-
-    eroded_15 = cv2.erode(smooth_skin, np.ones((15, 15), np.uint8))
-    smooth_blob_pct = (np.count_nonzero(eroded_15) / (320 * 320)) * 100.0
-
-    num_labels, _, stats, _ = cv2.connectedComponentsWithStats(smooth_skin)
-    max_smooth_cc_pct = 0.0
-    if num_labels > 1:
-        max_smooth_cc_pct = (float(np.max(stats[1:, cv2.CC_STAT_AREA])) / (320 * 320)) * 100.0
-
-    if smooth_blob_pct > 3.5 or max_smooth_cc_pct > 15.0:
-        return False, "human_subject_detected", (
-            f"Human subject or face detected ({smooth_blob_pct:.1f}% smooth skin region). "
-            "Defect analysis paused. Please align a Printed Circuit Board inside the optical reticle."
-        )
-
-    # 4. Minimum circuit trace edge requirement (filters out blank/uniform walls, empty desks, or dark voids)
-    if edge_density < 0.25:
-        return False, "low_circuit_density", (
-            f"Insufficient circuit trace structure detected ({edge_density:.2f}% edge density). "
-            "Ensure the PCB is aligned inside the optical reticle under adequate lighting."
-        )
-
-    return True, "valid_pcb", f"PCB domain verified (Trace edges: {edge_density:.2f}%, Smooth skin blob: {smooth_blob_pct:.2f}%)"
+    return True, "valid_pcb", "Frame verified for optical inspection."
 
 
 class RGPISHandler(http.server.SimpleHTTPRequestHandler):
@@ -340,6 +295,21 @@ class RGPISHandler(http.server.SimpleHTTPRequestHandler):
 
                 dur = time.time() - t0
                 total_defects = intel.get("board_summary", {}).get("total_defects", len(intel.get("individual_defect_intelligence", [])))
+
+                # If zero defects found, distinguish clean conforming PCB from non-circuit/passive view
+                if total_defects == 0:
+                    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                    edges = cv2.Canny(gray, 50, 150)
+                    edge_density = (np.count_nonzero(edges) / (img.shape[0] * img.shape[1])) * 100.0
+                    if edge_density < 0.20:
+                        for target in ("board_level_intelligence", "board_summary"):
+                            if target in intel and isinstance(intel[target], dict):
+                                intel[target]["board_condition"] = "PASSIVE SCENE (0 Defects Detected)"
+                                intel[target]["acceptance_rationale"] = (
+                                    "Optical field clear: No circuit trace anomalies detected. "
+                                    "Align a physical PCB inside the optical reticle for inspection."
+                                )
+
                 print(f"[LIVE API] Successfully analyzed '{filename}' in {dur:.2f}s — Found {total_defects} defect(s).")
 
                 # 4. Log to persistent audit trail (JSONL + CSV)
