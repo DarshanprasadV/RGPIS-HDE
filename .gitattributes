@@ -1,0 +1,10 @@
+# GitHub Linguist Language Configuration
+# Suppress Kotlin detection completely
+*.kt linguist-detectable=false
+*.kts linguist-detectable=false
+mobile_app/** linguist-detectable=false
+
+# Mark generated intelligence dashboards and evaluation outputs as vendored
+# so that Python correctly reflects as the primary codebase language
+outputs/** linguist-vendored
+outputs/intelligence/*.html linguist-vendored
