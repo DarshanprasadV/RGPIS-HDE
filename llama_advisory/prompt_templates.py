@@ -431,16 +431,27 @@ def get_deterministic_board_fallback(report: Dict[str, Any], reason: str) -> Dic
         prio = d.get("unified_score", {}).get("priority_level")
         priorities.append(f"Defect #{did} ({cname.upper()} - {prio}): Immediate optical isolation and rework evaluation.")
 
-    cond_str = (
-        f"CRITICAL_NON_CONFORMING ({p1_count} P1 Critical defects detected)"
-        if disposition == "REJECT" else
-        f"MARGINAL_REVIEW_REQUIRED ({p2_count} High-risk defects requiring review)"
-    )
+    if disposition == "ACCEPT" or len(defects) == 0:
+        cond_str = "CONFORMING_CLASS_3 (0 Defects detected)"
+        rationale = (
+            "The PCB conforms fully to IPC-A-600 Class 3 acceptance criteria with zero detectable trace anomalies. "
+            "Production release approved."
+        )
+        if not risks:
+            risks = ["No operational, dielectric, or thermal reliability risks identified."]
+        if not priorities:
+            priorities = ["Standard post-inspection cleaning and packaging."]
+    else:
+        cond_str = (
+            f"CRITICAL_NON_CONFORMING ({p1_count} P1 Critical defects detected)"
+            if disposition == "REJECT" else
+            f"MARGINAL_REVIEW_REQUIRED ({p2_count} High-risk defects requiring review)"
+        )
 
-    rationale = (
-        f"The PCB was determined as '{disposition}' based on unified scoring where critical functional defects "
-        f"violate IPC-A-600 Class 2/3 criteria. Immediate quarantine is mandated."
-    )
+        rationale = (
+            f"The PCB was determined as '{disposition}' based on unified scoring where critical functional defects "
+            f"violate IPC-A-600 Class 2/3 criteria. Immediate quarantine is mandated."
+        )
 
     return {
         "board_condition": cond_str,

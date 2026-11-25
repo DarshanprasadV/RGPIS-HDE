@@ -42,7 +42,7 @@ def get_detector() -> PCBDefectDetector:
     global _DETECTOR
     if _DETECTOR is None:
         print("  [INIT] Loading YOLO26n PCB Defect Detector into memory...")
-        _DETECTOR = PCBDefectDetector()
+        _DETECTOR = PCBDefectDetector(conf_threshold=0.35)
         print("  [INIT] YOLO26n Detector ready.")
     return _DETECTOR
 
@@ -54,6 +54,68 @@ def get_engine() -> EngineeringIntelligenceEngine:
         _INTEL_ENGINE = EngineeringIntelligenceEngine()
         print("  [INIT] Engineering Intelligence Engine ready.")
     return _INTEL_ENGINE
+
+
+def validate_pcb_domain(img: np.ndarray) -> tuple[bool, str, str]:
+    """
+    Validates whether an input frame or upload belongs to the PCB domain.
+    Rejects human faces/skin, empty backgrounds, and blurry/featureless scenes.
+    Distinguishes human faces in the optical center from fingers holding board margins.
+    
+    Returns: (is_pcb: bool, reason_code: str, user_friendly_message: str)
+    """
+    if img is None or img.size == 0:
+        return False, "invalid_image", "Failed to decode camera or upload frame."
+
+    h, w = img.shape[:2]
+    total_pixels = h * w
+
+    # 1. Biological Skin Tone Detection via combined YCrCb + HSV saturation
+    # Real human skin has both characteristic Cr/Cb chrominance AND minimum HSV saturation.
+    # This prevents warm white/gray reflections from indoor lighting or LCD screens from being misclassified.
+    ycrcb = cv2.cvtColor(img, cv2.COLOR_BGR2YCrCb)
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    skin_ycrcb = cv2.inRange(ycrcb, np.array([0, 135, 80]), np.array([255, 175, 125]))
+    skin_hsv = cv2.inRange(hsv, np.array([0, 30, 30]), np.array([25, 255, 255]))
+    skin_mask = cv2.bitwise_and(skin_ycrcb, skin_hsv)
+
+    total_skin_pct = (np.count_nonzero(skin_mask) / total_pixels) * 100.0
+
+    # Optical center inspection zone (inner 60% x 60% of frame)
+    # A person/face sits directly in the center; fingers holding a board only touch the margin.
+    cx1, cy1 = int(w * 0.20), int(h * 0.20)
+    cx2, cy2 = int(w * 0.80), int(h * 0.80)
+    center_patch = skin_mask[cy1:cy2, cx1:cx2]
+    center_area = max(1, (cx2 - cx1) * (cy2 - cy1))
+    center_skin_pct = (np.count_nonzero(center_patch) / center_area) * 100.0
+
+    if center_skin_pct > 5.0 or total_skin_pct > 12.0:
+        return False, "human_subject_detected", (
+            f"Human subject or face detected ({center_skin_pct:.1f}% center skin signature). "
+            "Defect analysis paused. Please align a Printed Circuit Board inside the optical reticle."
+        )
+
+    # 2. Minimum Circuit Structure / Trace Edge Energy (Canny)
+    # PCBs feature dense etched copper tracks, solder pads, drill vias, or SMT traces.
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    edges = cv2.Canny(gray, 50, 150)
+    edge_density = (np.count_nonzero(edges) / total_pixels) * 100.0
+
+    if edge_density < 0.25:
+        return False, "low_circuit_density", (
+            f"Insufficient circuit trace structure detected ({edge_density:.2f}% edge density). "
+            "Ensure the PCB is aligned inside the optical reticle under adequate lighting."
+        )
+
+    # 3. Grayscale Illumination / Contrast Check
+    std_dev = float(np.std(gray))
+    if std_dev < 12.0:
+        return False, "low_contrast", (
+            f"Scene contrast too low (std={std_dev:.1f}). "
+            "Adjust lighting or move the circuit board closer to the camera lens."
+        )
+
+    return True, "valid_pcb", f"PCB domain verified (Center skin: {center_skin_pct:.2f}%, Trace edges: {edge_density:.2f}%)"
 
 
 class RGPISHandler(http.server.SimpleHTTPRequestHandler):
@@ -123,6 +185,24 @@ class RGPISHandler(http.server.SimpleHTTPRequestHandler):
 
                 if img is None:
                     self._send_json({"status": "error", "message": "Failed to decode image."}, 400)
+                    return
+
+                data_url = req_data.get("image_b64", "")
+                if not data_url.startswith("data:"):
+                    data_url = f"data:image/jpeg;base64,{img_data_str}"
+
+                # 0. Gatekeeper: PCB Domain Validation
+                is_pcb, reason_code, domain_msg = validate_pcb_domain(img)
+                if not is_pcb:
+                    print(f"[LIVE API] Non-PCB input filtered: {reason_code} - {domain_msg}")
+                    self._send_json({
+                        "status": "not_a_pcb",
+                        "reason": reason_code,
+                        "message": domain_msg,
+                        "board_id": stem,
+                        "image_name": filename,
+                        "image_b64": data_url,
+                    }, 200)
                     return
 
                 print(f"\n[LIVE API] Received PCB '{filename}' ({img.shape[1]}x{img.shape[0]} px). Running detection...")

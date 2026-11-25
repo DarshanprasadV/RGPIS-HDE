@@ -1,0 +1,50 @@
+#!/bin/bash
+# RGPIS-HDE Desktop Application Launcher
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+CANDIDATE_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+DEFAULT_ROOT="/Users/ramkrupakiran/RG/RGPIS-HDE"
+
+if [ -f "$CANDIDATE_ROOT/llama_advisory/web_app.py" ]; then
+    PROJECT_ROOT="$CANDIDATE_ROOT"
+else
+    PROJECT_ROOT="$DEFAULT_ROOT"
+fi
+
+PYTHON_BIN="$PROJECT_ROOT/llama_advisory/venv/bin/python"
+APP_SCRIPT="$PROJECT_ROOT/llama_advisory/web_app.py"
+LOG_FILE="/tmp/rgpis_hde_app.log"
+PORT=5050
+URL="http://localhost:$PORT"
+
+if [ ! -x "$PYTHON_BIN" ]; then
+    osascript -e 'display alert "RGPIS-HDE Error" message "Python environment not found at '"$PYTHON_BIN"'." as critical'
+    exit 1
+fi
+
+# Check if server is already running
+if ! curl -s "$URL/api/health" >/dev/null 2>&1; then
+    osascript -e 'display notification "Starting YOLO26n & Engineering Intelligence Engine..." with title "RGPIS-HDE PCB Inspector"'
+    cd "$PROJECT_ROOT" || exit 1
+    nohup "$PYTHON_BIN" "$APP_SCRIPT" "$PORT" > "$LOG_FILE" 2>&1 &
+
+    # Wait up to 30 seconds for server to become healthy
+    for i in $(seq 1 60); do
+        if curl -s "$URL/api/health" >/dev/null 2>&1; then
+            break
+        fi
+        sleep 0.5
+    done
+fi
+
+if ! curl -s "$URL/api/health" >/dev/null 2>&1; then
+    osascript -e 'display alert "RGPIS-HDE Startup Failed" message "Server failed to start. Check logs at /tmp/rgpis_hde_app.log" as critical'
+    exit 1
+fi
+
+# Launch in standalone Chrome App Window if available, otherwise default browser
+if [ -d "/Applications/Google Chrome.app" ]; then
+    open -na "Google Chrome" --args --app="$URL" --window-size=1360,900
+else
+    open "$URL"
+fi

@@ -800,6 +800,191 @@
       transition: all 0.2s ease;
     }
     .btn:hover { background: rgba(59, 130, 246, 0.2); border-color: rgba(96, 165, 250, 0.45); transform: translateY(-1px); }
+
+    /* Live Optical Camera Viewport & Controls */
+    .camera-toggle-btn {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.35) 0%, rgba(99, 102, 241, 0.35) 100%);
+      border: 1px solid rgba(96, 165, 250, 0.5);
+      color: #93c5fd;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 14px rgba(59, 130, 246, 0.25);
+    }
+    .camera-toggle-btn:hover {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.6) 0%, rgba(99, 102, 241, 0.6) 100%);
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.45);
+    }
+    .camera-toggle-btn.active {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border-color: #34d399;
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.45);
+    }
+    .camera-panel {
+      display: none;
+      background: rgba(4, 7, 15, 0.95);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+    .camera-panel.active { display: block; }
+    .camera-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .camera-select {
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: #f1f5f9;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      outline: none;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .camera-video-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 640px;
+      aspect-ratio: 4 / 3;
+      margin: 0 auto;
+      background: #020409;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.7);
+    }
+    .camera-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: filter 0.2s ease;
+    }
+    .camera-video.is-inverted {
+      filter: invert(1) contrast(1.2) !important;
+    }
+    .camera-reticle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: min(76%, 380px);
+      height: min(76%, 380px);
+      aspect-ratio: 1 / 1;
+      transform: translate(-50%, -50%);
+      border: 2px dashed rgba(56, 189, 248, 0.75);
+      border-radius: 12px;
+      pointer-events: none;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.40);
+    }
+    .reticle-label {
+      position: absolute;
+      bottom: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #38bdf8;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 3px 10px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .reticle-corner {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-color: #38bdf8;
+      border-style: solid;
+    }
+    .reticle-corner.tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; }
+    .reticle-corner.tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; }
+    .reticle-corner.bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; }
+    .reticle-corner.br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; }
+    .reticle-center {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px; height: 12px;
+    }
+    .reticle-center::before, .reticle-center::after {
+      content: '';
+      position: absolute;
+      background: rgba(56, 189, 248, 0.85);
+    }
+    .reticle-center::before { top: 5px; left: 0; right: 0; height: 2px; }
+    .reticle-center::after { left: 5px; top: 0; bottom: 0; width: 2px; }
+    .camera-scan-sweep {
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.85), transparent);
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.8);
+      pointer-events: none;
+      animation: scan-sweep 3s linear infinite;
+    }
+    .camera-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .cam-action-btn {
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+    .cam-action-btn.primary {
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+    }
+    .cam-action-btn.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(37, 99, 235, 0.55);
+    }
+    .cam-action-btn.secondary {
+      background: rgba(30, 41, 59, 0.85);
+      border-color: rgba(148, 163, 184, 0.3);
+      color: #cbd5e1;
+    }
+    .cam-action-btn.secondary:hover {
+      background: rgba(51, 65, 85, 0.85);
+      color: #ffffff;
+    }
+    .cam-action-btn.secondary.active {
+      background: rgba(16, 185, 129, 0.25);
+      border-color: #10b981;
+      color: #6ee7b7;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.35);
+    }
   </style>
 </head>
 <body>
@@ -841,12 +1026,59 @@
     <div class="upload-header">
       <div style="display:flex; align-items:center; gap:10px;">
         <span style="font-size:20px;">📷</span>
-        <span style="font-weight:700; font-size:13.5px; color:#93c5fd; text-transform:uppercase; letter-spacing:0.8px;">Live Image Input & On-The-Spot Analysis</span>
+        <span style="font-weight:700; font-size:13.5px; color:#93c5fd; text-transform:uppercase; letter-spacing:0.8px;">Live Optical Input & On-The-Spot Analysis</span>
       </div>
-      <div style="font-size:12px; color:#94a3b8;" id="uploadStatusText">
-        Drop any PCB image below or click a sample board to inspect on the spot.
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <button class="camera-toggle-btn" id="btnToggleCamera" onclick="toggleCamera()">
+          <span id="cameraBtnIcon">📹</span>
+          <span id="cameraBtnText">Live Camera Mode</span>
+        </button>
+        <div style="font-size:12px; color:#94a3b8;" id="uploadStatusText">
+          Drop any PCB image below, select a sample board, or open live camera.
+        </div>
       </div>
     </div>
+
+    <!-- Live Camera Viewport (Expandable) -->
+    <div id="cameraPanel" class="camera-panel">
+      <div class="camera-header-bar">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="live-dot">OPTICAL FEED</span>
+          <span style="font-size:13px; font-weight:700; color:#cbd5e1;">Live Camera Optical Inspection</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <select id="cameraDeviceSelect" class="camera-select" onchange="switchCameraDevice(this.value)">
+            <option value="">Default Camera</option>
+          </select>
+          <button class="polarity-btn" onclick="toggleCameraPolarity()" id="btnCamPolarity" title="Invert camera colors for high contrast">🌓 Invert Feed</button>
+          <button class="btn" onclick="toggleCamera(false)" style="padding:5px 12px; font-size:11px;">✕ Close</button>
+        </div>
+      </div>
+      <div class="camera-video-wrap">
+        <video id="cameraVideo" class="camera-video" autoplay playsinline muted></video>
+        <div class="camera-reticle">
+          <div class="reticle-corner tl"></div>
+          <div class="reticle-corner tr"></div>
+          <div class="reticle-corner bl"></div>
+          <div class="reticle-corner br"></div>
+          <div class="reticle-center"></div>
+          <div class="reticle-label">ALIGN PCB TRACES INSIDE RETICLE</div>
+        </div>
+        <div class="camera-scan-sweep"></div>
+      </div>
+      <div class="camera-controls">
+        <button class="cam-action-btn primary" onclick="captureCameraSnapshot()">
+          <span style="font-size:16px;">📸</span> Capture &amp; Inspect PCB
+        </button>
+        <button class="cam-action-btn secondary" id="btnAutoScan" onclick="toggleAutoScan()">
+          <span id="autoScanIcon">🔄</span> <span id="autoScanText">Continuous Live Scan (Off)</span>
+        </button>
+        <span style="font-size:11.5px; color:#64748b; font-family:'JetBrains Mono',monospace;">
+          Locks frame · runs YOLO26n &amp; IPC-A-600 physics live
+        </span>
+      </div>
+    </div>
+    <canvas id="cameraCaptureCanvas" style="display:none;"></canvas>
 
     <!-- Drag & Drop Zone -->
     <div id="dropZone" class="dropzone" onclick="document.getElementById('fileUploadInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFileDrop(event)">
@@ -1413,7 +1645,7 @@
   const BOARD_FINGERPRINTS = {"deep_12100046": [176, 255, 255, 156, 166, 255, 189, 141, 221, 34, 0, 0, 0, 35, 2, 0, 255, 255, 245, 72, 198, 255, 125, 251, 255, 228, 131, 127, 127, 132, 133, 134, 255, 243, 71, 172, 255, 255, 212, 91, 115, 114, 111, 109, 106, 110, 233, 255, 243, 68, 179, 255, 255, 255, 255, 255, 255, 255, 253, 249, 71, 0, 150, 255, 66, 182, 255, 255, 255, 255, 255, 255, 255, 249, 250, 255, 60, 105, 115, 255, 186, 255, 255, 255, 254, 187, 149, 152, 253, 255, 232, 255, 79, 23, 137, 255, 255, 255, 255, 197, 92, 0, 41, 47, 129, 255, 255, 255, 222, 32, 131, 255, 255, 255, 176, 135, 153, 15, 17, 20, 7, 126, 255, 255, 255, 227, 68, 170, 255, 171, 149, 255, 255, 250, 189, 123, 122, 86, 120, 255, 255, 255, 245, 80, 136, 154, 255, 255, 255, 255, 255, 255, 255, 255, 120, 113, 254, 255, 255, 248, 214, 255, 255, 255, 255, 255, 255, 255, 255, 255, 237, 125, 107, 254, 255, 255, 173, 229, 232, 254, 255, 255, 255, 254, 239, 164, 9, 198, 133, 101, 253, 255, 21, 76, 46, 85, 112, 157, 216, 149, 11, 18, 49, 56, 244, 89, 212, 255, 255, 255, 153, 153, 243, 249, 255, 253, 217, 96, 108, 101, 173, 108, 214, 255, 73, 255, 153, 71, 141, 137, 196, 136, 32, 88, 114, 122, 213, 108, 214, 255, 200, 247, 99, 156, 254, 255, 255, 253, 207, 89, 100, 59, 108, 108, 210, 255], "deep_12100052": [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 253, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 228, 209, 226, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 216, 144, 219, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 240, 209, 237, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 253, 249, 249, 254, 243, 253, 249, 250, 255, 255, 255, 255, 255, 255, 255, 160, 48, 57, 60, 14, 64, 63, 59, 63, 64, 255, 255, 255, 255, 255, 250, 53, 253, 159, 160, 56, 144, 127, 159, 155, 97, 255, 255, 255, 255, 255, 248, 72, 255, 60, 158, 65, 149, 130, 159, 157, 153, 255, 255, 255, 255, 255, 248, 76, 255, 87, 243, 61, 255, 204, 225, 173, 200, 255, 255, 255, 255, 255, 249, 75, 152, 43, 214, 46, 255, 110, 182, 187, 127, 255, 255, 255, 255, 255, 249, 65, 55, 252, 197, 104, 207, 149, 128, 204, 213, 255, 255, 255, 255, 255, 246, 60, 71, 255, 168, 108, 99, 201, 155, 149, 202, 255, 255, 255, 255, 255, 248, 58, 70, 255, 193, 108, 173, 254, 205, 171, 222], "deep_12100126": [255, 255, 255, 255, 106, 183, 64, 255, 255, 251, 45, 8, 255, 255, 172, 131, 255, 255, 255, 255, 206, 72, 170, 255, 255, 253, 56, 13, 255, 255, 238, 88, 255, 255, 255, 255, 255, 255, 255, 255, 255, 202, 18, 27, 255, 255, 213, 147, 255, 255, 255, 255, 255, 255, 255, 255, 197, 16, 26, 203, 255, 212, 166, 255, 255, 255, 255, 255, 255, 255, 255, 182, 12, 11, 211, 255, 211, 169, 255, 198, 255, 255, 255, 255, 255, 255, 188, 11, 35, 67, 255, 227, 175, 255, 172, 68, 255, 255, 255, 255, 255, 191, 10, 0, 18, 129, 255, 198, 236, 255, 208, 94, 255, 255, 255, 255, 176, 6, 0, 0, 125, 255, 255, 215, 174, 255, 255, 255, 255, 255, 255, 255, 44, 0, 0, 132, 255, 255, 255, 255, 184, 85, 196, 255, 255, 255, 255, 255, 43, 19, 58, 255, 255, 255, 255, 255, 254, 145, 9, 59, 255, 255, 255, 255, 83, 133, 71, 255, 255, 255, 255, 255, 255, 255, 134, 119, 255, 255, 255, 255, 235, 135, 217, 255, 255, 255, 255, 255, 255, 255, 251, 149, 255, 255, 255, 255, 255, 255, 255, 255, 253, 141, 97, 236, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 192, 66, 77, 131, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 232, 24, 8, 18, 191, 210, 210, 203, 255, 255, 255, 255, 255, 255, 255, 255, 254, 60, 0, 0, 0, 0, 0, 0], "deep_50600009": [255, 255, 255, 160, 0, 0, 95, 210, 0, 0, 4, 54, 57, 50, 0, 0, 255, 255, 255, 162, 0, 0, 101, 212, 0, 0, 2, 59, 20, 100, 0, 0, 255, 255, 255, 166, 0, 0, 97, 212, 0, 0, 15, 57, 0, 75, 81, 81, 255, 255, 255, 164, 0, 0, 93, 210, 0, 0, 21, 64, 0, 12, 31, 0, 255, 255, 255, 163, 0, 0, 92, 206, 120, 121, 128, 154, 121, 116, 138, 120, 255, 255, 255, 173, 0, 0, 90, 31, 88, 84, 86, 89, 84, 84, 89, 83, 255, 255, 255, 166, 0, 0, 74, 78, 79, 81, 78, 79, 80, 78, 80, 81, 255, 255, 255, 170, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 197, 81, 78, 80, 81, 84, 86, 81, 79, 78, 79, 80, 79, 255, 255, 255, 167, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 189, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 245, 244, 245, 242, 208, 205, 202, 198, 204, 202, 207, 204, 255, 255, 255, 255, 255, 255, 255, 219, 0, 0, 10, 107, 82, 80, 80, 83, 255, 255, 255, 255, 255, 255, 255, 222, 0, 0, 15, 75, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 223, 0, 0, 1, 37, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 221, 0, 0, 9, 60, 0, 0, 0, 0], "deep_50600035": [153, 0, 0, 0, 130, 166, 68, 83, 76, 3, 158, 0, 71, 0, 92, 190, 164, 59, 42, 52, 132, 166, 68, 71, 0, 0, 157, 0, 67, 36, 119, 192, 152, 0, 0, 69, 124, 159, 67, 77, 22, 32, 165, 0, 0, 0, 90, 185, 153, 0, 0, 69, 128, 164, 72, 25, 11, 26, 166, 0, 0, 0, 95, 189, 153, 0, 87, 65, 130, 170, 65, 0, 0, 0, 156, 0, 0, 0, 87, 190, 150, 0, 64, 0, 127, 165, 63, 0, 0, 0, 153, 0, 0, 0, 84, 189, 152, 0, 73, 42, 128, 155, 68, 0, 0, 0, 153, 33, 46, 34, 102, 188, 152, 0, 0, 66, 117, 165, 69, 0, 0, 0, 155, 62, 0, 31, 125, 187, 147, 0, 0, 65, 122, 167, 35, 46, 72, 12, 158, 63, 0, 30, 122, 187, 151, 0, 79, 96, 127, 172, 0, 0, 54, 15, 156, 66, 76, 71, 105, 192, 152, 0, 65, 0, 133, 167, 0, 56, 90, 12, 154, 63, 70, 0, 82, 185, 151, 0, 76, 22, 128, 167, 0, 66, 0, 0, 154, 59, 77, 26, 101, 185, 151, 0, 10, 13, 133, 187, 0, 70, 0, 0, 155, 69, 8, 9, 97, 191, 169, 0, 0, 0, 121, 177, 0, 46, 59, 12, 152, 65, 0, 0, 76, 187, 152, 0, 0, 0, 119, 170, 0, 0, 49, 13, 152, 61, 0, 0, 82, 186, 157, 0, 0, 0, 122, 174, 0, 41, 97, 16, 151, 68, 0, 0, 86, 188]};
   let currentBoardId = "deep_12100052";
   let currentIntel = {"metadata": {"board_id": "deep_12100052", "image_name": "deep_12100052.jpg", "timestamp": "2026-11-23T13:52:49Z", "total_generation_latency_seconds": 0.0, "runtime_backend": "ExecuTorch (XNNPACK CPU Offline Runtime)", "foundation_model": "Llama-3.2-1B-Instruct (4-bit SpinQuant INT4)", "standards_basis": "IPC-A-600 / IPC-6012 Class 2/3"}, "board_summary": {"overall_disposition": "REJECT", "disposition_reason": "Board REJECTED: Contains 4 critical P1 defect(s) violating IPC-A-600 Class 2/3 criteria. Severe functional circuit failure or hazardous electrical bridge detected.", "total_defects": 4, "critical_defects_count": 4, "high_risk_count": 0, "medium_risk_count": 0, "low_risk_count": 0, "max_unified_risk_score": 98.9, "priority_breakdown": {"P1_CRITICAL": 4, "P2_HIGH": 0, "P3_MEDIUM": 0, "P4_LOW": 0}}, "board_level_intelligence": {"board_condition": "CRITICAL_NON_CONFORMING (4 P1 Critical defects detected)", "acceptance_rationale": "The PCB was determined as 'REJECT' based on unified scoring where critical functional defects violate IPC-A-600 Class 2/3 criteria. Immediate quarantine is mandated.", "major_risks": ["Complete trace discontinuity (open circuit) causing total signal loss or floating gate behavior.", "Trace bottlenecking from mousebites induces localized current crowding and thermal stress hotspots.", "Dielectric clearance erosion from copper spurs elevates risk of localized dielectric breakdown or solder bridging."], "immediate_priorities": ["Defect #4 (OPEN - P1_CRITICAL): Immediate optical isolation and rework evaluation.", "Defect #1 (MOUSEBITE - P1_CRITICAL): Immediate optical isolation and rework evaluation.", "Defect #2 (SPUR - P1_CRITICAL): Immediate optical isolation and rework evaluation."], "engine": "deterministic_fallback", "fallback_reason": "Fast mode requested (deterministic generator)"}, "individual_defect_intelligence": [{"defect_id": 4, "class_name": "open", "canonical_type": "open_circuit", "display_name": "Open Circuit", "confidence": 0.777999997138977, "bbox": [315.7099914550781, 432.7900085449219, 374.2699890136719, 465.44000244140625], "what_was_detected": "Detected Open Circuit anomaly at coordinates [315.7, 432.8, 374.3, 465.4] with 77.8% optical model confidence.", "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.", "potential_consequences": ["Loss of signal continuity across the net, causing functional circuit failure.", "Disconnected power rail or floating high-impedance logic input.", "Intermittent operation under thermal expansion and mechanical vibration.", "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."], "region_inspection_points": ["Position stereo microscope directly over bounding coordinates [315.7, 432.8, 374.3, 465.4] under 20x-30x magnification.", "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.", "Overlay Gerber reference net to confirm original intended conductor boundaries."], "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.", "verification_protocol": ["Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).", "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.", "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."], "ceri_metrics": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 100.0, "clearance_intrusion_pct": 0.0, "clearance_remaining_mm": 0.15, "geometric_risk_score": 1.0, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia_proxies": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 0.0, "current_density_A_m2": 0.0, "current_density_str": "0.0 A\u00b7m\u207b\u00b2 (Open Circuit / Zero Conduction)", "current_density_unit": "A\u00b7m\u207b\u00b2", "current_density_multiplier": 0.0, "nominal_baseline_J0_A_m2": 112485939.26, "resistance_multiplier_proxy": 999999.0, "signal_integrity_risk": "CRITICAL", "thermal_dissipation_risk": "LOW", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 98.9, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 100.0, "ceia_component": 100.0, "rank": 1}, "explanation": "A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.", "metrics": {"engine": "Deterministic IPC Rules"}}, {"defect_id": 1, "class_name": "mousebite", "canonical_type": "mouse_bite", "display_name": "Mouse Bite", "confidence": 0.8745999932289124, "bbox": [240.08999633789062, 335.7300109863281, 271.55999755859375, 370.94000244140625], "what_was_detected": "Detected Mouse Bite anomaly at coordinates [240.1, 335.7, 271.6, 370.9] with 87.5% optical model confidence.", "why_significant": "IPC-A-600 Class 2/3 violation: A notch, tear, or void along the edge of a copper conductor trace, reducing the effective cross-sectional conductor width.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.", "potential_consequences": ["Localized current crowding and increased trace resistance at the bottleneck.", "Elevated localized temperature rise (hotspot) under rated current load.", "Vulnerability to fatigue fracture during thermal cycling or mechanical shock.", "CERI & CEIA Proxies: 95.0% trace width necking elevates localized current density to 2.25 \u00d7 10\u2079 A\u00b7m\u207b\u00b2 (20.0x crowding vs nominal J\u2080), risking severe Joule heating and thermal stress hotspots."], "region_inspection_points": ["Position stereo microscope directly over bounding coordinates [240.1, 335.7, 271.6, 370.9] under 20x-30x magnification.", "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.", "Overlay Gerber reference net to confirm original intended conductor boundaries."], "suggested_corrective_action": "Evaluate remaining trace width against DRC specification (95.0% reduction). If remaining width meets minimum current-carrying capacity, accept with engineering note. Otherwise, apply copper foil micro-patch or bridge with micro-wire.", "verification_protocol": ["Measure narrowest conductor bottleneck width using calibrated optical reticle microscope.", "Conduct Kelvin 4-wire trace resistance measurement to verify resistance within 5% of nominal trace."], "ceri_metrics": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 95.0, "clearance_intrusion_pct": 0.0, "clearance_remaining_mm": 0.15, "geometric_risk_score": 0.97, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia_proxies": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 0.05, "current_density_A_m2": 2249718785.15, "current_density_str": "2.25 \u00d7 10\u2079 A\u00b7m\u207b\u00b2", "current_density_unit": "A\u00b7m\u207b\u00b2", "current_density_multiplier": 20.0, "nominal_baseline_J0_A_m2": 112485939.26, "resistance_multiplier_proxy": 8.6, "signal_integrity_risk": "MODERATE", "thermal_dissipation_risk": "HIGH", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 82.5, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 97.0, "ceia_component": 75.0, "rank": 2}, "explanation": "A notch, tear, or void along the edge of a copper conductor trace, reducing the effective cross-sectional conductor width.", "metrics": {"engine": "Deterministic IPC Rules"}}, {"defect_id": 2, "class_name": "spur", "canonical_type": "spur", "display_name": "Spur", "confidence": 0.8352000117301941, "bbox": [444.07000732421875, 299.6000061035156, 480.80999755859375, 332.9800109863281], "what_was_detected": "Detected Spur anomaly at coordinates [444.1, 299.6, 480.8, 333.0] with 83.5% optical model confidence.", "why_significant": "IPC-A-600 Class 2/3 violation: An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.", "potential_consequences": ["Severe reduction of dielectric clearance distance to adjacent conductors.", "Risk of electrical arc or dielectric breakdown during high-voltage transient events.", "Potential trap for solder bridge formation during wave or reflow soldering.", "CERI Proxy: 95.0% dielectric clearance reduction (0.01 mm remaining) increases susceptibility to localized capacitive cross-talk and transient dielectric breakdown."], "region_inspection_points": ["Position stereo microscope directly over bounding coordinates [444.1, 299.6, 480.8, 333.0] under 20x-30x magnification.", "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.", "Overlay Gerber reference net to confirm original intended conductor boundaries."], "suggested_corrective_action": "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.", "verification_protocol": ["Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).", "Inspect substrate for mechanical damage or delamination."], "ceri_metrics": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 0.0, "clearance_intrusion_pct": 95.0, "clearance_remaining_mm": 0.01, "geometric_risk_score": 0.97, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia_proxies": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 1.0, "current_density_A_m2": 118110236.22, "current_density_str": "1.18 \u00d7 10\u2078 A\u00b7m\u207b\u00b2", "current_density_unit": "A\u00b7m\u207b\u00b2", "current_density_multiplier": 1.05, "nominal_baseline_J0_A_m2": 112485939.26, "resistance_multiplier_proxy": 1.0, "signal_integrity_risk": "HIGH", "thermal_dissipation_risk": "LOW", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 81.8, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 97.0, "ceia_component": 75.0, "rank": 3}, "explanation": "An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.", "metrics": {"engine": "Deterministic IPC Rules"}}, {"defect_id": 3, "class_name": "spur", "canonical_type": "spur", "display_name": "Spur", "confidence": 0.8296999931335449, "bbox": [417.7099914550781, 362.489990234375, 450.6499938964844, 391.3800048828125], "what_was_detected": "Detected Spur anomaly at coordinates [417.7, 362.5, 450.6, 391.4] with 83.0% optical model confidence.", "why_significant": "IPC-A-600 Class 2/3 violation: An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.", "potential_consequences": ["Severe reduction of dielectric clearance distance to adjacent conductors.", "Risk of electrical arc or dielectric breakdown during high-voltage transient events.", "Potential trap for solder bridge formation during wave or reflow soldering.", "CERI Proxy: 95.0% dielectric clearance reduction (0.01 mm remaining) increases susceptibility to localized capacitive cross-talk and transient dielectric breakdown."], "region_inspection_points": ["Position stereo microscope directly over bounding coordinates [417.7, 362.5, 450.6, 391.4] under 20x-30x magnification.", "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.", "Overlay Gerber reference net to confirm original intended conductor boundaries."], "suggested_corrective_action": "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.", "verification_protocol": ["Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).", "Inspect substrate for mechanical damage or delamination."], "ceri_metrics": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 0.0, "clearance_intrusion_pct": 95.0, "clearance_remaining_mm": 0.01, "geometric_risk_score": 0.97, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia_proxies": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 1.0, "current_density_A_m2": 118110236.22, "current_density_str": "1.18 \u00d7 10\u2078 A\u00b7m\u207b\u00b2", "current_density_unit": "A\u00b7m\u207b\u00b2", "current_density_multiplier": 1.05, "nominal_baseline_J0_A_m2": 112485939.26, "resistance_multiplier_proxy": 1.0, "signal_integrity_risk": "HIGH", "thermal_dissipation_risk": "LOW", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 81.7, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 97.0, "ceia_component": 75.0, "rank": 4}, "explanation": "An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.", "metrics": {"engine": "Deterministic IPC Rules"}}], "corrective_action_recommendations": [{"step_number": 1, "defect_id": 4, "defect_name": "Open Circuit", "priority_level": "P1_CRITICAL", "unified_score": 98.9, "urgency": "IMMEDIATE_ACTION_BEFORE_ENERGIZATION", "action_type": "MICRO_JUMPER_OR_SCRAP", "target_coordinates": [315.7099914550781, 432.7900085449219, 374.2699890136719, 465.44000244140625], "recommended_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.", "verification_procedure": ["Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).", "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.", "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."], "assigned_station": "Precision Micro-Rework Station", "sign_off_required": true}, {"step_number": 2, "defect_id": 1, "defect_name": "Mouse Bite", "priority_level": "P1_CRITICAL", "unified_score": 82.5, "urgency": "IMMEDIATE_ACTION_BEFORE_ENERGIZATION", "action_type": "BOTTLENECK_METROLOGY_PATCH", "target_coordinates": [240.08999633789062, 335.7300109863281, 271.55999755859375, 370.94000244140625], "recommended_action": "Evaluate remaining trace width against DRC specification (95.0% reduction). If remaining width meets minimum current-carrying capacity, accept with engineering note. Otherwise, apply copper foil micro-patch or bridge with micro-wire.", "verification_procedure": ["Measure narrowest conductor bottleneck width using calibrated optical reticle microscope.", "Conduct Kelvin 4-wire trace resistance measurement to verify resistance within 5% of nominal trace."], "assigned_station": "Precision Micro-Rework Station", "sign_off_required": true}, {"step_number": 3, "defect_id": 2, "defect_name": "Spur", "priority_level": "P1_CRITICAL", "unified_score": 81.8, "urgency": "IMMEDIATE_ACTION_BEFORE_ENERGIZATION", "action_type": "CLEARANCE_TRIMMING", "target_coordinates": [444.07000732421875, 299.6000061035156, 480.80999755859375, 332.9800109863281], "recommended_action": "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.", "verification_procedure": ["Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).", "Inspect substrate for mechanical damage or delamination."], "assigned_station": "Precision Micro-Rework Station", "sign_off_required": true}, {"step_number": 4, "defect_id": 3, "defect_name": "Spur", "priority_level": "P1_CRITICAL", "unified_score": 81.7, "urgency": "IMMEDIATE_ACTION_BEFORE_ENERGIZATION", "action_type": "CLEARANCE_TRIMMING", "target_coordinates": [417.7099914550781, 362.489990234375, 450.6499938964844, 391.3800048828125], "recommended_action": "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.", "verification_procedure": ["Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).", "Inspect substrate for mechanical damage or delamination."], "assigned_station": "Precision Micro-Rework Station", "sign_off_required": true}], "process_intelligence": {"pattern_summary": "Multivariate defect distribution with 4 total anomalies spanning both subtractive (trace loss) and additive (clearance encroachment) mechanisms.", "fab_stage_hypotheses": ["HYPOTHESIS (Etching Over-Rate): Co-occurrence of 1 open(s) and 1 mousebite(s) suggests potential chemical over-etching, elevated acid bath temperature, or prolonged line dwell time.", "HYPOTHESIS (Incomplete Etching / Resist Scum): Detection of 0 short(s) and 2 spur(s) points to potential localized under-etching, developing spray nozzle pressure drops, or photoresist scumming."], "recommended_investigations": ["Audit chemical etchant concentration (CuCl2 / H2O2) and monitor conveyor belt feed speed.", "Inspect developer manifold spray nozzles and verify UV exposure energy calibration."], "disclaimer": "Hypotheses generated for engineering guidance. Validation via chemical titration and SPC logs is required.", "engine": "deterministic_fallback"}};
-  let currentReport = {"metadata": {"board_id": "deep_12100052", "image_name": "deep_12100052.jpg", "timestamp": "2026-11-23T13:52:49Z", "total_generation_latency_seconds": 0.0, "runtime_backend": "ExecuTorch (XNNPACK CPU Offline Runtime)", "foundation_model": "Llama-3.2-1B-Instruct (4-bit SpinQuant INT4)", "standards_basis": "IPC-A-600 / IPC-6012 Class 2/3"}, "board_summary": {"overall_disposition": "REJECT", "disposition_reason": "Board REJECTED: Contains 4 critical P1 defect(s) violating IPC-A-600 Class 2/3 criteria. Severe functional circuit failure or hazardous electrical bridge detected.", "total_defects": 4, "critical_defects_count": 4, "high_risk_count": 0, "medium_risk_count": 0, "low_risk_count": 0, "max_unified_risk_score": 98.9, "priority_breakdown": {"P1_CRITICAL": 4, "P2_HIGH": 0, "P3_MEDIUM": 0, "P4_LOW": 0}}, "defects": [{"defect_id": 4, "class_name": "open", "canonical_type": "open_circuit", "display_name": "Open Circuit", "confidence": 0.777999997138977, "bbox": [315.7099914550781, 432.7900085449219, 374.2699890136719, 465.44000244140625], "what_was_detected": "Detected Open Circuit anomaly at coordinates [315.7, 432.8, 374.3, 465.4] with 77.8% optical model confidence.", "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.", "potential_consequences": ["Loss of signal continuity across the net, causing functional circuit failure.", "Disconnected power rail or floating high-impedance logic input.", "Intermittent operation under thermal expansion and mechanical vibration.", "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."], "region_inspection_points": ["Position stereo microscope directly over bounding coordinates [315.7, 432.8, 374.3, 465.4] under 20x-30x magnification.", "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.", "Overlay Gerber reference net to confirm original intended conductor boundaries."], "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.", "verification_protocol": ["Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).", "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.", "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."], "ceri_metrics": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 100.0, "clearance_intrusion_pct": 0.0, "clearance_remaining_mm": 0.15, "geometric_risk_score": 1.0, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia_proxies": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 0.0, "current_density_A_m2": 0.0, "current_density_str": "0.0 A\u00b7m\u207b\u00b2 (Open Circuit / Zero Conduction)", "current_density_unit": "A\u00b7m\u207b\u00b2", "current_density_multiplier": 0.0, "nominal_baseline_J0_A_m2": 112485939.26, "resistance_multiplier_proxy": 999999.0, "signal_integrity_risk": "CRITICAL", "thermal_dissipation_risk": "LOW", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 98.9, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 100.0, "ceia_component": 100.0, "rank": 1}, "explanation": "A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.", "metrics": {"engine": "Deterministic IPC Rules"}}, {"defect_id": 1, "class_name": "mousebite", "canonical_type": "mouse_bite", "display_name": "Mouse Bite", "confidence": 0.8745999932289124, "bbox": [240.08999633789062, 335.7300109863281, 271.55999755859375, 370.94000244140625], "what_was_detected": "Detected Mouse Bite anomaly at coordinates [240.1, 335.7, 271.6, 370.9] with 87.5% optical model confidence.", "why_significant": "IPC-A-600 Class 2/3 violation: A notch, tear, or void along the edge of a copper conductor trace, reducing the effective cross-sectional conductor width.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.", "potential_consequences": ["Localized current crowding and increased trace resistance at the bottleneck.", "Elevated localized temperature rise (hotspot) under rated current load.", "Vulnerability to fatigue fracture during thermal cycling or mechanical shock.", "CERI & CEIA Proxies: 95.0% trace width necking elevates localized current density to 2.25 \u00d7 10\u2079 A\u00b7m\u207b\u00b2 (20.0x crowding vs nominal J\u2080), risking severe Joule heating and thermal stress hotspots."], "region_inspection_points": ["Position stereo microscope directly over bounding coordinates [240.1, 335.7, 271.6, 370.9] under 20x-30x magnification.", "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.", "Overlay Gerber reference net to confirm original intended conductor boundaries."], "suggested_corrective_action": "Evaluate remaining trace width against DRC specification (95.0% reduction). If remaining width meets minimum current-carrying capacity, accept with engineering note. Otherwise, apply copper foil micro-patch or bridge with micro-wire.", "verification_protocol": ["Measure narrowest conductor bottleneck width using calibrated optical reticle microscope.", "Conduct Kelvin 4-wire trace resistance measurement to verify resistance within 5% of nominal trace."], "ceri_metrics": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 95.0, "clearance_intrusion_pct": 0.0, "clearance_remaining_mm": 0.15, "geometric_risk_score": 0.97, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia_proxies": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 0.05, "current_density_A_m2": 2249718785.15, "current_density_str": "2.25 \u00d7 10\u2079 A\u00b7m\u207b\u00b2", "current_density_unit": "A\u00b7m\u207b\u00b2", "current_density_multiplier": 20.0, "nominal_baseline_J0_A_m2": 112485939.26, "resistance_multiplier_proxy": 8.6, "signal_integrity_risk": "MODERATE", "thermal_dissipation_risk": "HIGH", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 82.5, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 97.0, "ceia_component": 75.0, "rank": 2}, "explanation": "A notch, tear, or void along the edge of a copper conductor trace, reducing the effective cross-sectional conductor width.", "metrics": {"engine": "Deterministic IPC Rules"}}, {"defect_id": 2, "class_name": "spur", "canonical_type": "spur", "display_name": "Spur", "confidence": 0.8352000117301941, "bbox": [444.07000732421875, 299.6000061035156, 480.80999755859375, 332.9800109863281], "what_was_detected": "Detected Spur anomaly at coordinates [444.1, 299.6, 480.8, 333.0] with 83.5% optical model confidence.", "why_significant": "IPC-A-600 Class 2/3 violation: An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.", "potential_consequences": ["Severe reduction of dielectric clearance distance to adjacent conductors.", "Risk of electrical arc or dielectric breakdown during high-voltage transient events.", "Potential trap for solder bridge formation during wave or reflow soldering.", "CERI Proxy: 95.0% dielectric clearance reduction (0.01 mm remaining) increases susceptibility to localized capacitive cross-talk and transient dielectric breakdown."], "region_inspection_points": ["Position stereo microscope directly over bounding coordinates [444.1, 299.6, 480.8, 333.0] under 20x-30x magnification.", "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.", "Overlay Gerber reference net to confirm original intended conductor boundaries."], "suggested_corrective_action": "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.", "verification_protocol": ["Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).", "Inspect substrate for mechanical damage or delamination."], "ceri_metrics": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 0.0, "clearance_intrusion_pct": 95.0, "clearance_remaining_mm": 0.01, "geometric_risk_score": 0.97, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia_proxies": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 1.0, "current_density_A_m2": 118110236.22, "current_density_str": "1.18 \u00d7 10\u2078 A\u00b7m\u207b\u00b2", "current_density_unit": "A\u00b7m\u207b\u00b2", "current_density_multiplier": 1.05, "nominal_baseline_J0_A_m2": 112485939.26, "resistance_multiplier_proxy": 1.0, "signal_integrity_risk": "HIGH", "thermal_dissipation_risk": "LOW", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 81.8, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 97.0, "ceia_component": 75.0, "rank": 3}, "explanation": "An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.", "metrics": {"engine": "Deterministic IPC Rules"}}, {"defect_id": 3, "class_name": "spur", "canonical_type": "spur", "display_name": "Spur", "confidence": 0.8296999931335449, "bbox": [417.7099914550781, 362.489990234375, 450.6499938964844, 391.3800048828125], "what_was_detected": "Detected Spur anomaly at coordinates [417.7, 362.5, 450.6, 391.4] with 83.0% optical model confidence.", "why_significant": "IPC-A-600 Class 2/3 violation: An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.", "potential_consequences": ["Severe reduction of dielectric clearance distance to adjacent conductors.", "Risk of electrical arc or dielectric breakdown during high-voltage transient events.", "Potential trap for solder bridge formation during wave or reflow soldering.", "CERI Proxy: 95.0% dielectric clearance reduction (0.01 mm remaining) increases susceptibility to localized capacitive cross-talk and transient dielectric breakdown."], "region_inspection_points": ["Position stereo microscope directly over bounding coordinates [417.7, 362.5, 450.6, 391.4] under 20x-30x magnification.", "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.", "Overlay Gerber reference net to confirm original intended conductor boundaries."], "suggested_corrective_action": "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.", "verification_protocol": ["Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).", "Inspect substrate for mechanical damage or delamination."], "ceri_metrics": {"metric_name": "Critical Engineering Risk Index (CERI)", "trace_width_reduction_pct": 0.0, "clearance_intrusion_pct": 95.0, "clearance_remaining_mm": 0.01, "geometric_risk_score": 0.97, "ipc_violation": true, "ipc_threshold_standard": "IPC-A-600 Class 2/3 (Max trace reduction <= 20%, Min clearance reduction <= 30%)"}, "ceia_proxies": {"metric_name": "Counterfactual Electrical Impact Analysis (CEIA)", "proxy_indicator_type": "COUNTERFACTUAL_GEOMETRIC_PROXY", "nodal_conductance_factor": 1.0, "current_density_A_m2": 118110236.22, "current_density_str": "1.18 \u00d7 10\u2078 A\u00b7m\u207b\u00b2", "current_density_unit": "A\u00b7m\u207b\u00b2", "current_density_multiplier": 1.05, "nominal_baseline_J0_A_m2": 112485939.26, "resistance_multiplier_proxy": 1.0, "signal_integrity_risk": "HIGH", "thermal_dissipation_risk": "LOW", "proxy_disclaimer": "Proxy metric estimated from optical copper geometry and 2D finite resistance network. Not an in-situ physical multimeter or TDR bench measurement."}, "unified_score": {"score": 81.7, "priority_level": "P1_CRITICAL", "action_urgency": "IMMEDIATE_STOP_AND_QUARANTINE", "ceri_component": 97.0, "ceia_component": 75.0, "rank": 4}, "explanation": "An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.", "metrics": {"engine": "Deterministic IPC Rules"}}]};
+  let currentReport = {"metadata": {"board_id": "deep_12100052", "image_name": "deep_12100052.jpg", "timestamp": "2026-11-23T13:52:49Z", "total_generation_latency_seconds": 0.0, "runtime_backend": "ExecuTorch (XNNPACK CPU Offline Runtime)", "foundation_model": "Llama-3.2-1B-Instruct (4-bit SpinQuant INT4)", "standards_basis": "IPC-A-600 / IPC-6012 Class 2/3"}, "board_summary": {"overall_disposition": "REJECT", "disposition_reason": "Board REJECTED: Contains 4 critical P1 defect(s) violating IPC-A-600 Class 2/3 criteria. Severe functional circuit failure or hazardous electrical bridge detected.", "total_defects": 4, "critical_defects_count": 4, "high_risk_count": 0, "medium_risk_count": 0, "low_risk_count": 0, "max_unified_risk_score": 98.9, "priority_breakdown": {"P1_CRITICAL": 4, "P2_HIGH": 0, "P3_MEDIUM": 0, "P4_LOW": 0}}};
 
   // Inversion State Management
   let isDisplayInverted = false;
@@ -1523,102 +1755,392 @@
 
   function processUploadedImage(file) {
     const fileName = file.name;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      sendDataUrlForAnalysis(evt.target.result, fileName);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleNonPcbDetected(data, dataUrl, fileName) {
+    const status = document.getElementById("uploadStatusText");
+    if (status) {
+      status.innerHTML = `<span style="color:#f59e0b; font-weight:700;">⚠️ ${data.message || "Non-PCB scene detected. Defect analysis paused. Please align a physical Printed Circuit Board inside the camera reticle."}</span>`;
+    }
+
+    // Display captured image without bounding boxes
+    if (dataUrl) setPcbImage(dataUrl);
+    renderBBoxes([]);
+
+    // Update Header & Disposition Badge
+    const headerBoardId = document.getElementById("headerBoardId");
+    if (headerBoardId) headerBoardId.textContent = "NON-PCB SCENE";
+    const headerImageName = document.getElementById("headerImageName");
+    if (headerImageName) headerImageName.textContent = fileName;
+
+    const dispBadge = document.getElementById("dispositionBadge");
+    const dispText = document.getElementById("dispositionText");
+    if (dispText) dispText.textContent = "NON-PCB";
+    if (dispBadge) {
+      dispBadge.style.background = "#f59e0b";
+      dispBadge.style.boxShadow = "0 0 20px rgba(245, 158, 11, 0.4)";
+    }
+
+    // Update Status Pulse Chip
+    const pulseChip = document.getElementById("boardStatusPulse");
+    if (pulseChip) {
+      pulseChip.textContent = "NON-PCB · OOD PAUSED";
+      pulseChip.style.background = "rgba(245, 158, 11, 0.16)";
+      pulseChip.style.color = "#fde68a";
+      pulseChip.style.borderColor = "rgba(245, 158, 11, 0.45)";
+    }
+
+    // Zero out KPIs
+    animateCounter(document.getElementById("kpiTotalDefects"), 0, "", 300);
+    animateCounter(document.getElementById("kpiP1Count"), 0, "", 300);
+    animateCounter(document.getElementById("kpiMaxTraceLoss"), 0, "%", 300);
+    const traceRing = document.getElementById("kpiTraceRing");
+    if (traceRing) traceRing.style.strokeDashoffset = 113.1;
+
+    const jEl = document.getElementById("kpiMaxCurrentDensity");
+    if (jEl) jEl.textContent = "0.0 A·m⁻²";
+
+    const scoreEl = document.getElementById("kpiMaxScore");
+    if (scoreEl) scoreEl.innerHTML = `<span id="kpiScoreNum">0</span><span style="font-size:14px; color:#9ca3af;">/100</span>`;
+    const scoreRing = document.getElementById("kpiScoreRing");
+    if (scoreRing) scoreRing.style.strokeDashoffset = 113.1;
+
+    const riskFill = document.getElementById("boardRiskTimelineFill");
+    if (riskFill) riskFill.style.width = "0%";
+
+    // Board-Level Intelligence
+    const condEl = document.getElementById("boardConditionText");
+    if (condEl) condEl.textContent = "Non-PCB Input Detected (Inspection Suspended)";
+    const ratEl = document.getElementById("acceptanceRationaleText");
+    if (ratEl) ratEl.textContent = data.message || "Optical Domain Gatekeeper: The input camera frame contains a human face, skin, or natural environment scene. IPC-A-600 defect evaluation requires a physical bare or populated PCB aligned in the reticle.";
+
+    const risksList = document.getElementById("majorRisksList");
+    if (risksList) {
+      risksList.innerHTML = `
+        <li class="warning-item">⚠️ Optical Gatekeeper active: Scene does not exhibit bare or assembled PCB trace signatures.</li>
+        <li class="warning-item">⚠️ Defect bounding boxes suppressed to prevent false positive hallucinations on natural textures.</li>
+      `;
+    }
+
+    const priosList = document.getElementById("immediatePrioritiesList");
+    if (priosList) {
+      priosList.innerHTML = `
+        <li class="warning-item">🎯 Position a bare or assembled PCB inside the optical reticle overlay.</li>
+        <li class="warning-item">🎯 Ensure adequate lighting without direct reflections or shadows.</li>
+      `;
+    }
+
+    // Process Intelligence
+    const patEl = document.getElementById("processPatternText");
+    if (patEl) patEl.textContent = "Domain Gatekeeper Active: Standing by for PCB presentation.";
+    const hypList = document.getElementById("processHypothesesList");
+    if (hypList) {
+      hypList.innerHTML = `<div class="timeline-item"><div class="timeline-node">📷</div><div class="timeline-card">Awaiting PCB alignment in camera view.</div></div>`;
+    }
+    const audList = document.getElementById("processAuditsList");
+    if (audList) {
+      audList.innerHTML = `<div class="timeline-item"><div class="timeline-node audit">🔍</div><div class="timeline-card">Optical gatekeeper verifies trace contrast and absence of skin signatures before engaging YOLO.</div></div>`;
+    }
+
+    // Corrective Actions Table
+    const tableBody = document.getElementById("correctiveActionsTableBody");
+    if (tableBody) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="8" style="text-align:center; padding:24px; color:#f59e0b; font-weight:600;">
+            ⚠️ Non-PCB scene detected. No defect corrective actions generated. Align a PCB in the camera stream to inspect.
+          </td>
+        </tr>
+      `;
+    }
+
+    // Defect Cards
+    const cardsEl = document.getElementById("defectCardsContainer");
+    if (cardsEl) {
+      cardsEl.innerHTML = `
+        <div style="background:rgba(245, 158, 11, 0.08); border:1px solid rgba(245, 158, 11, 0.35); border-radius:10px; padding:28px; text-align:center; color:#fde68a;">
+          <div style="font-size:36px; margin-bottom:10px;">⚠️</div>
+          <div style="font-weight:700; font-size:16px; color:#f8fafc; margin-bottom:8px;">Optical Domain Gatekeeper: Non-PCB Subject Detected</div>
+          <div style="font-size:13px; color:#cbd5e1; max-width:620px; margin:0 auto 16px; line-height:1.5;">
+            ${data.message || "The camera captured a human face, skin, or natural environment scene. Defect bounding boxes and IPC-A-600 severity scoring are paused."}<br>
+            Please aim the camera at a physical PCB or select a benchmark board above.
+          </div>
+          <button class="board-pill active" style="margin:0 auto; padding:8px 18px;" onclick="switchBoard('deep_12100046')">Load Benchmark PCB deep_12100046</button>
+        </div>
+      `;
+    }
+  }
+
+  // Unified image analysis pipeline (used by file upload, dropzone, and live camera snapshot)
+  function sendDataUrlForAnalysis(dataUrl, fileName) {
     const stem = fileName.replace(/\.[^/.]+$/, "");
     const status = document.getElementById("uploadStatusText");
     const dropZone = document.getElementById("dropZone");
     if (status) status.innerHTML = `<em>Processing <strong>${fileName}</strong> on the spot...</em>`;
     if (dropZone) dropZone.classList.add("is-loading");
 
-    // Read the uploaded image via FileReader
-    const reader = new FileReader();
-    reader.onload = function(evt) {
-      const dataUrl = evt.target.result;
+    // 1. Try Live AI Server (POST /api/analyze) for real-time YOLO defect detection
+    if (status) status.innerHTML = `<span style="color:#60a5fa;">⚡ Running live YOLO26n defect detection & IPC-A-600 analysis on <strong>${fileName}</strong>...</span>`;
 
-      // 1. Try Live AI Server (POST /api/analyze) for real-time YOLO defect detection
-      if (status) status.innerHTML = `<span style="color:#60a5fa;">⚡ Running live YOLO26n defect detection & IPC-A-600 analysis on <strong>${fileName}</strong>...</span>`;
+    const apiEndpoint = window.location.protocol.startsWith("http")
+      ? "/api/analyze"
+      : "http://localhost:5050/api/analyze";
 
-      const apiEndpoint = window.location.protocol.startsWith("http")
-        ? "/api/analyze"
-        : "http://localhost:5050/api/analyze";
-
-      fetch(apiEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ filename: fileName, image_b64: dataUrl }),
-      })
-      .then(res => {
-        if (!res.ok) throw new Error("HTTP error " + res.status);
-        return res.json();
-      })
-      .then(data => {
-        if (dropZone) dropZone.classList.remove("is-loading");
-        if (data.status === "success" && data.intelligence) {
-          updateDashboard(data.intelligence, data.image_b64 || dataUrl, data.board_id || stem, data.image_name || fileName);
-          if (status) {
-            const count = data.total_defects || 0;
-            const dur = data.inference_duration_seconds || 1.2;
-            status.innerHTML = `<span style="color:#34d399;">✓ <strong>${fileName}</strong> analyzed live on the spot (${dur}s)! Detected ${count} defect(s) with 100% locked coordinates & IPC-A-600 solutions.</span>`;
-          }
+    fetch(apiEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ filename: fileName, image_b64: dataUrl }),
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("HTTP error " + res.status);
+      return res.json();
+    })
+    .then(data => {
+      if (dropZone) dropZone.classList.remove("is-loading");
+      if (data.status === "not_a_pcb") {
+        handleNonPcbDetected(data, dataUrl, fileName);
+        return;
+      }
+      if (data.status === "success" && data.intelligence) {
+        updateDashboard(data.intelligence, data.image_b64 || dataUrl, data.board_id || stem, data.image_name || fileName);
+        if (status) {
+          const count = data.total_defects || 0;
+          const dur = data.inference_duration_seconds || 1.2;
+          status.innerHTML = `<span style="color:#34d399;">✓ <strong>${fileName}</strong> analyzed live on the spot (${dur}s)! Detected ${count} defect(s) with 100% locked coordinates & IPC-A-600 solutions.</span>`;
+        }
+        return;
+      }
+      throw new Error(data.message || "Detection failed");
+    })
+    .catch(err => {
+      if (dropZone) dropZone.classList.remove("is-loading");
+      console.log("Live backend not connected or offline, using client-side matching:", err);
+      // Fallback 1: Direct name or substring match against known boards
+      for (const key of Object.keys(ALL_BOARDS)) {
+        if (stem.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(stem.toLowerCase())) {
+          switchBoard(key);
+          if (status) status.innerHTML = `<span style="color:#34d399;">✓ Board matched as <strong>${key}</strong> by filename! Exact defect coordinates loaded.</span>`;
           return;
         }
-        throw new Error(data.message || "Detection failed");
-      })
-      .catch(err => {
-        if (dropZone) dropZone.classList.remove("is-loading");
-        console.log("Live backend not connected or offline, using client-side matching:", err);
-        // Fallback 1: Direct name or substring match against known boards
-        for (const key of Object.keys(ALL_BOARDS)) {
-          if (stem.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(stem.toLowerCase())) {
-            switchBoard(key);
-            if (status) status.innerHTML = `<span style="color:#34d399;">✓ Board matched as <strong>${key}</strong> by filename! Exact defect coordinates loaded.</span>`;
-            return;
+      }
+
+      // Fallback 2: 16x16 visual fingerprinting
+      const img = new Image();
+      img.onload = function() {
+        const cvs = document.createElement("canvas");
+        cvs.width = 16;
+        cvs.height = 16;
+        const ctx = cvs.getContext("2d");
+        ctx.drawImage(img, 0, 0, 16, 16);
+        const imgData = ctx.getImageData(0, 0, 16, 16).data;
+        const gray = [];
+        for (let i = 0; i < imgData.length; i += 4) {
+          gray.push(0.299 * imgData[i] + 0.587 * imgData[i+1] + 0.114 * imgData[i+2]);
+        }
+
+        let bestBoard = null;
+        let lowestMse = Infinity;
+        for (const [bid, fp] of Object.entries(BOARD_FINGERPRINTS || {})) {
+          if (!fp || fp.length !== 256) continue;
+          let sumSq = 0;
+          for (let j = 0; j < 256; j++) {
+            const diff = gray[j] - fp[j];
+            sumSq += diff * diff;
+          }
+          const mse = sumSq / 256;
+          if (mse < lowestMse) {
+            lowestMse = mse;
+            bestBoard = bid;
           }
         }
 
-        // Fallback 2: 16x16 visual fingerprinting
-        const img = new Image();
-        img.onload = function() {
-          const cvs = document.createElement("canvas");
-          cvs.width = 16;
-          cvs.height = 16;
-          const ctx = cvs.getContext("2d");
-          ctx.drawImage(img, 0, 0, 16, 16);
-          const imgData = ctx.getImageData(0, 0, 16, 16).data;
-          const gray = [];
-          for (let i = 0; i < imgData.length; i += 4) {
-            gray.push(0.299 * imgData[i] + 0.587 * imgData[i+1] + 0.114 * imgData[i+2]);
-          }
+        if (lowestMse < 650 && bestBoard && ALL_BOARDS[bestBoard]) {
+          switchBoard(bestBoard);
+          const matchPct = Math.max(92, Math.min(99.9, 100 - lowestMse / 35)).toFixed(1);
+          if (status) status.innerHTML = `<span style="color:#34d399;">✓ Auto-recognized PCB as <strong>${bestBoard}</strong> (${matchPct}% visual match). 100% Coordinate-Locked Defect Annotations & Engineering Intelligence Loaded!</span>`;
+          return;
+        }
 
-          let bestBoard = null;
-          let lowestMse = Infinity;
-          for (const [bid, fp] of Object.entries(BOARD_FINGERPRINTS || {})) {
-            if (!fp || fp.length !== 256) continue;
-            let sumSq = 0;
-            for (let j = 0; j < 256; j++) {
-              const diff = gray[j] - fp[j];
-              sumSq += diff * diff;
-            }
-            const mse = sumSq / 256;
-            if (mse < lowestMse) {
-              lowestMse = mse;
-              bestBoard = bid;
-            }
-          }
+        // Fallback 3: Custom image without live server
+        loadCustomBoard(fileName, dataUrl, img.width, img.height);
+      };
+      img.src = dataUrl;
+    });
+  }
 
-          if (lowestMse < 650 && bestBoard && ALL_BOARDS[bestBoard]) {
-            switchBoard(bestBoard);
-            const matchPct = Math.max(92, Math.min(99.9, 100 - lowestMse / 35)).toFixed(1);
-            if (status) status.innerHTML = `<span style="color:#34d399;">✓ Auto-recognized PCB as <strong>${bestBoard}</strong> (${matchPct}% visual match). 100% Coordinate-Locked Defect Annotations & Engineering Intelligence Loaded!</span>`;
-            return;
-          }
+  // Live Optical Camera Stream & Inspection Management
+  let cameraStream = null;
+  let isCameraActive = false;
+  let isCameraInverted = false;
+  let autoScanTimer = null;
+  let isAutoScanning = false;
+  let currentCameraDeviceId = null;
 
-          // Fallback 3: Custom image without live server
-          loadCustomBoard(fileName, dataUrl, img.width, img.height);
-        };
-        img.src = dataUrl;
+  async function populateCameraDevices() {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(d => d.kind === "videoinput");
+      const select = document.getElementById("cameraDeviceSelect");
+      if (!select) return;
+      select.innerHTML = "";
+      videoDevices.forEach((dev, idx) => {
+        const opt = document.createElement("option");
+        opt.value = dev.deviceId;
+        opt.textContent = dev.label || `Camera ${idx + 1}`;
+        select.appendChild(opt);
       });
-    };
-    reader.readAsDataURL(file);
+      if (currentCameraDeviceId) select.value = currentCameraDeviceId;
+    } catch (e) {
+      console.warn("Could not enumerate camera devices:", e);
+    }
+  }
+
+  async function toggleCamera(forceState) {
+    const shouldOpen = (forceState !== undefined) ? forceState : !isCameraActive;
+    const panel = document.getElementById("cameraPanel");
+    const btn = document.getElementById("btnToggleCamera");
+    const icon = document.getElementById("cameraBtnIcon");
+    const txt = document.getElementById("cameraBtnText");
+
+    if (shouldOpen) {
+      try {
+        const constraints = {
+          video: currentCameraDeviceId
+            ? { deviceId: { exact: currentCameraDeviceId }, width: { ideal: 1280 }, height: { ideal: 960 } }
+            : { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 960 } }
+        };
+        cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+        const video = document.getElementById("cameraVideo");
+        if (video) {
+          video.srcObject = cameraStream;
+          video.play();
+        }
+        isCameraActive = true;
+        if (panel) panel.classList.add("active");
+        if (btn) btn.classList.add("active");
+        if (icon) icon.textContent = "🔴";
+        if (txt) txt.textContent = "Camera Live (Active)";
+        await populateCameraDevices();
+        const status = document.getElementById("uploadStatusText");
+        if (status) status.innerHTML = `<span style="color:#34d399;">📹 Live camera feed active! Position PCB in the frame and click <strong>Capture &amp; Inspect</strong>.</span>`;
+      } catch (err) {
+        console.error("Camera access error:", err);
+        alert("Camera access denied or unavailable: " + err.message + "\n\nTip: Allow camera access in your browser or connect a USB microscope.");
+      }
+    } else {
+      stopCamera();
+      if (panel) panel.classList.remove("active");
+      if (btn) btn.classList.remove("active");
+      if (icon) icon.textContent = "📹";
+      if (txt) txt.textContent = "Live Camera Mode";
+    }
+  }
+
+  function stopCamera() {
+    if (autoScanTimer) {
+      clearInterval(autoScanTimer);
+      autoScanTimer = null;
+      isAutoScanning = false;
+      const autoBtn = document.getElementById("btnAutoScan");
+      const autoTxt = document.getElementById("autoScanText");
+      if (autoBtn) autoBtn.classList.remove("active");
+      if (autoTxt) autoTxt.textContent = "Continuous Live Scan (Off)";
+    }
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      cameraStream = null;
+    }
+    const video = document.getElementById("cameraVideo");
+    if (video) video.srcObject = null;
+    isCameraActive = false;
+  }
+
+  function switchCameraDevice(devId) {
+    currentCameraDeviceId = devId;
+    if (isCameraActive) {
+      stopCamera();
+      toggleCamera(true);
+    }
+  }
+
+  function toggleCameraPolarity() {
+    isCameraInverted = !isCameraInverted;
+    const video = document.getElementById("cameraVideo");
+    if (video) {
+      if (isCameraInverted) video.classList.add("is-inverted");
+      else video.classList.remove("is-inverted");
+    }
+  }
+
+  function captureCameraSnapshot() {
+    const video = document.getElementById("cameraVideo");
+    if (!video || !cameraStream) {
+      alert("Camera feed is not active. Click 'Live Camera Mode' to start.");
+      return;
+    }
+    const canvas = document.getElementById("cameraCaptureCanvas");
+    if (!canvas) return;
+
+    // Crop to the centered square optical inspection zone
+    // Isolates the circuit, matches YOLO's 640x640 square training geometry,
+    // and eliminates user fingers/hands holding the edges and background room clutter.
+    const vw = video.videoWidth || 640;
+    const vh = video.videoHeight || 480;
+    const cropSize = Math.floor(Math.min(vw, vh) * 0.76);
+    const sx = Math.floor((vw - cropSize) / 2);
+    const sy = Math.floor((vh - cropSize) / 2);
+
+    canvas.width = 640;
+    canvas.height = 640;
+    const ctx = canvas.getContext("2d");
+    if (isCameraInverted) {
+      ctx.filter = "invert(1) contrast(1.2)";
+    }
+    ctx.drawImage(video, sx, sy, cropSize, cropSize, 0, 0, 640, 640);
+    ctx.filter = "none";
+
+    // Visual shutter flash effect on video element
+    video.style.opacity = "0.3";
+    setTimeout(() => { video.style.opacity = "1"; }, 120);
+
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+    const ts = new Date().toISOString().replace(/[:.]/g, "-").slice(11, 19);
+    const fileName = `live_pcb_${ts}.jpg`;
+
+    sendDataUrlForAnalysis(dataUrl, fileName);
+  }
+
+  function toggleAutoScan() {
+    const btn = document.getElementById("btnAutoScan");
+    const txt = document.getElementById("autoScanText");
+    const icon = document.getElementById("autoScanIcon");
+
+    if (isAutoScanning) {
+      clearInterval(autoScanTimer);
+      autoScanTimer = null;
+      isAutoScanning = false;
+      if (btn) btn.classList.remove("active");
+      if (txt) txt.textContent = "Continuous Live Scan (Off)";
+      if (icon) icon.textContent = "🔄";
+    } else {
+      if (!isCameraActive) {
+        toggleCamera(true);
+      }
+      isAutoScanning = true;
+      if (btn) btn.classList.add("active");
+      if (txt) txt.textContent = "Auto-Scanning (Every 2.5s)";
+      if (icon) icon.textContent = "⚡";
+      captureCameraSnapshot();
+      autoScanTimer = setInterval(() => {
+        captureCameraSnapshot();
+      }, 2500);
+    }
   }
 
   // Safely display an unanalyzed custom PCB without superimposing mismatched boxes

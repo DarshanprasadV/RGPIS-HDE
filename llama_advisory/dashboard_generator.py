@@ -957,6 +957,191 @@ def generate_dashboard_html(
       transition: all 0.2s ease;
     }}
     .btn:hover {{ background: rgba(59, 130, 246, 0.2); border-color: rgba(96, 165, 250, 0.45); transform: translateY(-1px); }}
+
+    /* Live Optical Camera Viewport & Controls */
+    .camera-toggle-btn {{
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.35) 0%, rgba(99, 102, 241, 0.35) 100%);
+      border: 1px solid rgba(96, 165, 250, 0.5);
+      color: #93c5fd;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 14px rgba(59, 130, 246, 0.25);
+    }}
+    .camera-toggle-btn:hover {{
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.6) 0%, rgba(99, 102, 241, 0.6) 100%);
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.45);
+    }}
+    .camera-toggle-btn.active {{
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border-color: #34d399;
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.45);
+    }}
+    .camera-panel {{
+      display: none;
+      background: rgba(4, 7, 15, 0.95);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }}
+    .camera-panel.active {{ display: block; }}
+    .camera-header-bar {{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }}
+    .camera-select {{
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: #f1f5f9;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      outline: none;
+      font-family: 'JetBrains Mono', monospace;
+    }}
+    .camera-video-wrap {{
+      position: relative;
+      width: 100%;
+      max-width: 640px;
+      aspect-ratio: 4 / 3;
+      margin: 0 auto;
+      background: #020409;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.7);
+    }}
+    .camera-video {{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: filter 0.2s ease;
+    }}
+    .camera-video.is-inverted {{
+      filter: invert(1) contrast(1.2) !important;
+    }}
+    .camera-reticle {{
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: min(76%, 380px);
+      height: min(76%, 380px);
+      aspect-ratio: 1 / 1;
+      transform: translate(-50%, -50%);
+      border: 2px dashed rgba(56, 189, 248, 0.75);
+      border-radius: 12px;
+      pointer-events: none;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.40);
+    }}
+    .reticle-label {{
+      position: absolute;
+      bottom: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #38bdf8;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 3px 10px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }}
+    .reticle-corner {{
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-color: #38bdf8;
+      border-style: solid;
+    }}
+    .reticle-corner.tl {{ top: -2px; left: -2px; border-width: 3px 0 0 3px; }}
+    .reticle-corner.tr {{ top: -2px; right: -2px; border-width: 3px 3px 0 0; }}
+    .reticle-corner.bl {{ bottom: -2px; left: -2px; border-width: 0 0 3px 3px; }}
+    .reticle-corner.br {{ bottom: -2px; right: -2px; border-width: 0 3px 3px 0; }}
+    .reticle-center {{
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px; height: 12px;
+    }}
+    .reticle-center::before, .reticle-center::after {{
+      content: '';
+      position: absolute;
+      background: rgba(56, 189, 248, 0.85);
+    }}
+    .reticle-center::before {{ top: 5px; left: 0; right: 0; height: 2px; }}
+    .reticle-center::after {{ left: 5px; top: 0; bottom: 0; width: 2px; }}
+    .camera-scan-sweep {{
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.85), transparent);
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.8);
+      pointer-events: none;
+      animation: scan-sweep 3s linear infinite;
+    }}
+    .camera-controls {{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }}
+    .cam-action-btn {{
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }}
+    .cam-action-btn.primary {{
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+    }}
+    .cam-action-btn.primary:hover {{
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(37, 99, 235, 0.55);
+    }}
+    .cam-action-btn.secondary {{
+      background: rgba(30, 41, 59, 0.85);
+      border-color: rgba(148, 163, 184, 0.3);
+      color: #cbd5e1;
+    }}
+    .cam-action-btn.secondary:hover {{
+      background: rgba(51, 65, 85, 0.85);
+      color: #ffffff;
+    }}
+    .cam-action-btn.secondary.active {{
+      background: rgba(16, 185, 129, 0.25);
+      border-color: #10b981;
+      color: #6ee7b7;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.35);
+    }}
   </style>
 </head>
 <body>
@@ -998,12 +1183,59 @@ def generate_dashboard_html(
     <div class="upload-header">
       <div style="display:flex; align-items:center; gap:10px;">
         <span style="font-size:20px;">📷</span>
-        <span style="font-weight:700; font-size:13.5px; color:#93c5fd; text-transform:uppercase; letter-spacing:0.8px;">Live Image Input & On-The-Spot Analysis</span>
+        <span style="font-weight:700; font-size:13.5px; color:#93c5fd; text-transform:uppercase; letter-spacing:0.8px;">Live Optical Input & On-The-Spot Analysis</span>
       </div>
-      <div style="font-size:12px; color:#94a3b8;" id="uploadStatusText">
-        Drop any PCB image below or click a sample board to inspect on the spot.
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <button class="camera-toggle-btn" id="btnToggleCamera" onclick="toggleCamera()">
+          <span id="cameraBtnIcon">📹</span>
+          <span id="cameraBtnText">Live Camera Mode</span>
+        </button>
+        <div style="font-size:12px; color:#94a3b8;" id="uploadStatusText">
+          Drop any PCB image below, select a sample board, or open live camera.
+        </div>
       </div>
     </div>
+
+    <!-- Live Camera Viewport (Expandable) -->
+    <div id="cameraPanel" class="camera-panel">
+      <div class="camera-header-bar">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="live-dot">OPTICAL FEED</span>
+          <span style="font-size:13px; font-weight:700; color:#cbd5e1;">Live Camera Optical Inspection</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <select id="cameraDeviceSelect" class="camera-select" onchange="switchCameraDevice(this.value)">
+            <option value="">Default Camera</option>
+          </select>
+          <button class="polarity-btn" onclick="toggleCameraPolarity()" id="btnCamPolarity" title="Invert camera colors for high contrast">🌓 Invert Feed</button>
+          <button class="btn" onclick="toggleCamera(false)" style="padding:5px 12px; font-size:11px;">✕ Close</button>
+        </div>
+      </div>
+      <div class="camera-video-wrap">
+        <video id="cameraVideo" class="camera-video" autoplay playsinline muted></video>
+        <div class="camera-reticle">
+          <div class="reticle-corner tl"></div>
+          <div class="reticle-corner tr"></div>
+          <div class="reticle-corner bl"></div>
+          <div class="reticle-corner br"></div>
+          <div class="reticle-center"></div>
+          <div class="reticle-label">ALIGN PCB TRACES INSIDE RETICLE</div>
+        </div>
+        <div class="camera-scan-sweep"></div>
+      </div>
+      <div class="camera-controls">
+        <button class="cam-action-btn primary" onclick="captureCameraSnapshot()">
+          <span style="font-size:16px;">📸</span> Capture &amp; Inspect PCB
+        </button>
+        <button class="cam-action-btn secondary" id="btnAutoScan" onclick="toggleAutoScan()">
+          <span id="autoScanIcon">🔄</span> <span id="autoScanText">Continuous Live Scan (Off)</span>
+        </button>
+        <span style="font-size:11.5px; color:#64748b; font-family:'JetBrains Mono',monospace;">
+          Locks frame · runs YOLO26n &amp; IPC-A-600 physics live
+        </span>
+      </div>
+    </div>
+    <canvas id="cameraCaptureCanvas" style="display:none;"></canvas>
 
     <!-- Drag & Drop Zone -->
     <div id="dropZone" class="dropzone" onclick="document.getElementById('fileUploadInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFileDrop(event)">
@@ -1472,102 +1704,392 @@ def generate_dashboard_html(
 
   function processUploadedImage(file) {{
     const fileName = file.name;
+    const reader = new FileReader();
+    reader.onload = function(evt) {{
+      sendDataUrlForAnalysis(evt.target.result, fileName);
+    }};
+    reader.readAsDataURL(file);
+  }}
+
+  function handleNonPcbDetected(data, dataUrl, fileName) {{
+    const status = document.getElementById("uploadStatusText");
+    if (status) {{
+      status.innerHTML = `<span style="color:#f59e0b; font-weight:700;">⚠️ ${{data.message || "Non-PCB scene detected. Defect analysis paused. Please align a physical Printed Circuit Board inside the camera reticle."}}</span>`;
+    }}
+
+    // Display captured image without bounding boxes
+    if (dataUrl) setPcbImage(dataUrl);
+    renderBBoxes([]);
+
+    // Update Header & Disposition Badge
+    const headerBoardId = document.getElementById("headerBoardId");
+    if (headerBoardId) headerBoardId.textContent = "NON-PCB SCENE";
+    const headerImageName = document.getElementById("headerImageName");
+    if (headerImageName) headerImageName.textContent = fileName;
+
+    const dispBadge = document.getElementById("dispositionBadge");
+    const dispText = document.getElementById("dispositionText");
+    if (dispText) dispText.textContent = "NON-PCB";
+    if (dispBadge) {{
+      dispBadge.style.background = "#f59e0b";
+      dispBadge.style.boxShadow = "0 0 20px rgba(245, 158, 11, 0.4)";
+    }}
+
+    // Update Status Pulse Chip
+    const pulseChip = document.getElementById("boardStatusPulse");
+    if (pulseChip) {{
+      pulseChip.textContent = "NON-PCB · OOD PAUSED";
+      pulseChip.style.background = "rgba(245, 158, 11, 0.16)";
+      pulseChip.style.color = "#fde68a";
+      pulseChip.style.borderColor = "rgba(245, 158, 11, 0.45)";
+    }}
+
+    // Zero out KPIs
+    animateCounter(document.getElementById("kpiTotalDefects"), 0, "", 300);
+    animateCounter(document.getElementById("kpiP1Count"), 0, "", 300);
+    animateCounter(document.getElementById("kpiMaxTraceLoss"), 0, "%", 300);
+    const traceRing = document.getElementById("kpiTraceRing");
+    if (traceRing) traceRing.style.strokeDashoffset = 113.1;
+
+    const jEl = document.getElementById("kpiMaxCurrentDensity");
+    if (jEl) jEl.textContent = "0.0 A·m⁻²";
+
+    const scoreEl = document.getElementById("kpiMaxScore");
+    if (scoreEl) scoreEl.innerHTML = `<span id="kpiScoreNum">0</span><span style="font-size:14px; color:#9ca3af;">/100</span>`;
+    const scoreRing = document.getElementById("kpiScoreRing");
+    if (scoreRing) scoreRing.style.strokeDashoffset = 113.1;
+
+    const riskFill = document.getElementById("boardRiskTimelineFill");
+    if (riskFill) riskFill.style.width = "0%";
+
+    // Board-Level Intelligence
+    const condEl = document.getElementById("boardConditionText");
+    if (condEl) condEl.textContent = "Non-PCB Input Detected (Inspection Suspended)";
+    const ratEl = document.getElementById("acceptanceRationaleText");
+    if (ratEl) ratEl.textContent = data.message || "Optical Domain Gatekeeper: The input camera frame contains a human face, skin, or natural environment scene. IPC-A-600 defect evaluation requires a physical bare or populated PCB aligned in the reticle.";
+
+    const risksList = document.getElementById("majorRisksList");
+    if (risksList) {{
+      risksList.innerHTML = `
+        <li class="warning-item">⚠️ Optical Gatekeeper active: Scene does not exhibit bare or assembled PCB trace signatures.</li>
+        <li class="warning-item">⚠️ Defect bounding boxes suppressed to prevent false positive hallucinations on natural textures.</li>
+      `;
+    }}
+
+    const priosList = document.getElementById("immediatePrioritiesList");
+    if (priosList) {{
+      priosList.innerHTML = `
+        <li class="warning-item">🎯 Position a bare or assembled PCB inside the optical reticle overlay.</li>
+        <li class="warning-item">🎯 Ensure adequate lighting without direct reflections or shadows.</li>
+      `;
+    }}
+
+    // Process Intelligence
+    const patEl = document.getElementById("processPatternText");
+    if (patEl) patEl.textContent = "Domain Gatekeeper Active: Standing by for PCB presentation.";
+    const hypList = document.getElementById("processHypothesesList");
+    if (hypList) {{
+      hypList.innerHTML = `<div class="timeline-item"><div class="timeline-node">📷</div><div class="timeline-card">Awaiting PCB alignment in camera view.</div></div>`;
+    }}
+    const audList = document.getElementById("processAuditsList");
+    if (audList) {{
+      audList.innerHTML = `<div class="timeline-item"><div class="timeline-node audit">🔍</div><div class="timeline-card">Optical gatekeeper verifies trace contrast and absence of skin signatures before engaging YOLO.</div></div>`;
+    }}
+
+    // Corrective Actions Table
+    const tableBody = document.getElementById("correctiveActionsTableBody");
+    if (tableBody) {{
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="8" style="text-align:center; padding:24px; color:#f59e0b; font-weight:600;">
+            ⚠️ Non-PCB scene detected. No defect corrective actions generated. Align a PCB in the camera stream to inspect.
+          </td>
+        </tr>
+      `;
+    }}
+
+    // Defect Cards
+    const cardsEl = document.getElementById("defectCardsContainer");
+    if (cardsEl) {{
+      cardsEl.innerHTML = `
+        <div style="background:rgba(245, 158, 11, 0.08); border:1px solid rgba(245, 158, 11, 0.35); border-radius:10px; padding:28px; text-align:center; color:#fde68a;">
+          <div style="font-size:36px; margin-bottom:10px;">⚠️</div>
+          <div style="font-weight:700; font-size:16px; color:#f8fafc; margin-bottom:8px;">Optical Domain Gatekeeper: Non-PCB Subject Detected</div>
+          <div style="font-size:13px; color:#cbd5e1; max-width:620px; margin:0 auto 16px; line-height:1.5;">
+            ${{data.message || "The camera captured a human face, skin, or natural environment scene. Defect bounding boxes and IPC-A-600 severity scoring are paused."}}<br>
+            Please aim the camera at a physical PCB or select a benchmark board above.
+          </div>
+          <button class="board-pill active" style="margin:0 auto; padding:8px 18px;" onclick="switchBoard('deep_12100046')">Load Benchmark PCB deep_12100046</button>
+        </div>
+      `;
+    }}
+  }}
+
+  // Unified image analysis pipeline (used by file upload, dropzone, and live camera snapshot)
+  function sendDataUrlForAnalysis(dataUrl, fileName) {{
     const stem = fileName.replace(/\\.[^/.]+$/, "");
     const status = document.getElementById("uploadStatusText");
     const dropZone = document.getElementById("dropZone");
     if (status) status.innerHTML = `<em>Processing <strong>${{fileName}}</strong> on the spot...</em>`;
     if (dropZone) dropZone.classList.add("is-loading");
 
-    // Read the uploaded image via FileReader
-    const reader = new FileReader();
-    reader.onload = function(evt) {{
-      const dataUrl = evt.target.result;
+    // 1. Try Live AI Server (POST /api/analyze) for real-time YOLO defect detection
+    if (status) status.innerHTML = `<span style="color:#60a5fa;">⚡ Running live YOLO26n defect detection & IPC-A-600 analysis on <strong>${{fileName}}</strong>...</span>`;
 
-      // 1. Try Live AI Server (POST /api/analyze) for real-time YOLO defect detection
-      if (status) status.innerHTML = `<span style="color:#60a5fa;">⚡ Running live YOLO26n defect detection & IPC-A-600 analysis on <strong>${{fileName}}</strong>...</span>`;
+    const apiEndpoint = window.location.protocol.startsWith("http")
+      ? "/api/analyze"
+      : "http://localhost:5050/api/analyze";
 
-      const apiEndpoint = window.location.protocol.startsWith("http")
-        ? "/api/analyze"
-        : "http://localhost:5050/api/analyze";
-
-      fetch(apiEndpoint, {{
-        method: "POST",
-        headers: {{ "Content-Type": "application/json" }},
-        body: JSON.stringify({{ filename: fileName, image_b64: dataUrl }}),
-      }})
-      .then(res => {{
-        if (!res.ok) throw new Error("HTTP error " + res.status);
-        return res.json();
-      }})
-      .then(data => {{
-        if (dropZone) dropZone.classList.remove("is-loading");
-        if (data.status === "success" && data.intelligence) {{
-          updateDashboard(data.intelligence, data.image_b64 || dataUrl, data.board_id || stem, data.image_name || fileName);
-          if (status) {{
-            const count = data.total_defects || 0;
-            const dur = data.inference_duration_seconds || 1.2;
-            status.innerHTML = `<span style="color:#34d399;">✓ <strong>${{fileName}}</strong> analyzed live on the spot (${{dur}}s)! Detected ${{count}} defect(s) with 100% locked coordinates & IPC-A-600 solutions.</span>`;
-          }}
+    fetch(apiEndpoint, {{
+      method: "POST",
+      headers: {{ "Content-Type": "application/json" }},
+      body: JSON.stringify({{ filename: fileName, image_b64: dataUrl }}),
+    }})
+    .then(res => {{
+      if (!res.ok) throw new Error("HTTP error " + res.status);
+      return res.json();
+    }})
+    .then(data => {{
+      if (dropZone) dropZone.classList.remove("is-loading");
+      if (data.status === "not_a_pcb") {{
+        handleNonPcbDetected(data, dataUrl, fileName);
+        return;
+      }}
+      if (data.status === "success" && data.intelligence) {{
+        updateDashboard(data.intelligence, data.image_b64 || dataUrl, data.board_id || stem, data.image_name || fileName);
+        if (status) {{
+          const count = data.total_defects || 0;
+          const dur = data.inference_duration_seconds || 1.2;
+          status.innerHTML = `<span style="color:#34d399;">✓ <strong>${{fileName}}</strong> analyzed live on the spot (${{dur}}s)! Detected ${{count}} defect(s) with 100% locked coordinates & IPC-A-600 solutions.</span>`;
+        }}
+        return;
+      }}
+      throw new Error(data.message || "Detection failed");
+    }})
+    .catch(err => {{
+      if (dropZone) dropZone.classList.remove("is-loading");
+      console.log("Live backend not connected or offline, using client-side matching:", err);
+      // Fallback 1: Direct name or substring match against known boards
+      for (const key of Object.keys(ALL_BOARDS)) {{
+        if (stem.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(stem.toLowerCase())) {{
+          switchBoard(key);
+          if (status) status.innerHTML = `<span style="color:#34d399;">✓ Board matched as <strong>${{key}}</strong> by filename! Exact defect coordinates loaded.</span>`;
           return;
         }}
-        throw new Error(data.message || "Detection failed");
-      }})
-      .catch(err => {{
-        if (dropZone) dropZone.classList.remove("is-loading");
-        console.log("Live backend not connected or offline, using client-side matching:", err);
-        // Fallback 1: Direct name or substring match against known boards
-        for (const key of Object.keys(ALL_BOARDS)) {{
-          if (stem.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(stem.toLowerCase())) {{
-            switchBoard(key);
-            if (status) status.innerHTML = `<span style="color:#34d399;">✓ Board matched as <strong>${{key}}</strong> by filename! Exact defect coordinates loaded.</span>`;
-            return;
+      }}
+
+      // Fallback 2: 16x16 visual fingerprinting
+      const img = new Image();
+      img.onload = function() {{
+        const cvs = document.createElement("canvas");
+        cvs.width = 16;
+        cvs.height = 16;
+        const ctx = cvs.getContext("2d");
+        ctx.drawImage(img, 0, 0, 16, 16);
+        const imgData = ctx.getImageData(0, 0, 16, 16).data;
+        const gray = [];
+        for (let i = 0; i < imgData.length; i += 4) {{
+          gray.push(0.299 * imgData[i] + 0.587 * imgData[i+1] + 0.114 * imgData[i+2]);
+        }}
+
+        let bestBoard = null;
+        let lowestMse = Infinity;
+        for (const [bid, fp] of Object.entries(BOARD_FINGERPRINTS || {{}})) {{
+          if (!fp || fp.length !== 256) continue;
+          let sumSq = 0;
+          for (let j = 0; j < 256; j++) {{
+            const diff = gray[j] - fp[j];
+            sumSq += diff * diff;
+          }}
+          const mse = sumSq / 256;
+          if (mse < lowestMse) {{
+            lowestMse = mse;
+            bestBoard = bid;
           }}
         }}
 
-        // Fallback 2: 16x16 visual fingerprinting
-        const img = new Image();
-        img.onload = function() {{
-          const cvs = document.createElement("canvas");
-          cvs.width = 16;
-          cvs.height = 16;
-          const ctx = cvs.getContext("2d");
-          ctx.drawImage(img, 0, 0, 16, 16);
-          const imgData = ctx.getImageData(0, 0, 16, 16).data;
-          const gray = [];
-          for (let i = 0; i < imgData.length; i += 4) {{
-            gray.push(0.299 * imgData[i] + 0.587 * imgData[i+1] + 0.114 * imgData[i+2]);
-          }}
+        if (lowestMse < 650 && bestBoard && ALL_BOARDS[bestBoard]) {{
+          switchBoard(bestBoard);
+          const matchPct = Math.max(92, Math.min(99.9, 100 - lowestMse / 35)).toFixed(1);
+          if (status) status.innerHTML = `<span style="color:#34d399;">✓ Auto-recognized PCB as <strong>${{bestBoard}}</strong> (${{matchPct}}% visual match). 100% Coordinate-Locked Defect Annotations & Engineering Intelligence Loaded!</span>`;
+          return;
+        }}
 
-          let bestBoard = null;
-          let lowestMse = Infinity;
-          for (const [bid, fp] of Object.entries(BOARD_FINGERPRINTS || {{}})) {{
-            if (!fp || fp.length !== 256) continue;
-            let sumSq = 0;
-            for (let j = 0; j < 256; j++) {{
-              const diff = gray[j] - fp[j];
-              sumSq += diff * diff;
-            }}
-            const mse = sumSq / 256;
-            if (mse < lowestMse) {{
-              lowestMse = mse;
-              bestBoard = bid;
-            }}
-          }}
+        // Fallback 3: Custom image without live server
+        loadCustomBoard(fileName, dataUrl, img.width, img.height);
+      }};
+      img.src = dataUrl;
+    }});
+  }}
 
-          if (lowestMse < 650 && bestBoard && ALL_BOARDS[bestBoard]) {{
-            switchBoard(bestBoard);
-            const matchPct = Math.max(92, Math.min(99.9, 100 - lowestMse / 35)).toFixed(1);
-            if (status) status.innerHTML = `<span style="color:#34d399;">✓ Auto-recognized PCB as <strong>${{bestBoard}}</strong> (${{matchPct}}% visual match). 100% Coordinate-Locked Defect Annotations & Engineering Intelligence Loaded!</span>`;
-            return;
-          }}
+  // Live Optical Camera Stream & Inspection Management
+  let cameraStream = null;
+  let isCameraActive = false;
+  let isCameraInverted = false;
+  let autoScanTimer = null;
+  let isAutoScanning = false;
+  let currentCameraDeviceId = null;
 
-          // Fallback 3: Custom image without live server
-          loadCustomBoard(fileName, dataUrl, img.width, img.height);
-        }};
-        img.src = dataUrl;
+  async function populateCameraDevices() {{
+    try {{
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(d => d.kind === "videoinput");
+      const select = document.getElementById("cameraDeviceSelect");
+      if (!select) return;
+      select.innerHTML = "";
+      videoDevices.forEach((dev, idx) => {{
+        const opt = document.createElement("option");
+        opt.value = dev.deviceId;
+        opt.textContent = dev.label || `Camera ${{idx + 1}}`;
+        select.appendChild(opt);
       }});
-    }};
-    reader.readAsDataURL(file);
+      if (currentCameraDeviceId) select.value = currentCameraDeviceId;
+    }} catch (e) {{
+      console.warn("Could not enumerate camera devices:", e);
+    }}
+  }}
+
+  async function toggleCamera(forceState) {{
+    const shouldOpen = (forceState !== undefined) ? forceState : !isCameraActive;
+    const panel = document.getElementById("cameraPanel");
+    const btn = document.getElementById("btnToggleCamera");
+    const icon = document.getElementById("cameraBtnIcon");
+    const txt = document.getElementById("cameraBtnText");
+
+    if (shouldOpen) {{
+      try {{
+        const constraints = {{
+          video: currentCameraDeviceId
+            ? {{ deviceId: {{ exact: currentCameraDeviceId }}, width: {{ ideal: 1280 }}, height: {{ ideal: 960 }} }}
+            : {{ facingMode: {{ ideal: "environment" }}, width: {{ ideal: 1280 }}, height: {{ ideal: 960 }} }}
+        }};
+        cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+        const video = document.getElementById("cameraVideo");
+        if (video) {{
+          video.srcObject = cameraStream;
+          video.play();
+        }}
+        isCameraActive = true;
+        if (panel) panel.classList.add("active");
+        if (btn) btn.classList.add("active");
+        if (icon) icon.textContent = "🔴";
+        if (txt) txt.textContent = "Camera Live (Active)";
+        await populateCameraDevices();
+        const status = document.getElementById("uploadStatusText");
+        if (status) status.innerHTML = `<span style="color:#34d399;">📹 Live camera feed active! Position PCB in the frame and click <strong>Capture &amp; Inspect</strong>.</span>`;
+      }} catch (err) {{
+        console.error("Camera access error:", err);
+        alert("Camera access denied or unavailable: " + err.message + "\\n\\nTip: Allow camera access in your browser or connect a USB microscope.");
+      }}
+    }} else {{
+      stopCamera();
+      if (panel) panel.classList.remove("active");
+      if (btn) btn.classList.remove("active");
+      if (icon) icon.textContent = "📹";
+      if (txt) txt.textContent = "Live Camera Mode";
+    }}
+  }}
+
+  function stopCamera() {{
+    if (autoScanTimer) {{
+      clearInterval(autoScanTimer);
+      autoScanTimer = null;
+      isAutoScanning = false;
+      const autoBtn = document.getElementById("btnAutoScan");
+      const autoTxt = document.getElementById("autoScanText");
+      if (autoBtn) autoBtn.classList.remove("active");
+      if (autoTxt) autoTxt.textContent = "Continuous Live Scan (Off)";
+    }}
+    if (cameraStream) {{
+      cameraStream.getTracks().forEach(track => track.stop());
+      cameraStream = null;
+    }}
+    const video = document.getElementById("cameraVideo");
+    if (video) video.srcObject = null;
+    isCameraActive = false;
+  }}
+
+  function switchCameraDevice(devId) {{
+    currentCameraDeviceId = devId;
+    if (isCameraActive) {{
+      stopCamera();
+      toggleCamera(true);
+    }}
+  }}
+
+  function toggleCameraPolarity() {{
+    isCameraInverted = !isCameraInverted;
+    const video = document.getElementById("cameraVideo");
+    if (video) {{
+      if (isCameraInverted) video.classList.add("is-inverted");
+      else video.classList.remove("is-inverted");
+    }}
+  }}
+
+  function captureCameraSnapshot() {{
+    const video = document.getElementById("cameraVideo");
+    if (!video || !cameraStream) {{
+      alert("Camera feed is not active. Click 'Live Camera Mode' to start.");
+      return;
+    }}
+    const canvas = document.getElementById("cameraCaptureCanvas");
+    if (!canvas) return;
+
+    // Crop to the centered square optical inspection zone
+    // Isolates the circuit, matches YOLO's 640x640 square training geometry,
+    // and eliminates user fingers/hands holding the edges and background room clutter.
+    const vw = video.videoWidth || 640;
+    const vh = video.videoHeight || 480;
+    const cropSize = Math.floor(Math.min(vw, vh) * 0.76);
+    const sx = Math.floor((vw - cropSize) / 2);
+    const sy = Math.floor((vh - cropSize) / 2);
+
+    canvas.width = 640;
+    canvas.height = 640;
+    const ctx = canvas.getContext("2d");
+    if (isCameraInverted) {{
+      ctx.filter = "invert(1) contrast(1.2)";
+    }}
+    ctx.drawImage(video, sx, sy, cropSize, cropSize, 0, 0, 640, 640);
+    ctx.filter = "none";
+
+    // Visual shutter flash effect on video element
+    video.style.opacity = "0.3";
+    setTimeout(() => {{ video.style.opacity = "1"; }}, 120);
+
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+    const ts = new Date().toISOString().replace(/[:.]/g, "-").slice(11, 19);
+    const fileName = `live_pcb_${{ts}}.jpg`;
+
+    sendDataUrlForAnalysis(dataUrl, fileName);
+  }}
+
+  function toggleAutoScan() {{
+    const btn = document.getElementById("btnAutoScan");
+    const txt = document.getElementById("autoScanText");
+    const icon = document.getElementById("autoScanIcon");
+
+    if (isAutoScanning) {{
+      clearInterval(autoScanTimer);
+      autoScanTimer = null;
+      isAutoScanning = false;
+      if (btn) btn.classList.remove("active");
+      if (txt) txt.textContent = "Continuous Live Scan (Off)";
+      if (icon) icon.textContent = "🔄";
+    }} else {{
+      if (!isCameraActive) {{
+        toggleCamera(true);
+      }}
+      isAutoScanning = true;
+      if (btn) btn.classList.add("active");
+      if (txt) txt.textContent = "Auto-Scanning (Every 2.5s)";
+      if (icon) icon.textContent = "⚡";
+      captureCameraSnapshot();
+      autoScanTimer = setInterval(() => {{
+        captureCameraSnapshot();
+      }}, 2500);
+    }}
   }}
 
   // Safely display an unanalyzed custom PCB without superimposing mismatched boxes
