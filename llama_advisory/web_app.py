@@ -277,6 +277,21 @@ class RGPISHandler(http.server.SimpleHTTPRequestHandler):
                 print(f"\n[LIVE API] Received PCB '{filename}' ({img.shape[1]}x{img.shape[0]} px). Running detection...")
                 t0 = time.time()
 
+                # 0.5 Server-side image enhancement for live camera frames
+                # CLAHE on LAB-L channel improves trace visibility under uneven lighting
+                # without affecting color channels (critical for skin-tone suppression)
+                is_live = "live" in filename.lower() or "cam" in filename.lower()
+                if is_live:
+                    try:
+                        lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+                        l_ch, a_ch, b_ch = cv2.split(lab)
+                        clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(8, 8))
+                        l_eq = clahe.apply(l_ch)
+                        img = cv2.cvtColor(cv2.merge([l_eq, a_ch, b_ch]), cv2.COLOR_LAB2BGR)
+                        print(f"[LIVE API] CLAHE enhancement applied ({img.shape[1]}x{img.shape[0]}).")
+                    except Exception as e_clahe:
+                        print(f"[LIVE API] CLAHE skipped: {e_clahe}")
+
                 # 1. Run YOLO Defect Detector
                 detector = get_detector()
                 det_dict = detector.detect(img)

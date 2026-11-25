@@ -1999,7 +1999,7 @@ def generate_dashboard_html(
           <div class="reticle-corner bl"></div>
           <div class="reticle-corner br"></div>
           <div class="reticle-center"></div>
-          <div class="reticle-label">ALIGN PCB TRACES INSIDE RETICLE</div>
+          <div class="reticle-label">HOLD PCB CLOSE · FILL THE FRAME</div>
         </div>
         <div class="camera-scan-sweep"></div>
       </div>
@@ -2013,6 +2013,20 @@ def generate_dashboard_html(
         <span style="font-size:11.5px; color:#94a3b8; font-family:'JetBrains Mono',monospace;">
           Locks frame · runs YOLO26n &amp; IPC-A-600 physics live
         </span>
+      </div>
+
+      <!-- Last Captured Frame Preview — shows exact image YOLO analyzed -->
+      <div id="lastCapturePreview" style="display:none; margin-top:14px; border-top:1px solid rgba(56,189,248,0.2); padding-top:12px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#94a3b8; margin-bottom:8px;">
+          📷 Last Frame Sent to YOLO &nbsp;
+          <span id="lastCaptureRes" style="color:#38bdf8; font-weight:600;"></span>
+        </div>
+        <img id="lastCaptureImg" src="" alt="Last capture"
+          style="width:100%; max-width:480px; border-radius:8px; border:1px solid rgba(56,189,248,0.3); display:block; margin:0 auto;"
+          title="Exact full-resolution frame sent to YOLO. PCB should fill the frame for best detection." />
+        <div style="font-size:10.5px; color:#64748b; text-align:center; margin-top:4px;">
+          ↑ Full frame (no crop). Hold the PCB closer and steady for better detection accuracy.
+        </div>
       </div>
     </div>
     <canvas id="cameraCaptureCanvas" style="display:none;"></canvas>
@@ -2916,10 +2930,11 @@ def generate_dashboard_html(
 
     if (shouldOpen) {{
       try {{
+        // Request max resolution for best YOLO detection accuracy
         const constraints = {{
           video: currentCameraDeviceId
-            ? {{ deviceId: {{ exact: currentCameraDeviceId }}, width: {{ ideal: 1280 }}, height: {{ ideal: 960 }} }}
-            : {{ facingMode: {{ ideal: "environment" }}, width: {{ ideal: 1280 }}, height: {{ ideal: 960 }} }}
+            ? {{ deviceId: {{ exact: currentCameraDeviceId }}, width: {{ ideal: 1920, min: 640 }}, height: {{ ideal: 1080, min: 480 }}, frameRate: {{ ideal: 15, max: 30 }} }}
+            : {{ facingMode: {{ ideal: "environment" }}, width: {{ ideal: 1920, min: 640 }}, height: {{ ideal: 1080, min: 480 }}, frameRate: {{ ideal: 15, max: 30 }} }}
         }};
         cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
         const video = document.getElementById("cameraVideo");
@@ -2993,31 +3008,40 @@ def generate_dashboard_html(
     const canvas = document.getElementById("cameraCaptureCanvas");
     if (!canvas) return;
 
-    // Crop to the centered square optical inspection zone
-    // Isolates the circuit, matches YOLO's 640x640 square training geometry,
-    // and eliminates user fingers/hands holding the edges and background room clutter.
-    const vw = video.videoWidth || 640;
-    const vh = video.videoHeight || 480;
-    const cropSize = Math.floor(Math.min(vw, vh) * 0.76);
-    const sx = Math.floor((vw - cropSize) / 2);
-    const sy = Math.floor((vh - cropSize) / 2);
+    // Send the FULL camera frame to YOLO — do NOT center-crop.
+    // Center-cropping a low-res webcam (e.g. 640x480 -> 364x364 -> 640x640 upscale)
+    // severely degrades detection. YOLO letterboxes natively to any aspect ratio.
+    const vw = video.videoWidth || 1280;
+    const vh = video.videoHeight || 720;
 
-    canvas.width = 640;
-    canvas.height = 640;
+    // Capture full frame at native resolution
+    canvas.width = vw;
+    canvas.height = vh;
     const ctx = canvas.getContext("2d");
     if (isCameraInverted) {{
       ctx.filter = "invert(1) contrast(1.2)";
     }}
-    ctx.drawImage(video, sx, sy, cropSize, cropSize, 0, 0, 640, 640);
+    ctx.drawImage(video, 0, 0, vw, vh);
     ctx.filter = "none";
 
     // Visual shutter flash effect on video element
     video.style.opacity = "0.3";
     setTimeout(() => {{ video.style.opacity = "1"; }}, 120);
 
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+    // Use JPEG quality 1.0 (lossless as possible) for best detection accuracy
+    const dataUrl = canvas.toDataURL("image/jpeg", 1.0);
     const ts = new Date().toISOString().replace(/[:.]/g, "-").slice(11, 19);
     const fileName = `live_pcb_${{ts}}.jpg`;
+
+    // Show last captured frame preview so user can see exactly what was sent to YOLO
+    const prevWrap = document.getElementById("lastCapturePreview");
+    const prevImg = document.getElementById("lastCaptureImg");
+    const prevRes = document.getElementById("lastCaptureRes");
+    if (prevImg && prevWrap) {{
+      prevImg.src = dataUrl;
+      prevWrap.style.display = "block";
+      if (prevRes) prevRes.textContent = `${{vw}}×${{vh}} px`;
+    }}
 
     sendDataUrlForAnalysis(dataUrl, fileName);
   }}

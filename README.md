@@ -2,6 +2,8 @@
 
 > **Bharat AI-SoC Challenge 2026/27** — Fully offline, edge-deployable PCB defect inspection and engineering intelligence system.
 
+📄 **Project Documentation:** [Download / View Project Report (PDF)](./RGPIS-HDE_Project_Report_with_logos.pdf)
+
 This repository contains:
 1. **Trained YOLO26n PCB Defect Detection Model** (`best.pt`) — **92.8% Precision**, **95.1% Recall**, mAP@50 96.57%.
 2. **CERI + CEIA Analysis** — Geometric risk scoring and counterfactual electrical impact (geometry-based proxies, IPC-A-600 grounded).
