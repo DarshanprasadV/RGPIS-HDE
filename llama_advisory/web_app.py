@@ -29,6 +29,15 @@ if str(PROJECT_ROOT) not in sys.path:
 from predict import PCBDefectDetector
 from llama_advisory.unified_pipeline_bridge import build_unified_report
 from llama_advisory.engineering_intelligence import EngineeringIntelligenceEngine
+from llama_advisory.inspection_logger import (
+    log_inspection,
+    get_inspection_history,
+    get_inspection_stats,
+    clear_inspection_history,
+    seed_benchmark_inspections_if_empty,
+    CSV_LOG_PATH,
+    JSONL_LOG_PATH,
+)
 
 INTEL_DIR = PROJECT_ROOT / "outputs" / "intelligence"
 DEFAULT_HTML = INTEL_DIR / "deep_12100046_intelligence_dashboard.html"
@@ -162,10 +171,58 @@ class RGPISHandler(http.server.SimpleHTTPRequestHandler):
             self._send_json({"status": "healthy", "service": "RGPIS-HDE Live Intelligence Server"})
             return
 
+        # ----------------------------------------------------------------------
+        # Inspection History & Audit Trail Endpoints
+        # ----------------------------------------------------------------------
+        if parsed.path == "/api/inspections":
+            history = get_inspection_history(limit=250)
+            stats = get_inspection_stats()
+            self._send_json({"status": "success", "history": history, "stats": stats})
+            return
+
+        if parsed.path == "/api/inspections/stats":
+            stats = get_inspection_stats()
+            self._send_json({"status": "success", "stats": stats})
+            return
+
+        if parsed.path in ("/api/inspections/export/csv", "/api/inspections/export"):
+            q = parsed.query.lower()
+            if "format=json" in q or "format=jsonl" in q:
+                if JSONL_LOG_PATH.exists():
+                    with open(JSONL_LOG_PATH, "rb") as f:
+                        data = f.read()
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/x-jsonlines; charset=utf-8")
+                    self.send_header("Content-Disposition", 'attachment; filename="rgpis_inspection_history.jsonl"')
+                    self._set_cors_headers()
+                    self.send_header("Content-Length", str(len(data)))
+                    self.end_headers()
+                    self.wfile.write(data)
+                    return
+            else:
+                if CSV_LOG_PATH.exists():
+                    with open(CSV_LOG_PATH, "rb") as f:
+                        data = f.read()
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/csv; charset=utf-8")
+                    self.send_header("Content-Disposition", 'attachment; filename="rgpis_inspection_log.csv"')
+                    self._set_cors_headers()
+                    self.send_header("Content-Length", str(len(data)))
+                    self.end_headers()
+                    self.wfile.write(data)
+                    return
+
         return super().do_GET()
 
     def do_POST(self):
         parsed = urlparse(self.path)
+
+        # Clear inspection logs
+        if parsed.path == "/api/inspections/clear":
+            success = clear_inspection_history()
+            self._send_json({"status": "success" if success else "error", "message": "Inspection history cleared."})
+            return
+
         if parsed.path == "/api/analyze":
             try:
                 content_len = int(self.headers.get("Content-Length", 0))
@@ -195,6 +252,14 @@ class RGPISHandler(http.server.SimpleHTTPRequestHandler):
                 is_pcb, reason_code, domain_msg = validate_pcb_domain(img)
                 if not is_pcb:
                     print(f"[LIVE API] Non-PCB input filtered: {reason_code} - {domain_msg}")
+                    logged = log_inspection(
+                        {},
+                        image_name=filename,
+                        board_id=stem,
+                        mode="LIVE_CAMERA" if ("live" in filename.lower() or "cam" in filename.lower()) else "FILE_UPLOAD",
+                        duration_seconds=0.05,
+                        status="not_a_pcb",
+                    )
                     self._send_json({
                         "status": "not_a_pcb",
                         "reason": reason_code,
@@ -202,6 +267,8 @@ class RGPISHandler(http.server.SimpleHTTPRequestHandler):
                         "board_id": stem,
                         "image_name": filename,
                         "image_b64": data_url,
+                        "inspection_id": logged.get("inspection_id"),
+                        "logged_record": logged,
                     }, 200)
                     return
 
@@ -228,18 +295,30 @@ class RGPISHandler(http.server.SimpleHTTPRequestHandler):
                 total_defects = intel.get("board_summary", {}).get("total_defects", len(intel.get("individual_defect_intelligence", [])))
                 print(f"[LIVE API] Successfully analyzed '{filename}' in {dur:.2f}s — Found {total_defects} defect(s).")
 
+                # 4. Log to persistent audit trail (JSONL + CSV)
+                logged = log_inspection(
+                    intel,
+                    image_name=filename,
+                    board_id=stem,
+                    mode="LIVE_CAMERA" if ("live" in filename.lower() or "cam" in filename.lower()) else "FILE_UPLOAD",
+                    duration_seconds=dur,
+                    status="success",
+                )
+
                 data_url = req_data.get("image_b64", "")
                 if not data_url.startswith("data:"):
                     data_url = f"data:image/jpeg;base64,{img_data_str}"
 
                 resp = {
                     "status": "success",
+                    "inspection_id": logged.get("inspection_id"),
                     "board_id": stem,
                     "image_name": filename,
                     "total_defects": total_defects,
                     "intelligence": intel,
                     "image_b64": data_url,
                     "inference_duration_seconds": round(dur, 2),
+                    "logged_record": logged,
                 }
                 self._send_json(resp, 200)
             except Exception as e:
@@ -258,6 +337,8 @@ def run_server(port: int = 5050):
     print("  🚀 PRE-WARMING RGPIS-HDE INFERENCE ENGINE...")
     get_detector()
     get_engine()
+    seed_benchmark_inspections_if_empty()
+    print("  📋 Inspection Audit Logging System Active (outputs/logs/).")
     print("=" * 76)
 
     handler = RGPISHandler

@@ -145,6 +145,18 @@ def generate_dashboard_html(
     client_report_json = json.dumps(report).replace("</script>", "<\\/script>")
     client_intel_json = json.dumps(intelligence).replace("</script>", "<\\/script>")
 
+    # Inspection History & Audit Trail data
+    from llama_advisory.inspection_logger import (
+        get_inspection_history,
+        get_inspection_stats,
+        seed_benchmark_inspections_if_empty,
+    )
+    seed_benchmark_inspections_if_empty()
+    inspection_history = get_inspection_history(limit=50)
+    inspection_stats = get_inspection_stats()
+    inspection_history_json = json.dumps(inspection_history).replace("</script>", "<\\/script>")
+    inspection_stats_json = json.dumps(inspection_stats).replace("</script>", "<\\/script>")
+
     pcb_image_b64 = _embed_image_b64(image_name)
     pcb_bg_style = (
         f"background-image: url('{pcb_image_b64}'); "
@@ -857,6 +869,41 @@ def generate_dashboard_html(
     .custom-table tbody tr:nth-child(even) td {{ background: rgba(255, 255, 255, 0.015); }}
     .custom-table tbody tr:hover td {{ background: rgba(59, 130, 246, 0.07); }}
     .action-checkbox {{ width: 17px; height: 17px; accent-color: #10b981; cursor: pointer; }}
+
+    /* Inspection Audit Log Table & Badges */
+    .audit-table {{ width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }}
+    .audit-table th {{
+      background: rgba(15, 23, 42, 0.85);
+      padding: 10px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #94a3b8;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+    }}
+    .audit-table td {{ padding: 10px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: #cbd5e1; vertical-align: middle; }}
+    .audit-table tbody tr:nth-child(even) td {{ background: rgba(255, 255, 255, 0.015); }}
+    .audit-table tbody tr:hover td {{ background: rgba(56, 189, 248, 0.08); }}
+    .audit-badge {{
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: 0.5px;
+    }}
+    .audit-badge.reject {{ background: rgba(239, 68, 68, 0.18); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }}
+    .audit-badge.accept {{ background: rgba(16, 185, 129, 0.18); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }}
+    .audit-badge.review {{ background: rgba(245, 158, 11, 0.18); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.4); }}
+    .audit-badge.non-pcb {{ background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px dashed rgba(245, 158, 11, 0.5); }}
+    .flash-row {{
+      animation: flashNewRow 1.6s ease-out;
+    }}
+    @keyframes flashNewRow {{
+      0% {{ background: rgba(56, 189, 248, 0.4); }}
+      100% {{ background: transparent; }}
+    }}
 
     /* Q&A Terminal Console */
     .qa-box {{
@@ -1586,12 +1633,85 @@ def generate_dashboard_html(
     </div>
   </div>
 
+  <!-- Layer 6: Inspection Results Logging & Quality Audit Trail -->
+  <div class="card glass-card log-panel" id="inspectionAuditSection" style="margin-top:24px;">
+    <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div class="card-title" style="margin:0;">
+        <span class="card-icon" style="background:rgba(56, 189, 248, 0.15); color:#38bdf8;">📋</span>
+        Inspection Results & Quality Audit Log (IPC-A-600)
+      </div>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <button class="cam-action-btn" onclick="exportInspectionLog('csv')" style="padding:6px 14px; font-size:12px; background:rgba(16, 185, 129, 0.15); border:1px solid rgba(16, 185, 129, 0.4); color:#34d399;">
+          📥 Export CSV Log
+        </button>
+        <button class="cam-action-btn" onclick="exportInspectionLog('json')" style="padding:6px 14px; font-size:12px; background:rgba(56, 189, 248, 0.15); border:1px solid rgba(56, 189, 248, 0.4); color:#38bdf8;">
+          📑 Export JSONL
+        </button>
+        <button class="cam-action-btn" onclick="refreshInspectionLogs()" style="padding:6px 12px; font-size:12px; background:rgba(255, 255, 255, 0.06); border:1px solid rgba(255, 255, 255, 0.15); color:#cbd5e1;" title="Refresh Log Table">
+          🔄 Refresh
+        </button>
+        <button class="cam-action-btn" onclick="clearInspectionLogs()" style="padding:6px 12px; font-size:12px; background:rgba(239, 68, 68, 0.12); border:1px solid rgba(239, 68, 68, 0.35); color:#f87171;" title="Reset History">
+          🗑️ Clear
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick KPI Stats Bar -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px; padding:14px 20px; background:rgba(15, 23, 42, 0.6); border-bottom:1px solid rgba(255, 255, 255, 0.06);">
+      <div>
+        <div style="font-size:11px; text-transform:uppercase; color:#94a3b8; font-weight:700; letter-spacing:0.5px;">Total Logged</div>
+        <div id="statTotalLogged" style="font-size:22px; font-weight:800; color:#f8fafc; margin-top:2px;">0</div>
+      </div>
+      <div>
+        <div style="font-size:11px; text-transform:uppercase; color:#94a3b8; font-weight:700; letter-spacing:0.5px;">Accept Rate (Yield)</div>
+        <div id="statYieldRate" style="font-size:22px; font-weight:800; color:#34d399; margin-top:2px;">0.0%</div>
+      </div>
+      <div>
+        <div style="font-size:11px; text-transform:uppercase; color:#94a3b8; font-weight:700; letter-spacing:0.5px;">Quarantined Rejects</div>
+        <div id="statRejectCount" style="font-size:22px; font-weight:800; color:#f87171; margin-top:2px;">0</div>
+      </div>
+      <div>
+        <div style="font-size:11px; text-transform:uppercase; color:#94a3b8; font-weight:700; letter-spacing:0.5px;">Total Defects Logged</div>
+        <div id="statTotalDefects" style="font-size:22px; font-weight:800; color:#fbbf24; margin-top:2px;">0</div>
+      </div>
+      <div>
+        <div style="font-size:11px; text-transform:uppercase; color:#94a3b8; font-weight:700; letter-spacing:0.5px;">Avg AOI Latency</div>
+        <div id="statAvgLatency" style="font-size:22px; font-weight:800; color:#38bdf8; margin-top:2px;">0.00s</div>
+      </div>
+    </div>
+
+    <!-- Log Table -->
+    <div style="padding:12px; overflow-x:auto;">
+      <table class="audit-table">
+        <thead>
+          <tr>
+            <th>Inspection ID</th>
+            <th>Timestamp</th>
+            <th>Board / File</th>
+            <th>Source</th>
+            <th>Disposition</th>
+            <th>Defect Tally</th>
+            <th>Max CERI</th>
+            <th>Max CEIA (A·m⁻²)</th>
+            <th>Risk Score</th>
+            <th style="text-align:center;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="inspectionLogTableBody">
+          <!-- Dynamically populated -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <script>
   // Bundled multi-board pre-analyzed dataset for zero-latency switching
   const ALL_BOARDS = {bundle_json};
   const BOARD_FINGERPRINTS = {fingerprints_json};
+  const INITIAL_INSPECTIONS = {inspection_history_json};
+  const INITIAL_STATS = {inspection_stats_json};
   let currentBoardId = "{board_id}";
   let currentIntel = {client_intel_json};
   let currentReport = {client_report_json};
@@ -1853,10 +1973,12 @@ def generate_dashboard_html(
       if (dropZone) dropZone.classList.remove("is-loading");
       if (data.status === "not_a_pcb") {{
         handleNonPcbDetected(data, dataUrl, fileName);
+        if (data.logged_record) appendInspectionToTable(data.logged_record);
         return;
       }}
       if (data.status === "success" && data.intelligence) {{
         updateDashboard(data.intelligence, data.image_b64 || dataUrl, data.board_id || stem, data.image_name || fileName);
+        if (data.logged_record) appendInspectionToTable(data.logged_record);
         if (status) {{
           const count = data.total_defects || 0;
           const dur = data.inference_duration_seconds || 1.2;
@@ -2503,9 +2625,233 @@ def generate_dashboard_html(
     a.click();
   }}
 
-  // Initialize Canvas on load
+  // ---------------------------------------------------------------------------
+  // Layer 6: Inspection Results Logging & Quality Audit Trail
+  // ---------------------------------------------------------------------------
+  let inspectionHistory = Array.isArray(INITIAL_INSPECTIONS) ? [...INITIAL_INSPECTIONS] : [];
+
+  function initInspectionAuditLog() {{
+    renderInspectionTable(inspectionHistory);
+    renderInspectionStats(INITIAL_STATS);
+  }}
+
+  function renderInspectionStats(stats) {{
+    if (!stats) return;
+    const sTotal = document.getElementById("statTotalLogged");
+    const sYield = document.getElementById("statYieldRate");
+    const sReject = document.getElementById("statRejectCount");
+    const sDefects = document.getElementById("statTotalDefects");
+    const sLat = document.getElementById("statAvgLatency");
+
+    if (sTotal) sTotal.textContent = stats.total_inspections || 0;
+    if (sYield) sYield.textContent = (stats.yield_rate_pct !== undefined ? stats.yield_rate_pct : 0.0) + "%";
+    if (sReject) sReject.textContent = stats.reject_count || 0;
+    if (sDefects) sDefects.textContent = stats.total_defects_logged || 0;
+    if (sLat) sLat.textContent = (stats.avg_latency_seconds || 0.45).toFixed(2) + "s";
+  }}
+
+  function renderInspectionTable(records) {{
+    const tbody = document.getElementById("inspectionLogTableBody");
+    if (!tbody) return;
+    if (!records || records.length === 0) {{
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">No inspection logs recorded yet. Run a live camera inspection or upload a PCB.</td></tr>`;
+      return;
+    }}
+
+    tbody.innerHTML = records.map(r => formatInspectionRowHtml(r)).join("");
+  }}
+
+  function formatInspectionRowHtml(r) {{
+    const disp = r.disposition || "REVIEW";
+    const dispClass = disp.toLowerCase().replace(/[^a-z0-9]/g, "-");
+    const jFmt = formatJVal(r.max_current_density_A_m2 || 0);
+
+    const mode = r.inspection_mode || "SAMPLE_BENCHMARK";
+    const sourceBadge = mode === "LIVE_CAMERA"
+      ? '<span style="color:#38bdf8;">📷 Camera</span>'
+      : mode === "SAMPLE_BENCHMARK"
+      ? '<span style="color:#a78bfa;">🧪 Sample</span>'
+      : '<span style="color:#34d399;">📁 Upload</span>';
+
+    const p = r.priority_breakdown || {{}};
+    const pBreakdownStr = r.total_defects > 0
+      ? `${{r.total_defects}} (<span style="color:#f87171;">${{p.P1_CRITICAL||0}} P1</span>, <span style="color:#fb923c;">${{p.P2_HIGH||0}} P2</span>)`
+      : `<span style="color:#34d399;">0 Flaws</span>`;
+
+    const ceriColor = (r.max_trace_loss_pct || 0) > 0 ? "#f87171" : "#34d399";
+    const riskColor = (r.max_unified_risk_score || 0) > 50 ? "#f87171" : "#34d399";
+
+    return `
+      <tr id="row-${{r.inspection_id}}">
+        <td style="font-family:'JetBrains Mono',monospace; color:#94a3b8; font-size:11px;">${{r.inspection_id}}</td>
+        <td style="color:#cbd5e1; white-space:nowrap; font-size:11px;">${{r.timestamp_readable || r.timestamp_iso || "Just now"}}</td>
+        <td style="font-weight:600; color:#f8fafc;">${{r.board_id || r.image_name}}</td>
+        <td>${{sourceBadge}}</td>
+        <td><span class="audit-badge ${{dispClass}}">${{disp}}</span></td>
+        <td>${{pBreakdownStr}}</td>
+        <td style="color:${{ceriColor}}; font-weight:600;">${{(r.max_trace_loss_pct||0).toFixed(1)}}%</td>
+        <td style="font-family:'JetBrains Mono',monospace; color:#94a3b8; font-size:11px;">${{jFmt}}</td>
+        <td style="font-weight:700; color:${{riskColor}};">${{r.max_unified_risk_score||0}}/100</td>
+        <td style="text-align:center;">
+          <button class="cam-action-btn" onclick="viewLoggedBoard('${{r.board_id}}')" style="padding:3px 8px; font-size:11px; background:rgba(56, 189, 248, 0.15); border:1px solid rgba(56, 189, 248, 0.4); color:#38bdf8;">
+            Inspect
+          </button>
+        </td>
+      </tr>
+    `;
+  }}
+
+  function appendInspectionToTable(record) {{
+    if (!record) return;
+    const tbody = document.getElementById("inspectionLogTableBody");
+    if (!tbody) return;
+
+    // Avoid duplicate row insertion
+    if (document.getElementById("row-" + record.inspection_id)) return;
+
+    inspectionHistory.unshift(record);
+
+    if (tbody.children.length === 1 && tbody.children[0].innerText.includes("No inspection logs")) {{
+      tbody.innerHTML = "";
+    }}
+
+    const dummyContainer = document.createElement("tbody");
+    dummyContainer.innerHTML = formatInspectionRowHtml(record);
+    const newTr = dummyContainer.firstElementChild;
+    if (newTr) {{
+      newTr.classList.add("flash-row");
+      tbody.insertBefore(newTr, tbody.firstChild);
+    }}
+
+    recalcLocalStats();
+  }}
+
+  function recalcLocalStats() {{
+    const total = inspectionHistory.length;
+    const pcbList = inspectionHistory.filter(r => r.disposition !== "NON-PCB");
+    const accepts = pcbList.filter(r => r.disposition === "ACCEPT").length;
+    const rejects = pcbList.filter(r => r.disposition === "REJECT").length;
+    const totalDefects = pcbList.reduce((acc, r) => acc + (r.total_defects || 0), 0);
+    const yieldPct = pcbList.length > 0 ? ((accepts / pcbList.length) * 100).toFixed(1) : "0.0";
+
+    const sTotal = document.getElementById("statTotalLogged");
+    const sYield = document.getElementById("statYieldRate");
+    const sReject = document.getElementById("statRejectCount");
+    const sDefects = document.getElementById("statTotalDefects");
+
+    if (sTotal) sTotal.textContent = total;
+    if (sYield) sYield.textContent = yieldPct + "%";
+    if (sReject) sReject.textContent = rejects;
+    if (sDefects) sDefects.textContent = totalDefects;
+  }}
+
+  function viewLoggedBoard(boardId) {{
+    if (!boardId) return;
+    if (ALL_BOARDS && ALL_BOARDS[boardId]) {{
+      switchBoard(boardId);
+      window.scrollTo({{ top: 0, behavior: "smooth" }});
+    }} else {{
+      const rec = inspectionHistory.find(r => r.board_id === boardId);
+      if (rec && rec.image_name) {{
+        alert("Board '" + boardId + "' was an uploaded or live camera inspection. Total defects logged: " + (rec.total_defects || 0) + " (" + (rec.disposition || "REVIEW") + ").");
+      }} else {{
+        alert("Selected board: " + boardId);
+      }}
+    }}
+  }}
+
+  function exportInspectionLog(format) {{
+    const isHttp = window.location.protocol.startsWith("http");
+    if (isHttp) {{
+      const endpoint = format === "csv" ? "/api/inspections/export/csv" : "/api/inspections/export?format=json";
+      window.open(endpoint, "_blank");
+      return;
+    }}
+
+    // Offline direct client blob fallback
+    if (format === "csv") {{
+      const headers = ["inspection_id", "timestamp", "board_id", "mode", "disposition", "total_defects", "max_trace_loss_pct", "max_current_density_A_m2", "risk_score", "ipc_status"];
+      const rows = [headers.join(",")];
+      for (const r of inspectionHistory) {{
+        rows.push([
+          r.inspection_id,
+          `"${{r.timestamp_readable || r.timestamp_iso || ''}}"`,
+          r.board_id,
+          r.inspection_mode,
+          r.disposition,
+          r.total_defects,
+          r.max_trace_loss_pct,
+          r.max_current_density_A_m2,
+          r.max_unified_risk_score,
+          `"${{r.ipc_classification || ''}}"`,
+        ].join(","));
+      }}
+      downloadBlob(rows.join("\\n"), "rgpis_inspection_log.csv", "text/csv");
+    }} else {{
+      const jsonStr = JSON.stringify(inspectionHistory, null, 2);
+      downloadBlob(jsonStr, "rgpis_inspection_history.json", "application/json");
+    }}
+  }}
+
+  function downloadBlob(content, filename, contentType) {{
+    const blob = new Blob([content], {{ type: contentType }});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }}
+
+  function refreshInspectionLogs() {{
+    const apiEndpoint = window.location.protocol.startsWith("http")
+      ? "/api/inspections"
+      : "http://localhost:5050/api/inspections";
+
+    fetch(apiEndpoint)
+      .then(r => r.json())
+      .then(d => {{
+        if (d.status === "success" && Array.isArray(d.history)) {{
+          inspectionHistory = d.history;
+          renderInspectionTable(d.history);
+          renderInspectionStats(d.stats);
+        }}
+      }})
+      .catch(e => {{
+        console.log("Could not refresh from live API, rendering local history:", e);
+        renderInspectionTable(inspectionHistory);
+        recalcLocalStats();
+      }});
+  }}
+
+  function clearInspectionLogs() {{
+    if (!confirm("Are you sure you want to clear all inspection history logs? This cannot be undone.")) return;
+    const apiEndpoint = window.location.protocol.startsWith("http")
+      ? "/api/inspections/clear"
+      : "http://localhost:5050/api/inspections/clear";
+
+    fetch(apiEndpoint, {{ method: "POST" }})
+      .then(r => r.json())
+      .then(d => {{
+        inspectionHistory = [];
+        renderInspectionTable([]);
+        renderInspectionStats({{ total_inspections: 0, yield_rate_pct: 0.0, reject_count: 0, total_defects_logged: 0, avg_latency_seconds: 0 }});
+      }})
+      .catch(e => {{
+        inspectionHistory = [];
+        renderInspectionTable([]);
+        renderInspectionStats({{ total_inspections: 0, yield_rate_pct: 0.0, reject_count: 0, total_defects_logged: 0, avg_latency_seconds: 0 }});
+      }});
+  }}
+
+  // Initialize Canvas & Audit Log on load
   window.onload = function() {{
     renderBBoxes();
+    if (typeof initInspectionAuditLog === "function") {{
+      initInspectionAuditLog();
+    }}
   }};
 </script>
 

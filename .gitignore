@@ -34,9 +34,4 @@ yolo26n.pt
 datasets/**/yolo/images/
 datasets/**/yolo/labels/
 
-# Android build outputs & caches
-mobile_app/.gradle/
-mobile_app/**/build/
-mobile_app/local.properties
-
 
