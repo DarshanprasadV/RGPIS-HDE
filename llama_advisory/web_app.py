@@ -69,7 +69,8 @@ def validate_pcb_domain(img: np.ndarray) -> tuple[bool, str, str]:
     """
     Validates whether an input frame or upload belongs to the PCB domain.
     Rejects human faces/skin, empty backgrounds, and blurry/featureless scenes.
-    Distinguishes human faces in the optical center from fingers holding board margins.
+    Distinguishes genuine PCB boards (including copper tracks, gold ENIG, and yellow FR4)
+    from human faces or skin by prioritizing geometric circuit trace edge energy.
     
     Returns: (is_pcb: bool, reason_code: str, user_friendly_message: str)
     """
@@ -79,9 +80,21 @@ def validate_pcb_domain(img: np.ndarray) -> tuple[bool, str, str]:
     h, w = img.shape[:2]
     total_pixels = h * w
 
-    # 1. Biological Skin Tone Detection via combined YCrCb + HSV saturation
-    # Real human skin has both characteristic Cr/Cb chrominance AND minimum HSV saturation.
-    # This prevents warm white/gray reflections from indoor lighting or LCD screens from being misclassified.
+    # 1. Circuit Structure & Trace Edge Energy (Canny)
+    # Genuine PCBs feature dense etched copper tracks, solder pads, drill vias, or SMT traces.
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    edges = cv2.Canny(gray, 50, 150)
+    edge_density = (np.count_nonzero(edges) / total_pixels) * 100.0
+
+    # 2. Scene Contrast / Dynamic Range Check
+    std_dev = float(np.std(gray))
+    if std_dev < 10.0:
+        return False, "low_contrast", (
+            f"Scene contrast too low (std={std_dev:.1f}). "
+            "Adjust lighting or move the circuit board closer to the camera lens."
+        )
+
+    # 3. Biological Skin Tone Detection via combined YCrCb + HSV saturation
     ycrcb = cv2.cvtColor(img, cv2.COLOR_BGR2YCrCb)
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     skin_ycrcb = cv2.inRange(ycrcb, np.array([0, 135, 80]), np.array([255, 175, 125]))
@@ -91,40 +104,29 @@ def validate_pcb_domain(img: np.ndarray) -> tuple[bool, str, str]:
     total_skin_pct = (np.count_nonzero(skin_mask) / total_pixels) * 100.0
 
     # Optical center inspection zone (inner 60% x 60% of frame)
-    # A person/face sits directly in the center; fingers holding a board only touch the margin.
     cx1, cy1 = int(w * 0.20), int(h * 0.20)
     cx2, cy2 = int(w * 0.80), int(h * 0.80)
     center_patch = skin_mask[cy1:cy2, cx1:cx2]
     center_area = max(1, (cx2 - cx1) * (cy2 - cy1))
     center_skin_pct = (np.count_nonzero(center_patch) / center_area) * 100.0
 
-    if center_skin_pct > 5.0 or total_skin_pct > 12.0:
+    # Real human faces or bodies have high skin percentage AND lack circuit track edges (< 1.0%).
+    # On real PCBs, warm copper traces, gold plating, and FR4 laminate fall in the YCrCb chrominance range,
+    # but exhibit high edge density (typically > 1.0% to 15%). We must NEVER reject real circuit traces!
+    if (center_skin_pct > 40.0 or total_skin_pct > 50.0) and edge_density < 1.0:
         return False, "human_subject_detected", (
-            f"Human subject or face detected ({center_skin_pct:.1f}% center skin signature). "
+            f"Human subject or face detected ({center_skin_pct:.1f}% skin signature, {edge_density:.2f}% edge density). "
             "Defect analysis paused. Please align a Printed Circuit Board inside the optical reticle."
         )
 
-    # 2. Minimum Circuit Structure / Trace Edge Energy (Canny)
-    # PCBs feature dense etched copper tracks, solder pads, drill vias, or SMT traces.
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    edges = cv2.Canny(gray, 50, 150)
-    edge_density = (np.count_nonzero(edges) / total_pixels) * 100.0
-
+    # Minimum circuit trace edge requirement (filters out blank/uniform walls, empty desks, or dark voids)
     if edge_density < 0.25:
         return False, "low_circuit_density", (
             f"Insufficient circuit trace structure detected ({edge_density:.2f}% edge density). "
             "Ensure the PCB is aligned inside the optical reticle under adequate lighting."
         )
 
-    # 3. Grayscale Illumination / Contrast Check
-    std_dev = float(np.std(gray))
-    if std_dev < 12.0:
-        return False, "low_contrast", (
-            f"Scene contrast too low (std={std_dev:.1f}). "
-            "Adjust lighting or move the circuit board closer to the camera lens."
-        )
-
-    return True, "valid_pcb", f"PCB domain verified (Center skin: {center_skin_pct:.2f}%, Trace edges: {edge_density:.2f}%)"
+    return True, "valid_pcb", f"PCB domain verified (Trace edges: {edge_density:.2f}%, Center skin: {center_skin_pct:.1f}%)"
 
 
 class RGPISHandler(http.server.SimpleHTTPRequestHandler):
