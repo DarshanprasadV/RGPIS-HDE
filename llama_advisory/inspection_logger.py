@@ -290,6 +290,63 @@ def get_inspection_stats() -> Dict[str, Any]:
     }
 
 
+def delete_inspection(inspection_id: str) -> bool:
+    """
+    Safely deletes a specific inspection log record by inspection_id
+    from both inspection_history.jsonl and inspection_log.csv.
+    """
+    ensure_log_dir()
+    if not inspection_id:
+        return False
+
+    with _LOCK:
+        try:
+            found = False
+            # 1. Update JSONL file
+            if JSONL_LOG_PATH.exists():
+                kept_jsonl = []
+                with open(JSONL_LOG_PATH, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line_str = line.strip()
+                        if not line_str:
+                            continue
+                        try:
+                            rec = json.loads(line_str)
+                            if str(rec.get("inspection_id", "")).strip() == str(inspection_id).strip():
+                                found = True
+                                continue
+                            kept_jsonl.append(line_str)
+                        except Exception:
+                            kept_jsonl.append(line_str)
+
+                with open(JSONL_LOG_PATH, "w", encoding="utf-8") as f:
+                    for l in kept_jsonl:
+                        f.write(l + "\n")
+
+            # 2. Update CSV file
+            if CSV_LOG_PATH.exists():
+                kept_csv = []
+                with open(CSV_LOG_PATH, "r", encoding="utf-8") as f:
+                    reader = csv.reader(f)
+                    header = next(reader, None)
+                    for row in reader:
+                        if row and len(row) > 0 and str(row[0]).strip() == str(inspection_id).strip():
+                            found = True
+                            continue
+                        kept_csv.append(row)
+
+                with open(CSV_LOG_PATH, "w", newline="", encoding="utf-8") as f:
+                    writer = csv.writer(f)
+                    writer.writerow(CSV_HEADERS)
+                    writer.writerows(kept_csv)
+
+            logger.info(f"Deleted inspection record '{inspection_id}' (found={found})")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to delete inspection log {inspection_id}: {e}")
+            return False
+
+
 def clear_inspection_history() -> bool:
     """Safely clears the inspection log files."""
     ensure_log_dir()

@@ -34,6 +34,7 @@ from llama_advisory.inspection_logger import (
     get_inspection_history,
     get_inspection_stats,
     clear_inspection_history,
+    delete_inspection,
     seed_benchmark_inspections_if_empty,
     CSV_LOG_PATH,
     JSONL_LOG_PATH,
@@ -216,13 +217,52 @@ class RGPISHandler(http.server.SimpleHTTPRequestHandler):
 
         return super().do_GET()
 
+    def do_DELETE(self):
+        parsed = urlparse(self.path)
+        # e.g. DELETE /api/inspections/INSP-1234
+        if parsed.path.startswith("/api/inspections/"):
+            target_id = parsed.path.split("/")[-1].strip()
+            if target_id and target_id not in ("delete", "clear"):
+                success = delete_inspection(target_id)
+                new_stats = get_inspection_stats()
+                self._send_json({
+                    "status": "success" if success else "error",
+                    "deleted_id": target_id,
+                    "stats": new_stats,
+                    "message": f"Record {target_id} deleted."
+                })
+                return
+        self._send_json({"status": "error", "message": "Endpoint not found or invalid ID."}, 404)
+
     def do_POST(self):
         parsed = urlparse(self.path)
 
-        # Clear inspection logs
+        # Clear all inspection logs
         if parsed.path == "/api/inspections/clear":
             success = clear_inspection_history()
             self._send_json({"status": "success" if success else "error", "message": "Inspection history cleared."})
+            return
+
+        # Delete single inspection log entry
+        if parsed.path == "/api/inspections/delete":
+            try:
+                content_len = int(self.headers.get("Content-Length", 0))
+                body = self.rfile.read(content_len) if content_len > 0 else b"{}"
+                req_data = json.loads(body.decode("utf-8")) if body else {}
+                target_id = req_data.get("inspection_id", "").strip()
+                if not target_id:
+                    self._send_json({"status": "error", "message": "Missing inspection_id parameter."}, 400)
+                    return
+                success = delete_inspection(target_id)
+                new_stats = get_inspection_stats()
+                self._send_json({
+                    "status": "success" if success else "error",
+                    "deleted_id": target_id,
+                    "stats": new_stats,
+                    "message": f"Inspection log {target_id} deleted successfully." if success else "Failed to delete record."
+                })
+            except Exception as e:
+                self._send_json({"status": "error", "message": str(e)}, 500)
             return
 
         if parsed.path == "/api/analyze":

@@ -3651,10 +3651,15 @@ def generate_dashboard_html(
         <td style="color:${{ceriColor}}; font-weight:600;">${{(r.max_trace_loss_pct||0).toFixed(1)}}%</td>
         <td style="font-family:'JetBrains Mono',monospace; color:var(--text-muted); font-size:11px;">${{jFmt}}</td>
         <td style="font-weight:700; color:${{riskColor}};">${{r.max_unified_risk_score||0}}/100</td>
-        <td style="text-align:center;">
-          <button class="cam-action-btn" onclick="viewLoggedBoard('${{r.board_id}}')" style="padding:3px 9px; font-size:11px; background:var(--accent-soft); border:1px solid var(--accent); color:var(--accent-text);">
-            Inspect
-          </button>
+        <td style="text-align:center; white-space:nowrap;">
+          <div style="display:inline-flex; gap:6px; align-items:center; justify-content:center;">
+            <button class="cam-action-btn" onclick="viewLoggedBoard('${{r.board_id}}')" style="padding:3px 9px; font-size:11px; background:var(--accent-soft); border:1px solid var(--accent); color:var(--accent-text); border-radius:5px; cursor:pointer;" title="Inspect board in cockpit">
+              Inspect
+            </button>
+            <button class="cam-action-btn delete-log-btn" onclick="deleteInspectionLog('${{r.inspection_id}}')" style="padding:3px 8px; font-size:11px; background:rgba(239, 68, 68, 0.12); border:1px solid rgba(239, 68, 68, 0.35); color:#f87171; border-radius:5px; cursor:pointer;" title="Delete this log entry">
+              🗑️
+            </button>
+          </div>
         </td>
       </tr>
     `;
@@ -3781,6 +3786,54 @@ def generate_dashboard_html(
       .catch(e => {{
         console.log("Could not refresh from live API, rendering local history:", e);
         renderInspectionTable(inspectionHistory);
+        recalcLocalStats();
+      }});
+  }}
+
+  function deleteInspectionLog(inspectionId) {{
+    if (!inspectionId) return;
+    if (!confirm(`Delete inspection record "${{inspectionId}}"?`)) return;
+
+    const row = document.getElementById("row-" + inspectionId);
+    if (row) {{
+      row.style.transition = "opacity 0.25s, transform 0.25s";
+      row.style.opacity = "0.3";
+    }}
+
+    const apiEndpoint = window.location.protocol.startsWith("http")
+      ? "/api/inspections/delete"
+      : "http://localhost:5050/api/inspections/delete";
+
+    fetch(apiEndpoint, {{
+      method: "POST",
+      headers: {{ "Content-Type": "application/json" }},
+      body: JSON.stringify({{ inspection_id: inspectionId }})
+    }})
+      .then(r => r.json())
+      .then(d => {{
+        if (d.status === "success") {{
+          inspectionHistory = inspectionHistory.filter(r => r.inspection_id !== inspectionId);
+          if (row) row.remove();
+          if (inspectionHistory.length === 0) {{
+            renderInspectionTable([]);
+          }}
+          if (d.stats) {{
+            renderInspectionStats(d.stats);
+          }} else {{
+            recalcLocalStats();
+          }}
+        }} else {{
+          alert("Could not delete record: " + (d.message || "Unknown error"));
+          if (row) row.style.opacity = "1";
+        }}
+      }})
+      .catch(e => {{
+        console.warn("Delete request error, removing locally:", e);
+        inspectionHistory = inspectionHistory.filter(r => r.inspection_id !== inspectionId);
+        if (row) row.remove();
+        if (inspectionHistory.length === 0) {{
+          renderInspectionTable([]);
+        }}
         recalcLocalStats();
       }});
   }}
