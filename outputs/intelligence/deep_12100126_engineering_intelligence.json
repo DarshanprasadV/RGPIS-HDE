@@ -2,7 +2,7 @@
   "metadata": {
     "board_id": "deep_12100126",
     "image_name": "deep_12100126.jpg",
-    "timestamp": "2026-11-23T13:52:49Z",
+    "timestamp": "2026-11-25T11:37:57Z",
     "total_generation_latency_seconds": 0.0,
     "runtime_backend": "ExecuTorch (XNNPACK CPU Offline Runtime)",
     "foundation_model": "Llama-3.2-1B-Instruct (4-bit SpinQuant INT4)",
@@ -25,17 +25,17 @@
     }
   },
   "board_level_intelligence": {
-    "board_condition": "CRITICAL_NON_CONFORMING (5 P1 Critical defects detected)",
-    "acceptance_rationale": "The PCB was determined as 'REJECT' based on unified scoring where critical functional defects violate IPC-A-600 Class 2/3 criteria. Immediate quarantine is mandated.",
+    "board_condition": "NON-CONFORMING (5 Critical Defects)",
+    "acceptance_rationale": "Quarantined: Board marked REJECT due to critical conductor anomalies violating IPC-A-600 Class 3. Do not power on.",
     "major_risks": [
-      "Complete trace discontinuity (open circuit) causing total signal loss or floating gate behavior.",
-      "Trace bottlenecking from mousebites induces localized current crowding and thermal stress hotspots.",
-      "Dielectric clearance erosion from copper spurs elevates risk of localized dielectric breakdown or solder bridging."
+      "Open Circuit: Broken signal trace causes complete circuit failure.",
+      "Mouse Bite: Narrowed conductor neck can overheat under operating current.",
+      "Spur: Copper protrusion encroaches on safe dielectric clearance."
     ],
     "immediate_priorities": [
-      "Defect #4 (OPEN - P1_CRITICAL): Immediate optical isolation and rework evaluation.",
-      "Defect #1 (MOUSEBITE - P1_CRITICAL): Immediate optical isolation and rework evaluation.",
-      "Defect #3 (MOUSEBITE - P1_CRITICAL): Immediate optical isolation and rework evaluation."
+      "Defect #4 (Open \u00b7 P1_CRITICAL): Solder jumper wire across broken trace",
+      "Defect #1 (Mousebite \u00b7 P1_CRITICAL): Check trace width and patch if >20% loss",
+      "Defect #3 (Mousebite \u00b7 P1_CRITICAL): Check trace width and patch if >20% loss"
     ],
     "engine": "deterministic_fallback",
     "fallback_reason": "Fast mode requested (deterministic generator)"
@@ -53,24 +53,19 @@
         407.989990234375,
         550.1199951171875
       ],
-      "what_was_detected": "Detected Open Circuit anomaly at coordinates [349.9, 494.8, 408.0, 550.1] with 82.8% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Open Circuit detected at [350, 495] with 83% confidence.",
+      "why_significant": "IPC Class 3 violation: Complete trace break cuts signal and power continuity.",
       "potential_consequences": [
-        "Loss of signal continuity across the net, causing functional circuit failure.",
-        "Disconnected power rail or floating high-impedance logic input.",
-        "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
+        "Complete circuit open (0.0 A\u00b7m\u207b\u00b2). Zero signal or power transfer through track."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [349.9, 494.8, 408.0, 550.1] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [350, 495] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "suggested_corrective_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_protocol": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -120,23 +115,19 @@
         254.25,
         275.6499938964844
       ],
-      "what_was_detected": "Detected Mouse Bite anomaly at coordinates [215.4, 244.4, 254.2, 275.6] with 87.4% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A notch, tear, or void along the edge of a copper conductor trace, reducing the effective cross-sectional conductor width.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Mouse Bite detected at [215, 244] with 87% confidence.",
+      "why_significant": "IPC Class 3 violation: Trace bottleneck creates high current density and thermal stress hotspot.",
       "potential_consequences": [
-        "Localized current crowding and increased trace resistance at the bottleneck.",
-        "Elevated localized temperature rise (hotspot) under rated current load.",
-        "Vulnerability to fatigue fracture during thermal cycling or mechanical shock.",
-        "CERI & CEIA Proxies: 95.0% trace width necking elevates localized current density to 2.25 \u00d7 10\u2079 A\u00b7m\u207b\u00b2 (20.0x crowding vs nominal J\u2080), risking severe Joule heating and thermal stress hotspots."
+        "95.0% trace necking causes 20.0x current crowding and localized Joule heating."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [215.4, 244.4, 254.2, 275.6] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [215, 244] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "Evaluate remaining trace width against DRC specification (95.0% reduction). If remaining width meets minimum current-carrying capacity, accept with engineering note. Otherwise, apply copper foil micro-patch or bridge with micro-wire.",
+      "suggested_corrective_action": "Check trace width (95.0% loss). If >20%, micro-patch with copper foil.",
       "verification_protocol": [
-        "Measure narrowest conductor bottleneck width using calibrated optical reticle microscope.",
-        "Conduct Kelvin 4-wire trace resistance measurement to verify resistance within 5% of nominal trace."
+        "Optical reticle measurement of narrowest bottleneck width.",
+        "Kelvin 4-wire resistance check against nominal trace."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -186,23 +177,19 @@
         372.6499938964844,
         262.42999267578125
       ],
-      "what_was_detected": "Detected Mouse Bite anomaly at coordinates [337.0, 231.1, 372.6, 262.4] with 83.5% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A notch, tear, or void along the edge of a copper conductor trace, reducing the effective cross-sectional conductor width.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Mouse Bite detected at [337, 231] with 84% confidence.",
+      "why_significant": "IPC Class 3 violation: Trace bottleneck creates high current density and thermal stress hotspot.",
       "potential_consequences": [
-        "Localized current crowding and increased trace resistance at the bottleneck.",
-        "Elevated localized temperature rise (hotspot) under rated current load.",
-        "Vulnerability to fatigue fracture during thermal cycling or mechanical shock.",
-        "CERI & CEIA Proxies: 95.0% trace width necking elevates localized current density to 2.25 \u00d7 10\u2079 A\u00b7m\u207b\u00b2 (20.0x crowding vs nominal J\u2080), risking severe Joule heating and thermal stress hotspots."
+        "95.0% trace necking causes 20.0x current crowding and localized Joule heating."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [337.0, 231.1, 372.6, 262.4] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [337, 231] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "Evaluate remaining trace width against DRC specification (95.0% reduction). If remaining width meets minimum current-carrying capacity, accept with engineering note. Otherwise, apply copper foil micro-patch or bridge with micro-wire.",
+      "suggested_corrective_action": "Check trace width (95.0% loss). If >20%, micro-patch with copper foil.",
       "verification_protocol": [
-        "Measure narrowest conductor bottleneck width using calibrated optical reticle microscope.",
-        "Conduct Kelvin 4-wire trace resistance measurement to verify resistance within 5% of nominal trace."
+        "Optical reticle measurement of narrowest bottleneck width.",
+        "Kelvin 4-wire resistance check against nominal trace."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -252,23 +239,19 @@
         517.510009765625,
         317.32000732421875
       ],
-      "what_was_detected": "Detected Spur anomaly at coordinates [475.0, 284.4, 517.5, 317.3] with 79.4% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Spur detected at [475, 284] with 79% confidence.",
+      "why_significant": "IPC Class 3 violation: Copper protrusion violates minimum safe dielectric clearance.",
       "potential_consequences": [
-        "Severe reduction of dielectric clearance distance to adjacent conductors.",
-        "Risk of electrical arc or dielectric breakdown during high-voltage transient events.",
-        "Potential trap for solder bridge formation during wave or reflow soldering.",
-        "CERI Proxy: 95.0% dielectric clearance reduction (0.01 mm remaining) increases susceptibility to localized capacitive cross-talk and transient dielectric breakdown."
+        "95.0% clearance loss elevates risk of capacitive cross-talk and solder bridging."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [475.0, 284.4, 517.5, 317.3] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [475, 284] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.",
+      "suggested_corrective_action": "Trim copper protrusion with micro-scraper to restore design clearance.",
       "verification_protocol": [
-        "Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).",
-        "Inspect substrate for mechanical damage or delamination."
+        "Optical clearance measurement to adjacent track.",
+        "Substrate inspection for surface gouges."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -318,23 +301,19 @@
         319.20001220703125,
         201.32000732421875
       ],
-      "what_was_detected": "Detected Spur anomaly at coordinates [285.0, 170.3, 319.2, 201.3] with 78.5% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Spur detected at [285, 170] with 79% confidence.",
+      "why_significant": "IPC Class 3 violation: Copper protrusion violates minimum safe dielectric clearance.",
       "potential_consequences": [
-        "Severe reduction of dielectric clearance distance to adjacent conductors.",
-        "Risk of electrical arc or dielectric breakdown during high-voltage transient events.",
-        "Potential trap for solder bridge formation during wave or reflow soldering.",
-        "CERI Proxy: 95.0% dielectric clearance reduction (0.01 mm remaining) increases susceptibility to localized capacitive cross-talk and transient dielectric breakdown."
+        "95.0% clearance loss elevates risk of capacitive cross-talk and solder bridging."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [285.0, 170.3, 319.2, 201.3] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [285, 170] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.",
+      "suggested_corrective_action": "Trim copper protrusion with micro-scraper to restore design clearance.",
       "verification_protocol": [
-        "Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).",
-        "Inspect substrate for mechanical damage or delamination."
+        "Optical clearance measurement to adjacent track.",
+        "Substrate inspection for surface gouges."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -384,23 +363,19 @@
         425.010009765625,
         157.8000030517578
       ],
-      "what_was_detected": "Detected Pin Hole anomaly at coordinates [399.0, 123.7, 425.0, 157.8] with 83.9% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A small circular or irregular void, pit, or penetration within a conductive trace, pad, or ground plane surface.. Evaluated with CERI geometric risk score of 0.52 and Unified Priority P2_HIGH.",
+      "what_was_detected": "Pin Hole detected at [399, 124] with 84% confidence.",
+      "why_significant": "IPC Class 3 defect: Void in conductor pad weakens solder joint and traps flux residue.",
       "potential_consequences": [
-        "Slight reduction in conductor cross-section and localized resistance increase.",
-        "If located on an SMT solder pad or via annular ring, can degrade solder joint wetting and mechanical shear strength.",
-        "Trap for chemical residues, flux, or moisture, accelerating localized dendritic corrosion.",
-        "CERI Proxy: 40.0% localized cross-sectional reduction within conductor/pad. Potential trap for corrosive soldering residues."
+        "Void weakens mechanical solder bond and can harbor corrosive residues."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [399.0, 123.7, 425.0, 157.8] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [399, 124] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "Check void diameter against IPC-A-600 limit (<= 10% conductor width). If within tolerance, document and accept. If on SMT pad, apply micro-solder touch-up.",
+      "suggested_corrective_action": "Inspect void diameter; apply micro-solder touch-up if located on SMT pad.",
       "verification_protocol": [
-        "Verify pad coplanarity and solderability if on component landing pad.",
-        "Inspect under optical reticle to confirm void does not extend to conductor edge."
+        "Inspect pad coplanarity under reticle microscope.",
+        "Solderability wetting check."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -454,11 +429,10 @@
         407.989990234375,
         550.1199951171875
       ],
-      "recommended_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "recommended_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_procedure": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -477,10 +451,10 @@
         254.25,
         275.6499938964844
       ],
-      "recommended_action": "Evaluate remaining trace width against DRC specification (95.0% reduction). If remaining width meets minimum current-carrying capacity, accept with engineering note. Otherwise, apply copper foil micro-patch or bridge with micro-wire.",
+      "recommended_action": "Check trace width (95.0% loss). If >20%, micro-patch with copper foil.",
       "verification_procedure": [
-        "Measure narrowest conductor bottleneck width using calibrated optical reticle microscope.",
-        "Conduct Kelvin 4-wire trace resistance measurement to verify resistance within 5% of nominal trace."
+        "Optical reticle measurement of narrowest bottleneck width.",
+        "Kelvin 4-wire resistance check against nominal trace."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -499,10 +473,10 @@
         372.6499938964844,
         262.42999267578125
       ],
-      "recommended_action": "Evaluate remaining trace width against DRC specification (95.0% reduction). If remaining width meets minimum current-carrying capacity, accept with engineering note. Otherwise, apply copper foil micro-patch or bridge with micro-wire.",
+      "recommended_action": "Check trace width (95.0% loss). If >20%, micro-patch with copper foil.",
       "verification_procedure": [
-        "Measure narrowest conductor bottleneck width using calibrated optical reticle microscope.",
-        "Conduct Kelvin 4-wire trace resistance measurement to verify resistance within 5% of nominal trace."
+        "Optical reticle measurement of narrowest bottleneck width.",
+        "Kelvin 4-wire resistance check against nominal trace."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -521,10 +495,10 @@
         517.510009765625,
         317.32000732421875
       ],
-      "recommended_action": "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.",
+      "recommended_action": "Trim copper protrusion with micro-scraper to restore design clearance.",
       "verification_procedure": [
-        "Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).",
-        "Inspect substrate for mechanical damage or delamination."
+        "Optical clearance measurement to adjacent track.",
+        "Substrate inspection for surface gouges."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -543,10 +517,10 @@
         319.20001220703125,
         201.32000732421875
       ],
-      "recommended_action": "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.",
+      "recommended_action": "Trim copper protrusion with micro-scraper to restore design clearance.",
       "verification_procedure": [
-        "Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).",
-        "Inspect substrate for mechanical damage or delamination."
+        "Optical clearance measurement to adjacent track.",
+        "Substrate inspection for surface gouges."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -565,28 +539,28 @@
         425.010009765625,
         157.8000030517578
       ],
-      "recommended_action": "Check void diameter against IPC-A-600 limit (<= 10% conductor width). If within tolerance, document and accept. If on SMT pad, apply micro-solder touch-up.",
+      "recommended_action": "Inspect void diameter; apply micro-solder touch-up if located on SMT pad.",
       "verification_procedure": [
-        "Verify pad coplanarity and solderability if on component landing pad.",
-        "Inspect under optical reticle to confirm void does not extend to conductor edge."
+        "Inspect pad coplanarity under reticle microscope.",
+        "Solderability wetting check."
       ],
       "assigned_station": "SMT Quality Inspection Desk",
       "sign_off_required": true
     }
   ],
   "process_intelligence": {
-    "pattern_summary": "Multivariate defect distribution with 6 total anomalies spanning both subtractive (trace loss) and additive (clearance encroachment) mechanisms.",
+    "pattern_summary": "Mixed defect distribution (6 anomalies): Both conductor necking (over-etch) and excess copper (under-etch) observed.",
     "fab_stage_hypotheses": [
-      "HYPOTHESIS (Etching Over-Rate): Co-occurrence of 1 open(s) and 2 mousebite(s) suggests potential chemical over-etching, elevated acid bath temperature, or prolonged line dwell time.",
-      "HYPOTHESIS (Incomplete Etching / Resist Scum): Detection of 0 short(s) and 2 spur(s) points to potential localized under-etching, developing spray nozzle pressure drops, or photoresist scumming.",
-      "HYPOTHESIS (Plating Aeration): 1 pin-hole void(s) detected. Possible hydrogen micro-bubble entrapment on the copper surface during acid copper electroplating or particulate contamination on phototool."
+      "Etch Tank Over-Etching (1 open, 2 mousebite): Acid bath concentration or conveyor dwell time too high.",
+      "Photolithography / Under-Etching (0 short, 2 spur): Clogged developer spray nozzles or unremoved resist residue.",
+      "Plating Aeration (1 pin-holes): Air micro-bubbles trapped on copper during electroplating."
     ],
     "recommended_investigations": [
-      "Audit chemical etchant concentration (CuCl2 / H2O2) and monitor conveyor belt feed speed.",
-      "Inspect developer manifold spray nozzles and verify UV exposure energy calibration.",
-      "Check plating bath agitation air spargers and inspect dry film laminator cleanroom roller filters."
+      "Audit CuCl\u2082 acid concentration and calibrate line conveyor speed.",
+      "Inspect developer spray nozzles and verify UV exposure energy.",
+      "Inspect air spargers in plating tank and check cleanroom air filters."
     ],
-    "disclaimer": "Hypotheses generated for engineering guidance. Validation via chemical titration and SPC logs is required.",
+    "disclaimer": "Diagnostic hypotheses for line engineering. Confirm with bath titration and SPC logs.",
     "engine": "deterministic_fallback"
   }
 }

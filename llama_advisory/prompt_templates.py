@@ -398,14 +398,14 @@ def validate_board_intelligence_output(raw_output: str, report: Dict[str, Any]) 
 
 
 def get_deterministic_board_fallback(report: Dict[str, Any], reason: str) -> Dict[str, Any]:
-    """Deterministic board intelligence generator based strictly on IPC standards."""
+    """Deterministic board intelligence generator based strictly on IPC standards - crisp executive wording."""
     summary = report.get("board_summary", {})
     defects = report.get("defects", [])
     disposition = summary.get("overall_disposition", "REJECT")
     p1_count = summary.get("critical_defects_count", 0)
     p2_count = summary.get("high_risk_count", 0)
 
-    classes = [d.get("class_name") for d in defects]
+    classes = [d.get("class_name", "") for d in defects]
     has_short = any("short" in c for c in classes)
     has_open = any("open" in c for c in classes)
     has_mousebite = any("mousebite" in c for c in classes)
@@ -413,44 +413,52 @@ def get_deterministic_board_fallback(report: Dict[str, Any], reason: str) -> Dic
 
     risks = []
     if has_short:
-        risks.append("Catastrophic short circuit creates direct low-resistance shunt path risking power rail shutdown or component burnout.")
+        risks.append("Short Circuit: Unwanted copper bridge risks frying downstream components.")
     if has_open:
-        risks.append("Complete trace discontinuity (open circuit) causing total signal loss or floating gate behavior.")
+        risks.append("Open Circuit: Broken signal trace causes complete circuit failure.")
     if has_mousebite:
-        risks.append("Trace bottlenecking from mousebites induces localized current crowding and thermal stress hotspots.")
+        risks.append("Mouse Bite: Narrowed conductor neck can overheat under operating current.")
     if has_spur:
-        risks.append("Dielectric clearance erosion from copper spurs elevates risk of localized dielectric breakdown or solder bridging.")
+        risks.append("Spur: Copper protrusion encroaches on safe dielectric clearance.")
 
     if not risks:
-        risks.append("Minor cosmetic anomalies requiring standard optical quality review.")
+        risks.append("Low Risk: Minor cosmetic blemishes within IPC Class 3 tolerances.")
 
     priorities = []
     for d in defects[:3]:
         did = d.get("defect_id")
-        cname = d.get("class_name")
-        prio = d.get("unified_score", {}).get("priority_level")
-        priorities.append(f"Defect #{did} ({cname.upper()} - {prio}): Immediate optical isolation and rework evaluation.")
+        cname = str(d.get("class_name", "defect")).replace("_", " ").title()
+        prio = d.get("unified_score", {}).get("priority_level", "P2_HIGH")
+        if "Short" in cname:
+            action_brief = "Cut copper bridge to isolate short"
+        elif "Open" in cname:
+            action_brief = "Solder jumper wire across broken trace"
+        elif "Mouse" in cname:
+            action_brief = "Check trace width and patch if >20% loss"
+        elif "Spur" in cname:
+            action_brief = "Trim copper spur to restore spacing"
+        else:
+            action_brief = "Optical verification and cleaning"
+        priorities.append(f"Defect #{did} ({cname} · {prio}): {action_brief}")
 
     if disposition == "ACCEPT" or len(defects) == 0:
-        cond_str = "CONFORMING_CLASS_3 (0 Defects detected)"
-        rationale = (
-            "The PCB conforms fully to IPC-A-600 Class 3 acceptance criteria with zero detectable trace anomalies. "
-            "Production release approved."
-        )
+        cond_str = "CONFORMING (0 Defects Detected)"
+        rationale = "Approved: Board meets all IPC-A-600 Class 3 specifications with zero critical trace defects."
         if not risks:
-            risks = ["No operational, dielectric, or thermal reliability risks identified."]
+            risks = ["No operational or thermal reliability risks identified."]
         if not priorities:
             priorities = ["Standard post-inspection cleaning and packaging."]
     else:
         cond_str = (
-            f"CRITICAL_NON_CONFORMING ({p1_count} P1 Critical defects detected)"
+            f"NON-CONFORMING ({p1_count} Critical Defect{'s' if p1_count != 1 else ''})"
             if disposition == "REJECT" else
-            f"MARGINAL_REVIEW_REQUIRED ({p2_count} High-risk defects requiring review)"
+            f"MARGINAL REVIEW ({p2_count} High-Risk Defect{'s' if p2_count != 1 else ''})"
         )
 
         rationale = (
-            f"The PCB was determined as '{disposition}' based on unified scoring where critical functional defects "
-            f"violate IPC-A-600 Class 2/3 criteria. Immediate quarantine is mandated."
+            f"Quarantined: Board marked {disposition} due to critical conductor anomalies violating IPC-A-600 Class 3. Do not power on."
+            if disposition == "REJECT" else
+            "Review Required: Conductor anomalies require engineering sign-off before assembly."
         )
 
     return {
@@ -584,9 +592,9 @@ def validate_process_intelligence_output(raw_output: str) -> Tuple[bool, Dict[st
 
 
 def get_deterministic_process_fallback(report: Dict[str, Any]) -> Dict[str, Any]:
-    """Deterministic process intelligence generator."""
+    """Deterministic process intelligence generator with concise plain-English hypotheses."""
     defects = report.get("defects", [])
-    classes = [d.get("class_name") for d in defects]
+    classes = [d.get("class_name", "") for d in defects]
 
     hypotheses = []
     investigations = []
@@ -600,40 +608,47 @@ def get_deterministic_process_fallback(report: Dict[str, Any]) -> Dict[str, Any]
 
     if opens > 0 or mousebites > 0:
         hypotheses.append(
-            f"HYPOTHESIS (Etching Over-Rate): Co-occurrence of {opens} open(s) and {mousebites} mousebite(s) "
-            "suggests potential chemical over-etching, elevated acid bath temperature, or prolonged line dwell time."
+            f"Etch Tank Over-Etching ({opens} open, {mousebites} mousebite): Acid bath concentration or conveyor dwell time too high."
         )
-        investigations.append("Audit chemical etchant concentration (CuCl2 / H2O2) and monitor conveyor belt feed speed.")
+        investigations.append("Audit CuCl₂ acid concentration and calibrate line conveyor speed.")
 
     if shorts > 0 or spurs > 0:
         hypotheses.append(
-            f"HYPOTHESIS (Incomplete Etching / Resist Scum): Detection of {shorts} short(s) and {spurs} spur(s) "
-            "points to potential localized under-etching, developing spray nozzle pressure drops, or photoresist scumming."
+            f"Photolithography / Under-Etching ({shorts} short, {spurs} spur): Clogged developer spray nozzles or unremoved resist residue."
         )
-        investigations.append("Inspect developer manifold spray nozzles and verify UV exposure energy calibration.")
+        investigations.append("Inspect developer spray nozzles and verify UV exposure energy.")
 
     if pinholes > 0:
         hypotheses.append(
-            f"HYPOTHESIS (Plating Aeration): {pinholes} pin-hole void(s) detected. Possible hydrogen micro-bubble "
-            "entrapment on the copper surface during acid copper electroplating or particulate contamination on phototool."
+            f"Plating Aeration ({pinholes} pin-holes): Air micro-bubbles trapped on copper during electroplating."
         )
-        investigations.append("Check plating bath agitation air spargers and inspect dry film laminator cleanroom roller filters.")
+        investigations.append("Inspect air spargers in plating tank and check cleanroom air filters.")
 
     if coppers > 0:
         hypotheses.append(
-            f"HYPOTHESIS (Resist Stripping Residue): {coppers} spurious copper island(s) indicate incomplete photoresist "
-            "stripping or re-deposition of unetched copper flakes in post-etch rinse tanks."
+            f"Stripping Tank Residue ({coppers} copper flakes): Incomplete photoresist stripping or copper flake redeposition."
         )
-        investigations.append("Inspect stripping chamber fluid filtration and rinse tank cascade replenishment.")
+        investigations.append("Clean stripping chamber filters and refresh cascade rinse bath.")
+
+    if not hypotheses:
+        hypotheses.append("No abnormal fabrication stage trends detected across panel.")
+        investigations.append("Maintain standard line SPC monitoring.")
+
+    pattern = (
+        f"Mixed defect distribution ({len(defects)} anomalies): Both conductor necking (over-etch) and excess copper (under-etch) observed."
+        if (opens or mousebites) and (shorts or spurs or coppers) else
+        f"Trace thinning trend ({len(defects)} anomalies): Over-etching characteristics dominant."
+        if (opens or mousebites) else
+        f"Excess copper trend ({len(defects)} anomalies): Under-etching or resist scumming dominant."
+        if (shorts or spurs or coppers) else
+        f"Standard surface inspection ({len(defects)} anomalies)."
+    )
 
     return {
-        "pattern_summary": (
-            f"Multivariate defect distribution with {len(defects)} total anomalies spanning both subtractive (trace loss) "
-            "and additive (clearance encroachment) mechanisms."
-        ),
+        "pattern_summary": pattern,
         "fab_stage_hypotheses": hypotheses,
         "recommended_investigations": investigations,
-        "disclaimer": "Hypotheses generated for engineering guidance. Validation via chemical titration and SPC logs is required.",
+        "disclaimer": "Diagnostic hypotheses for line engineering. Confirm with bath titration and SPC logs.",
         "engine": "deterministic_fallback"
     }
 

@@ -2,7 +2,7 @@
   "metadata": {
     "board_id": "deep_50600035",
     "image_name": "deep_50600035.jpg",
-    "timestamp": "2026-11-23T13:52:49Z",
+    "timestamp": "2026-11-25T11:37:59Z",
     "total_generation_latency_seconds": 0.0,
     "runtime_backend": "ExecuTorch (XNNPACK CPU Offline Runtime)",
     "foundation_model": "Llama-3.2-1B-Instruct (4-bit SpinQuant INT4)",
@@ -25,17 +25,17 @@
     }
   },
   "board_level_intelligence": {
-    "board_condition": "CRITICAL_NON_CONFORMING (14 P1 Critical defects detected)",
-    "acceptance_rationale": "The PCB was determined as 'REJECT' based on unified scoring where critical functional defects violate IPC-A-600 Class 2/3 criteria. Immediate quarantine is mandated.",
+    "board_condition": "NON-CONFORMING (14 Critical Defects)",
+    "acceptance_rationale": "Quarantined: Board marked REJECT due to critical conductor anomalies violating IPC-A-600 Class 3. Do not power on.",
     "major_risks": [
-      "Catastrophic short circuit creates direct low-resistance shunt path risking power rail shutdown or component burnout.",
-      "Complete trace discontinuity (open circuit) causing total signal loss or floating gate behavior.",
-      "Dielectric clearance erosion from copper spurs elevates risk of localized dielectric breakdown or solder bridging."
+      "Short Circuit: Unwanted copper bridge risks frying downstream components.",
+      "Open Circuit: Broken signal trace causes complete circuit failure.",
+      "Spur: Copper protrusion encroaches on safe dielectric clearance."
     ],
     "immediate_priorities": [
-      "Defect #1 (OPEN - P1_CRITICAL): Immediate optical isolation and rework evaluation.",
-      "Defect #3 (OPEN - P1_CRITICAL): Immediate optical isolation and rework evaluation.",
-      "Defect #4 (OPEN - P1_CRITICAL): Immediate optical isolation and rework evaluation."
+      "Defect #1 (Open \u00b7 P1_CRITICAL): Solder jumper wire across broken trace",
+      "Defect #3 (Open \u00b7 P1_CRITICAL): Solder jumper wire across broken trace",
+      "Defect #4 (Open \u00b7 P1_CRITICAL): Solder jumper wire across broken trace"
     ],
     "engine": "deterministic_fallback",
     "fallback_reason": "Fast mode requested (deterministic generator)"
@@ -53,24 +53,19 @@
         228.52000427246094,
         519.8800048828125
       ],
-      "what_was_detected": "Detected Open Circuit anomaly at coordinates [188.9, 485.2, 228.5, 519.9] with 84.8% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Open Circuit detected at [189, 485] with 85% confidence.",
+      "why_significant": "IPC Class 3 violation: Complete trace break cuts signal and power continuity.",
       "potential_consequences": [
-        "Loss of signal continuity across the net, causing functional circuit failure.",
-        "Disconnected power rail or floating high-impedance logic input.",
-        "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
+        "Complete circuit open (0.0 A\u00b7m\u207b\u00b2). Zero signal or power transfer through track."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [188.9, 485.2, 228.5, 519.9] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [189, 485] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "suggested_corrective_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_protocol": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -120,24 +115,19 @@
         590.1599731445312,
         496.1000061035156
       ],
-      "what_was_detected": "Detected Open Circuit anomaly at coordinates [489.4, 462.1, 590.2, 496.1] with 82.0% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Open Circuit detected at [489, 462] with 82% confidence.",
+      "why_significant": "IPC Class 3 violation: Complete trace break cuts signal and power continuity.",
       "potential_consequences": [
-        "Loss of signal continuity across the net, causing functional circuit failure.",
-        "Disconnected power rail or floating high-impedance logic input.",
-        "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
+        "Complete circuit open (0.0 A\u00b7m\u207b\u00b2). Zero signal or power transfer through track."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [489.4, 462.1, 590.2, 496.1] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [489, 462] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "suggested_corrective_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_protocol": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -187,24 +177,19 @@
         185.86000061035156,
         495.7799987792969
       ],
-      "what_was_detected": "Detected Open Circuit anomaly at coordinates [84.4, 462.3, 185.9, 495.8] with 78.9% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Open Circuit detected at [84, 462] with 79% confidence.",
+      "why_significant": "IPC Class 3 violation: Complete trace break cuts signal and power continuity.",
       "potential_consequences": [
-        "Loss of signal continuity across the net, causing functional circuit failure.",
-        "Disconnected power rail or floating high-impedance logic input.",
-        "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
+        "Complete circuit open (0.0 A\u00b7m\u207b\u00b2). Zero signal or power transfer through track."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [84.4, 462.3, 185.9, 495.8] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [84, 462] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "suggested_corrective_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_protocol": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -254,24 +239,19 @@
         184.14999389648438,
         425.989990234375
       ],
-      "what_was_detected": "Detected Open Circuit anomaly at coordinates [123.4, 365.6, 184.1, 426.0] with 78.5% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Open Circuit detected at [123, 366] with 79% confidence.",
+      "why_significant": "IPC Class 3 violation: Complete trace break cuts signal and power continuity.",
       "potential_consequences": [
-        "Loss of signal continuity across the net, causing functional circuit failure.",
-        "Disconnected power rail or floating high-impedance logic input.",
-        "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
+        "Complete circuit open (0.0 A\u00b7m\u207b\u00b2). Zero signal or power transfer through track."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [123.4, 365.6, 184.1, 426.0] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [123, 366] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "suggested_corrective_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_protocol": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -321,24 +301,19 @@
         160.47999572753906,
         288.07000732421875
       ],
-      "what_was_detected": "Detected Open Circuit anomaly at coordinates [82.4, 258.1, 160.5, 288.1] with 77.7% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Open Circuit detected at [82, 258] with 78% confidence.",
+      "why_significant": "IPC Class 3 violation: Complete trace break cuts signal and power continuity.",
       "potential_consequences": [
-        "Loss of signal continuity across the net, causing functional circuit failure.",
-        "Disconnected power rail or floating high-impedance logic input.",
-        "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
+        "Complete circuit open (0.0 A\u00b7m\u207b\u00b2). Zero signal or power transfer through track."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [82.4, 258.1, 160.5, 288.1] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [82, 258] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "suggested_corrective_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_protocol": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -388,24 +363,19 @@
         219.1699981689453,
         298.5
       ],
-      "what_was_detected": "Detected Short Circuit anomaly at coordinates [175.9, 267.5, 219.2, 298.5] with 73.9% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: An unintended conductive copper bridge, solder splash, or copper filament connecting two electrically distinct conductor traces or pads.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Short Circuit detected at [176, 268] with 74% confidence.",
+      "why_significant": "IPC Class 3 violation: Conductive bridge connects separate tracks, risking direct electrical short.",
       "potential_consequences": [
-        "Direct low-resistance path between distinct signals, ground, or power rails.",
-        "Severe overcurrent risk capable of damaging downstream integrated circuits or power supplies upon energization.",
-        "Nuisance tripping of power supply protection circuitry.",
-        "CEIA Proxy: Shunt bridge creates severe surge current density (1.07 \u00d7 10\u2079 A\u00b7m\u207b\u00b2), risking power rail shutdown and catastrophic conductor trace vaporization."
+        "Direct shunt bridge creates surge current (1.07 \u00d7 10\u2079 A\u00b7m\u207b\u00b2), risking component burnout."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [175.9, 267.5, 219.2, 298.5] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [176, 268] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "Quarantine board immediately. Do not power up. Using a precision micro-scalpel or ultrasonic deburring tool under 30x magnification, carefully excise the conductive copper bridge without scoring the FR4 substrate.",
+      "suggested_corrective_action": "Carefully excise copper bridge using micro-scalpel under 30x magnification.",
       "verification_protocol": [
-        "Perform 2-point isolation resistance measurement with DMM (> 100 MOhm isolation required).",
-        "Perform optical clearance verification to ensure minimum electrical spacing is fully restored.",
-        "Clean region with reagent-grade isopropyl alcohol and inspect for loose copper debris."
+        "DMM isolation resistance test (> 100 M\u03a9 between nets).",
+        "Optical check to confirm full clearance spacing."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -455,24 +425,19 @@
         592.0,
         83.7699966430664
       ],
-      "what_was_detected": "Detected Open Circuit anomaly at coordinates [486.1, 47.1, 592.0, 83.8] with 73.4% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Open Circuit detected at [486, 47] with 73% confidence.",
+      "why_significant": "IPC Class 3 violation: Complete trace break cuts signal and power continuity.",
       "potential_consequences": [
-        "Loss of signal continuity across the net, causing functional circuit failure.",
-        "Disconnected power rail or floating high-impedance logic input.",
-        "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
+        "Complete circuit open (0.0 A\u00b7m\u207b\u00b2). Zero signal or power transfer through track."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [486.1, 47.1, 592.0, 83.8] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [486, 47] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "suggested_corrective_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_protocol": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -522,24 +487,19 @@
         163.13999938964844,
         82.45999908447266
       ],
-      "what_was_detected": "Detected Open Circuit anomaly at coordinates [17.8, 48.8, 163.1, 82.5] with 73.3% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Open Circuit detected at [18, 49] with 73% confidence.",
+      "why_significant": "IPC Class 3 violation: Complete trace break cuts signal and power continuity.",
       "potential_consequences": [
-        "Loss of signal continuity across the net, causing functional circuit failure.",
-        "Disconnected power rail or floating high-impedance logic input.",
-        "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
+        "Complete circuit open (0.0 A\u00b7m\u207b\u00b2). Zero signal or power transfer through track."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [17.8, 48.8, 163.1, 82.5] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [18, 49] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "suggested_corrective_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_protocol": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -589,24 +549,19 @@
         365.8800048828125,
         546.9500122070312
       ],
-      "what_was_detected": "Detected Open Circuit anomaly at coordinates [284.7, 517.7, 365.9, 547.0] with 72.6% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Open Circuit detected at [285, 518] with 73% confidence.",
+      "why_significant": "IPC Class 3 violation: Complete trace break cuts signal and power continuity.",
       "potential_consequences": [
-        "Loss of signal continuity across the net, causing functional circuit failure.",
-        "Disconnected power rail or floating high-impedance logic input.",
-        "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
+        "Complete circuit open (0.0 A\u00b7m\u207b\u00b2). Zero signal or power transfer through track."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [284.7, 517.7, 365.9, 547.0] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [285, 518] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "suggested_corrective_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_protocol": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -656,24 +611,19 @@
         26.209999084472656,
         550.47998046875
       ],
-      "what_was_detected": "Detected Open Circuit anomaly at coordinates [0.0, 515.0, 26.2, 550.5] with 69.2% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Open Circuit detected at [0, 515] with 69% confidence.",
+      "why_significant": "IPC Class 3 violation: Complete trace break cuts signal and power continuity.",
       "potential_consequences": [
-        "Loss of signal continuity across the net, causing functional circuit failure.",
-        "Disconnected power rail or floating high-impedance logic input.",
-        "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
+        "Complete circuit open (0.0 A\u00b7m\u207b\u00b2). Zero signal or power transfer through track."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [0.0, 515.0, 26.2, 550.5] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [0, 515] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "suggested_corrective_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_protocol": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -723,24 +673,19 @@
         571.8099975585938,
         288.4200134277344
       ],
-      "what_was_detected": "Detected Open Circuit anomaly at coordinates [460.3, 256.7, 571.8, 288.4] with 63.8% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Open Circuit detected at [460, 257] with 64% confidence.",
+      "why_significant": "IPC Class 3 violation: Complete trace break cuts signal and power continuity.",
       "potential_consequences": [
-        "Loss of signal continuity across the net, causing functional circuit failure.",
-        "Disconnected power rail or floating high-impedance logic input.",
-        "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
+        "Complete circuit open (0.0 A\u00b7m\u207b\u00b2). Zero signal or power transfer through track."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [460.3, 256.7, 571.8, 288.4] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [460, 257] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "suggested_corrective_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_protocol": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -790,24 +735,19 @@
         431.25,
         136.9499969482422
       ],
-      "what_was_detected": "Detected Open Circuit anomaly at coordinates [283.4, 102.6, 431.2, 136.9] with 55.3% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Open Circuit detected at [283, 103] with 55% confidence.",
+      "why_significant": "IPC Class 3 violation: Complete trace break cuts signal and power continuity.",
       "potential_consequences": [
-        "Loss of signal continuity across the net, causing functional circuit failure.",
-        "Disconnected power rail or floating high-impedance logic input.",
-        "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
+        "Complete circuit open (0.0 A\u00b7m\u207b\u00b2). Zero signal or power transfer through track."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [283.4, 102.6, 431.2, 136.9] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [283, 103] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "suggested_corrective_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_protocol": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -857,24 +797,19 @@
         362.2699890136719,
         340.6099853515625
       ],
-      "what_was_detected": "Detected Open Circuit anomaly at coordinates [282.4, 311.3, 362.3, 340.6] with 51.1% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A complete physical discontinuity or break along a conductive copper trace or via pad, interrupting electrical connection.. Evaluated with CERI geometric risk score of 1.00 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Open Circuit detected at [282, 311] with 51% confidence.",
+      "why_significant": "IPC Class 3 violation: Complete trace break cuts signal and power continuity.",
       "potential_consequences": [
-        "Loss of signal continuity across the net, causing functional circuit failure.",
-        "Disconnected power rail or floating high-impedance logic input.",
-        "Intermittent operation under thermal expansion and mechanical vibration.",
-        "CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A\u00b7m\u207b\u00b2). Complete circuit open with zero current transfer."
+        "Complete circuit open (0.0 A\u00b7m\u207b\u00b2). Zero signal or power transfer through track."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [282.4, 311.3, 362.3, 340.6] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [282, 311] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "suggested_corrective_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_protocol": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -924,23 +859,19 @@
         250.6199951171875,
         259.92999267578125
       ],
-      "what_was_detected": "Detected Spur anomaly at coordinates [213.4, 230.1, 250.6, 259.9] with 78.4% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: An unwanted sharp or irregular copper protrusion extending outward from a trace boundary into the adjacent dielectric spacing.. Evaluated with CERI geometric risk score of 0.97 and Unified Priority P1_CRITICAL.",
+      "what_was_detected": "Spur detected at [213, 230] with 78% confidence.",
+      "why_significant": "IPC Class 3 violation: Copper protrusion violates minimum safe dielectric clearance.",
       "potential_consequences": [
-        "Severe reduction of dielectric clearance distance to adjacent conductors.",
-        "Risk of electrical arc or dielectric breakdown during high-voltage transient events.",
-        "Potential trap for solder bridge formation during wave or reflow soldering.",
-        "CERI Proxy: 95.0% dielectric clearance reduction (0.01 mm remaining) increases susceptibility to localized capacitive cross-talk and transient dielectric breakdown."
+        "95.0% clearance loss elevates risk of capacitive cross-talk and solder bridging."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [213.4, 230.1, 250.6, 259.9] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [213, 230] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.",
+      "suggested_corrective_action": "Trim copper protrusion with micro-scraper to restore design clearance.",
       "verification_protocol": [
-        "Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).",
-        "Inspect substrate for mechanical damage or delamination."
+        "Optical clearance measurement to adjacent track.",
+        "Substrate inspection for surface gouges."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -990,23 +921,19 @@
         303.6700134277344,
         159.9600067138672
       ],
-      "what_was_detected": "Detected Pin Hole anomaly at coordinates [267.0, 127.3, 303.7, 160.0] with 83.8% optical model confidence.",
-      "why_significant": "IPC-A-600 Class 2/3 violation: A small circular or irregular void, pit, or penetration within a conductive trace, pad, or ground plane surface.. Evaluated with CERI geometric risk score of 0.52 and Unified Priority P2_HIGH.",
+      "what_was_detected": "Pin Hole detected at [267, 127] with 84% confidence.",
+      "why_significant": "IPC Class 3 defect: Void in conductor pad weakens solder joint and traps flux residue.",
       "potential_consequences": [
-        "Slight reduction in conductor cross-section and localized resistance increase.",
-        "If located on an SMT solder pad or via annular ring, can degrade solder joint wetting and mechanical shear strength.",
-        "Trap for chemical residues, flux, or moisture, accelerating localized dendritic corrosion.",
-        "CERI Proxy: 40.0% localized cross-sectional reduction within conductor/pad. Potential trap for corrosive soldering residues."
+        "Void weakens mechanical solder bond and can harbor corrosive residues."
       ],
       "region_inspection_points": [
-        "Position stereo microscope directly over bounding coordinates [267.0, 127.3, 303.7, 160.0] under 20x-30x magnification.",
-        "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-        "Overlay Gerber reference net to confirm original intended conductor boundaries."
+        "Inspect coordinates [267, 127] under 20x stereomicroscope.",
+        "Verify conductor sidewall geometry against CAD/Gerber net reference."
       ],
-      "suggested_corrective_action": "Check void diameter against IPC-A-600 limit (<= 10% conductor width). If within tolerance, document and accept. If on SMT pad, apply micro-solder touch-up.",
+      "suggested_corrective_action": "Inspect void diameter; apply micro-solder touch-up if located on SMT pad.",
       "verification_protocol": [
-        "Verify pad coplanarity and solderability if on component landing pad.",
-        "Inspect under optical reticle to confirm void does not extend to conductor edge."
+        "Inspect pad coplanarity under reticle microscope.",
+        "Solderability wetting check."
       ],
       "ceri_metrics": {
         "metric_name": "Critical Engineering Risk Index (CERI)",
@@ -1060,11 +987,10 @@
         228.52000427246094,
         519.8800048828125
       ],
-      "recommended_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "recommended_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_procedure": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -1083,11 +1009,10 @@
         590.1599731445312,
         496.1000061035156
       ],
-      "recommended_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "recommended_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_procedure": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -1106,11 +1031,10 @@
         185.86000061035156,
         495.7799987792969
       ],
-      "recommended_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "recommended_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_procedure": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -1129,11 +1053,10 @@
         184.14999389648438,
         425.989990234375
       ],
-      "recommended_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "recommended_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_procedure": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -1152,11 +1075,10 @@
         160.47999572753906,
         288.07000732421875
       ],
-      "recommended_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "recommended_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_procedure": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -1175,11 +1097,10 @@
         219.1699981689453,
         298.5
       ],
-      "recommended_action": "Quarantine board immediately. Do not power up. Using a precision micro-scalpel or ultrasonic deburring tool under 30x magnification, carefully excise the conductive copper bridge without scoring the FR4 substrate.",
+      "recommended_action": "Carefully excise copper bridge using micro-scalpel under 30x magnification.",
       "verification_procedure": [
-        "Perform 2-point isolation resistance measurement with DMM (> 100 MOhm isolation required).",
-        "Perform optical clearance verification to ensure minimum electrical spacing is fully restored.",
-        "Clean region with reagent-grade isopropyl alcohol and inspect for loose copper debris."
+        "DMM isolation resistance test (> 100 M\u03a9 between nets).",
+        "Optical check to confirm full clearance spacing."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -1198,11 +1119,10 @@
         592.0,
         83.7699966430664
       ],
-      "recommended_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "recommended_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_procedure": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -1221,11 +1141,10 @@
         163.13999938964844,
         82.45999908447266
       ],
-      "recommended_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "recommended_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_procedure": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -1244,11 +1163,10 @@
         365.8800048828125,
         546.9500122070312
       ],
-      "recommended_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "recommended_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_procedure": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -1267,11 +1185,10 @@
         26.209999084472656,
         550.47998046875
       ],
-      "recommended_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "recommended_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_procedure": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -1290,11 +1207,10 @@
         571.8099975585938,
         288.4200134277344
       ],
-      "recommended_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "recommended_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_procedure": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -1313,11 +1229,10 @@
         431.25,
         136.9499969482422
       ],
-      "recommended_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "recommended_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_procedure": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -1336,11 +1251,10 @@
         362.2699890136719,
         340.6099853515625
       ],
-      "recommended_action": "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads.",
+      "recommended_action": "Solder 30 AWG insulated micro-jumper wire across break or scrap board.",
       "verification_procedure": [
-        "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-        "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-        "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace."
+        "DMM continuity test (< 0.5 \u03a9 across net endpoints).",
+        "Visual inspection under 20x magnification."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -1359,10 +1273,10 @@
         250.6199951171875,
         259.92999267578125
       ],
-      "recommended_action": "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification.",
+      "recommended_action": "Trim copper protrusion with micro-scraper to restore design clearance.",
       "verification_procedure": [
-        "Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).",
-        "Inspect substrate for mechanical damage or delamination."
+        "Optical clearance measurement to adjacent track.",
+        "Substrate inspection for surface gouges."
       ],
       "assigned_station": "Precision Micro-Rework Station",
       "sign_off_required": true
@@ -1381,28 +1295,28 @@
         303.6700134277344,
         159.9600067138672
       ],
-      "recommended_action": "Check void diameter against IPC-A-600 limit (<= 10% conductor width). If within tolerance, document and accept. If on SMT pad, apply micro-solder touch-up.",
+      "recommended_action": "Inspect void diameter; apply micro-solder touch-up if located on SMT pad.",
       "verification_procedure": [
-        "Verify pad coplanarity and solderability if on component landing pad.",
-        "Inspect under optical reticle to confirm void does not extend to conductor edge."
+        "Inspect pad coplanarity under reticle microscope.",
+        "Solderability wetting check."
       ],
       "assigned_station": "SMT Quality Inspection Desk",
       "sign_off_required": true
     }
   ],
   "process_intelligence": {
-    "pattern_summary": "Multivariate defect distribution with 15 total anomalies spanning both subtractive (trace loss) and additive (clearance encroachment) mechanisms.",
+    "pattern_summary": "Mixed defect distribution (15 anomalies): Both conductor necking (over-etch) and excess copper (under-etch) observed.",
     "fab_stage_hypotheses": [
-      "HYPOTHESIS (Etching Over-Rate): Co-occurrence of 12 open(s) and 0 mousebite(s) suggests potential chemical over-etching, elevated acid bath temperature, or prolonged line dwell time.",
-      "HYPOTHESIS (Incomplete Etching / Resist Scum): Detection of 1 short(s) and 1 spur(s) points to potential localized under-etching, developing spray nozzle pressure drops, or photoresist scumming.",
-      "HYPOTHESIS (Plating Aeration): 1 pin-hole void(s) detected. Possible hydrogen micro-bubble entrapment on the copper surface during acid copper electroplating or particulate contamination on phototool."
+      "Etch Tank Over-Etching (12 open, 0 mousebite): Acid bath concentration or conveyor dwell time too high.",
+      "Photolithography / Under-Etching (1 short, 1 spur): Clogged developer spray nozzles or unremoved resist residue.",
+      "Plating Aeration (1 pin-holes): Air micro-bubbles trapped on copper during electroplating."
     ],
     "recommended_investigations": [
-      "Audit chemical etchant concentration (CuCl2 / H2O2) and monitor conveyor belt feed speed.",
-      "Inspect developer manifold spray nozzles and verify UV exposure energy calibration.",
-      "Check plating bath agitation air spargers and inspect dry film laminator cleanroom roller filters."
+      "Audit CuCl\u2082 acid concentration and calibrate line conveyor speed.",
+      "Inspect developer spray nozzles and verify UV exposure energy.",
+      "Inspect air spargers in plating tank and check cleanroom air filters."
     ],
-    "disclaimer": "Hypotheses generated for engineering guidance. Validation via chemical titration and SPC logs is required.",
+    "disclaimer": "Diagnostic hypotheses for line engineering. Confirm with bath titration and SPC logs.",
     "engine": "deterministic_fallback"
   }
 }

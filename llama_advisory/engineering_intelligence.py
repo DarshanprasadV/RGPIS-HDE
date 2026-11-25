@@ -156,123 +156,88 @@ class EngineeringIntelligenceEngine:
         canonical_type = alias_map.get(cname.lower(), cname.lower())
         ref = self.kb.get("defects", {}).get(canonical_type, {})
 
-        # Default factual descriptions grounded in IPC knowledge base
+        # Default factual descriptions grounded in IPC knowledge base - concise executive phrasing
         display_name = ref.get("display_name", cname.replace("_", " ").title())
         what_detected = (
-            f"Detected {display_name} anomaly at coordinates [{bbox[0]:.1f}, {bbox[1]:.1f}, {bbox[2]:.1f}, {bbox[3]:.1f}] "
-            f"with {conf * 100:.1f}% optical model confidence."
+            f"{display_name} detected at [{bbox[0]:.0f}, {bbox[1]:.0f}] with {conf * 100:.0f}% confidence."
         )
 
-        why_significant = (
-            f"IPC-A-600 Class 2/3 violation: {ref.get('definition', 'Conductor boundary deviation')}. "
-            f"Evaluated with CERI geometric risk score of {ceri.get('geometric_risk_score', 0.5):.2f} "
-            f"and Unified Priority {unified.get('priority_level', 'P2_HIGH')}."
+        sig_map = {
+            "open_circuit": "IPC Class 3 violation: Complete trace break cuts signal and power continuity.",
+            "short_circuit": "IPC Class 3 violation: Conductive bridge connects separate tracks, risking direct electrical short.",
+            "mouse_bite": "IPC Class 3 violation: Trace bottleneck creates high current density and thermal stress hotspot.",
+            "spur": "IPC Class 3 violation: Copper protrusion violates minimum safe dielectric clearance.",
+            "spurious_copper": "IPC Class 3 violation: Unetched copper island risks dislodging and causing bridge.",
+            "pin_hole": "IPC Class 3 defect: Void in conductor pad weakens solder joint and traps flux residue.",
+        }
+        why_significant = sig_map.get(
+            canonical_type,
+            f"IPC-A-600 violation: Conductor boundary deviation with Unified Priority {unified.get('priority_level', 'P2_HIGH')}."
         )
 
         consequences = list(ref.get("possible_consequences", []))
-        # Append CERI & CEIA proxy groundings
+        # Append CERI & CEIA proxy groundings in 1 crisp line
         if "open" in canonical_type:
-            consequences.append("CEIA Proxy: Nodal conductance factor G=0.0 (J = 0.0 A·m⁻²). Complete circuit open with zero current transfer.")
+            consequences = ["Complete circuit open (0.0 A·m⁻²). Zero signal or power transfer through track."]
         elif "short" in canonical_type:
             j_str = ceia.get("current_density_str", "1.07 × 10⁹ A·m⁻²")
-            consequences.append(
-                f"CEIA Proxy: Shunt bridge creates severe surge current density ({j_str}), "
-                "risking power rail shutdown and catastrophic conductor trace vaporization."
-            )
+            consequences = [f"Direct shunt bridge creates surge current ({j_str}), risking component burnout."]
         elif "mouse" in canonical_type:
             red = ceri.get("trace_width_reduction_pct", 30)
-            j_str = ceia.get("current_density_str", f"{ceia.get('current_density_multiplier', 1.5)}x")
             j_mult = ceia.get("current_density_multiplier", 1.5)
-            consequences.append(
-                f"CERI & CEIA Proxies: {red}% trace width necking elevates localized current density to {j_str} "
-                f"({j_mult}x crowding vs nominal J₀), risking severe Joule heating and thermal stress hotspots."
-            )
+            consequences = [f"{red}% trace necking causes {j_mult}x current crowding and localized Joule heating."]
         elif "spur" in canonical_type:
             red = ceri.get("clearance_intrusion_pct", 50)
-            rem = ceri.get("clearance_remaining_mm", 0.05)
-            consequences.append(
-                f"CERI Proxy: {red}% dielectric clearance reduction ({rem} mm remaining) increases susceptibility to "
-                "localized capacitive cross-talk and transient dielectric breakdown."
-            )
+            consequences = [f"{red}% clearance loss elevates risk of capacitive cross-talk and solder bridging."]
         elif "copper" in canonical_type:
-            c_red = ceri.get("clearance_intrusion_pct", 40)
-            consequences.append(
-                f"CERI Proxy: {c_red}% clearance encroachment from isolated copper island increases capacitive coupling "
-                "and risk of dislodgement during mechanical shock."
-            )
+            consequences = ["Isolated copper flake risks short-circuiting adjacent traces under vibration."]
         elif "pin" in canonical_type:
-            t_red = ceri.get("trace_width_reduction_pct", 15)
-            consequences.append(
-                f"CERI Proxy: {t_red}% localized cross-sectional reduction within conductor/pad. "
-                "Potential trap for corrosive soldering residues."
-            )
+            consequences = ["Void weakens mechanical solder bond and can harbor corrosive residues."]
 
         region_inspection = [
-            f"Position stereo microscope directly over bounding coordinates [{bbox[0]:.1f}, {bbox[1]:.1f}, {bbox[2]:.1f}, {bbox[3]:.1f}] under 20x-30x magnification.",
-            "Use oblique ring-lighting to inspect conductor sidewalls, looking for copper lifting, undercut, or burrs.",
-            "Overlay Gerber reference net to confirm original intended conductor boundaries.",
+            f"Inspect coordinates [{bbox[0]:.0f}, {bbox[1]:.0f}] under 20x stereomicroscope.",
+            "Verify conductor sidewall geometry against CAD/Gerber net reference.",
         ]
 
         if "open" in canonical_type:
-            corrective_action = (
-                "For high-reliability Class 3 assemblies, scrap board or submit to Material Review Board (MRB). "
-                "For Class 2 rework: solder an approved 30 AWG insulated micro-jumper wire between net testpoints or via pads."
-            )
+            corrective_action = "Solder 30 AWG insulated micro-jumper wire across break or scrap board."
             verification = [
-                "Perform 2-point electrical continuity check using a calibrated digital multimeter (DMM) across net endpoints (< 0.5 Ohm).",
-                "Inspect jumper solder joints under 20x magnification for wetting, meniscus, and solder cleanliness.",
-                "Apply IPC-CC-830 conformal coating spot-repair over the reworked trace.",
+                "DMM continuity test (< 0.5 Ω across net endpoints).",
+                "Visual inspection under 20x magnification."
             ]
         elif "short" in canonical_type:
-            corrective_action = (
-                "Quarantine board immediately. Do not power up. Using a precision micro-scalpel or ultrasonic deburring tool "
-                "under 30x magnification, carefully excise the conductive copper bridge without scoring the FR4 substrate."
-            )
+            corrective_action = "Carefully excise copper bridge using micro-scalpel under 30x magnification."
             verification = [
-                "Perform 2-point isolation resistance measurement with DMM (> 100 MOhm isolation required).",
-                "Perform optical clearance verification to ensure minimum electrical spacing is fully restored.",
-                "Clean region with reagent-grade isopropyl alcohol and inspect for loose copper debris.",
+                "DMM isolation resistance test (> 100 MΩ between nets).",
+                "Optical check to confirm full clearance spacing."
             ]
         elif "mouse" in canonical_type:
-            corrective_action = (
-                f"Evaluate remaining trace width against DRC specification ({ceri.get('trace_width_reduction_pct', 0)}% reduction). "
-                "If remaining width meets minimum current-carrying capacity, accept with engineering note. "
-                "Otherwise, apply copper foil micro-patch or bridge with micro-wire."
-            )
+            corrective_action = f"Check trace width ({ceri.get('trace_width_reduction_pct', 0)}% loss). If >20%, micro-patch with copper foil."
             verification = [
-                "Measure narrowest conductor bottleneck width using calibrated optical reticle microscope.",
-                "Conduct Kelvin 4-wire trace resistance measurement to verify resistance within 5% of nominal trace.",
+                "Optical reticle measurement of narrowest bottleneck width.",
+                "Kelvin 4-wire resistance check against nominal trace."
             ]
         elif "spur" in canonical_type:
-            corrective_action = (
-                "Evaluate clearance against IPC-A-600 minimum spacing. If out of specification, micro-trim "
-                "the copper protrusion using an approved diamond-tipped dental micro-scraper under 20x stereo magnification."
-            )
+            corrective_action = "Trim copper protrusion with micro-scraper to restore design clearance."
             verification = [
-                "Measure post-trim dielectric clearance with optical measuring microscope (must exceed minimum spacing rule).",
-                "Inspect substrate for mechanical damage or delamination.",
+                "Optical clearance measurement to adjacent track.",
+                "Substrate inspection for surface gouges."
             ]
         elif "copper" in canonical_type:
-            corrective_action = (
-                "Determine if copper flake is surface debris or bonded laminate foil. If loose, clean with ESD cleanroom swab "
-                "and IPA. If bonded foil violating clearance, mechanically delaminate and peel using micro-tweezers."
-            )
+            corrective_action = "Peel unetched copper flake and clean surface with cleanroom swab and IPA."
             verification = [
-                "Verify dielectric surface cleanliness and complete flake removal.",
-                "Perform surface insulation resistance (SIR) check if required by high-voltage design rules.",
+                "Confirm complete flake removal under optical magnifier.",
+                "Surface insulation inspection."
             ]
         elif "pin" in canonical_type:
-            corrective_action = (
-                "Check void diameter against IPC-A-600 limit (<= 10% conductor width). "
-                "If within tolerance, document and accept. If on SMT pad, apply micro-solder touch-up."
-            )
+            corrective_action = "Inspect void diameter; apply micro-solder touch-up if located on SMT pad."
             verification = [
-                "Verify pad coplanarity and solderability if on component landing pad.",
-                "Inspect under optical reticle to confirm void does not extend to conductor edge.",
+                "Inspect pad coplanarity under reticle microscope.",
+                "Solderability wetting check."
             ]
         else:
-            corrective_action = "Quarantine board and submit to Quality Engineering for MRB disposition."
-            verification = ["Perform 100% optical and electrical verification against design Gerber."]
+            corrective_action = "Quarantine board and submit to Quality Engineering for MRB review."
+            verification = ["100% optical and electrical verification against Gerber."]
 
         # Enrich with Llama generated explanation if requested
         explanation = ref.get("definition", what_detected)
